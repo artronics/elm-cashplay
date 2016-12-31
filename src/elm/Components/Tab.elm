@@ -6,7 +6,7 @@ import Material
 import Material.Tabs as Tabs exposing (..)
 import Material.Options as Options exposing (..)
 import Material.Icon as Icon exposing (..)
-import Components.Customer as Customer
+import Components.Customer.Customer as Customer
 
 
 type alias Model =

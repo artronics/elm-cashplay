@@ -1,7 +1,7 @@
 module Components.Receipt exposing (..)
 
 import Html exposing (..)
-import Components.Customer as Customer exposing (Model)
+import Components.Customer.Customer as Customer exposing (Model)
 
 
 type alias Model =

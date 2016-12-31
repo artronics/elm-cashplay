@@ -1,4 +1,4 @@
-module Components.Customer exposing (..)
+module Components.Customer.Customer exposing (..)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -30,10 +30,6 @@ update msg model =
     case msg of
         AddToReceipt customer ->
             ( model, Cmd.none, customer )
-
-
-
--- hello component
 
 
 view : Model -> Html Msg
