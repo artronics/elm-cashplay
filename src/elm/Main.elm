@@ -6,11 +6,12 @@ import Material
 
 import Components.Customer as Customer
 import Components.Receipt as Receipt
+import Components.Tab as Tab
 -- MODEL
 
 
 type alias Model =
-    { tab : Tab
+    { tab : Tab.Model
     , customer: Customer.Model
     , receipt: Receipt.Model
     , mdl : Material.Model
@@ -19,7 +20,7 @@ type alias Model =
 
 model : Model
 model =
-    { tab = Customer
+    { tab = Tab.init
     , customer = Customer.init
     , receipt = Receipt.init
     , mdl = Material.model
@@ -31,27 +32,19 @@ model =
 
 
 type Msg
-    = NoOp
-    | Tab Tab
+    = TabMsg Tab.Msg
     | CustomerMsg Customer.Msg
     | ReceiptMsg Receipt.Msg
     | Mdl (Material.Msg Msg)
 
-type Tab
-    = Customer
-    | Item
-
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        NoOp -> (model, Cmd.none)
-
-        Tab tabName ->
-            case tabName of
-                Customer ->
-                    ({model | tab = Customer}, Cmd.none)
-                Item ->
-                    ({model | tab = Item}, Cmd.none)
+        TabMsg subMsg ->
+            let (updatedTab, cmd) =
+                Tab.update subMsg model.tab
+            in
+                ({model | tab = updatedTab}, Cmd.map TabMsg cmd)
 
         CustomerMsg subMsg->
             let
@@ -85,14 +78,9 @@ type alias Mdl =
 view : Model -> Html Msg
 view model =
     div[]
-    [ nav[]
-        [ p [onClick (Tab Customer)][text "Customer"]
-        , p [onClick (Tab Item)][text "Item"]
-        ]
-    , div[]
-        [ case model.tab of
-            Customer -> Html.map CustomerMsg (Customer.view model.customer)
-            Item -> p[][text "umadim item"]
+    [ div[]
+        [ p[][text "tab"]
+        , Html.map TabMsg (Tab.view model.tab)
         ]
     , div[]
         [ p [][text "receip"]
