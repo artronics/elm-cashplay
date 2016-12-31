@@ -2,54 +2,83 @@ module Components.Tab exposing (..)
 
 import Html exposing (..)
 import Html.Events exposing (onClick)
-
+import Material
+import Material.Tabs as Tabs exposing (..)
+import Material.Options as Options exposing (..)
+import Material.Icon as Icon exposing (..)
 import Components.Customer as Customer
+
+
 type alias Model =
-    { current:Tab
-    , customer:Customer.Model
+    { current : Tab
+    , customer : Customer.Model
+    , mdl : Material.Model
     }
 
-init:Model
+
+init : Model
 init =
-    { current = Customer
+    { current = 0
     , customer = Customer.init
+    , mdl = Material.model
     }
+
 
 type Msg
     = SelectTab Tab
     | CustomerMsg Customer.Msg
+    | Mdl (Material.Msg Msg)
 
-type Tab
-    = Customer
-    | Item
 
-update: Msg -> Model -> (Model, Cmd Msg)
+type alias Tab =
+    Int
+
+
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         SelectTab tab ->
-            ({model | current = tab}, Cmd.none)
+            ( { model | current = tab }, Cmd.none )
 
-        CustomerMsg subMsg->
+        CustomerMsg subMsg ->
             let
-                (updatedCustomer, cmd, _) =
+                ( updatedCustomer, cmd, _ ) =
                     Customer.update subMsg model.customer
             in
-                ({model | customer = updatedCustomer}, Cmd.map CustomerMsg cmd)
+                ( { model | customer = updatedCustomer }, Cmd.map CustomerMsg cmd )
 
-view: Model -> Html Msg
+        Mdl msg_ ->
+            Material.update Mdl msg_ model
+
+
+view : Model -> Html Msg
 view model =
-    div []
-        [ nav[]
-            [ p [onClick (SelectTab Customer)][text "Customer"]
-            , p [onClick (SelectTab Item)][text "Item"]
+    Options.div []
+        [ Tabs.render Mdl
+            [ 0 ]
+            model.mdl
+            [ Tabs.ripple
+            , Tabs.onSelectTab SelectTab
+            , Tabs.activeTab model.current
             ]
-        , div []
-            [
-                case model.current of
-                    Customer ->
-                        Html.map CustomerMsg (Customer.view model.customer)
-                    Item ->
-                        text "item tab"
+            [ Tabs.label
+                [ Options.center ]
+                [ Icon.i "info_outline"
+                , Options.span [ css "width" "4px" ] []
+                , text "Customer"
+                ]
+            , Tabs.label
+                [ Options.center ]
+                [ Icon.i "code"
+                , Options.span [ css "width" "4px" ] []
+                , text "Item"
+                ]
+            ]
+            [ case model.current of
+                0 ->
+                    Html.map CustomerMsg (Customer.view model.customer)
+
+                _ ->
+                    text "foo"
             ]
         ]
-

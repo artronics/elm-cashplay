@@ -1,19 +1,21 @@
 module Main exposing (..)
 
-import Html exposing (..)
+import Html exposing (Html, p, text)
 import Html.Events exposing (onClick)
 import Material
-
+import Material.Options exposing (..)
 import Components.Customer as Customer
 import Components.Receipt as Receipt
 import Components.Tab as Tab
+
+
 -- MODEL
 
 
 type alias Model =
     { tab : Tab.Model
-    , customer: Customer.Model
-    , receipt: Receipt.Model
+    , customer : Customer.Model
+    , receipt : Receipt.Model
     , mdl : Material.Model
     }
 
@@ -37,30 +39,33 @@ type Msg
     | ReceiptMsg Receipt.Msg
     | Mdl (Material.Msg Msg)
 
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         TabMsg subMsg ->
-            let (updatedTab, cmd) =
-                Tab.update subMsg model.tab
-            in
-                ({model | tab = updatedTab}, Cmd.map TabMsg cmd)
-
-        CustomerMsg subMsg->
             let
-                (updatedCustomer, cmd, selectedCustomer) =
+                ( updatedTab, cmd ) =
+                    Tab.update subMsg model.tab
+            in
+                ( { model | tab = updatedTab }, Cmd.map TabMsg cmd )
+
+        CustomerMsg subMsg ->
+            let
+                ( updatedCustomer, cmd, selectedCustomer ) =
                     Customer.update subMsg model.customer
-                (updatedReceipt, _) =
+
+                ( updatedReceipt, _ ) =
                     Receipt.addCustomer selectedCustomer model.receipt
             in
-                ({model | customer = updatedCustomer, receipt = updatedReceipt}, Cmd.map CustomerMsg cmd)
+                ( { model | customer = updatedCustomer, receipt = updatedReceipt }, Cmd.map CustomerMsg cmd )
 
         ReceiptMsg subMsg ->
             let
-                (updatedReceipt, cmd) =
+                ( updatedReceipt, cmd ) =
                     Receipt.update subMsg model.receipt
             in
-                ({model | receipt = updatedReceipt}, Cmd.map ReceiptMsg cmd)
+                ( { model | receipt = updatedReceipt }, Cmd.map ReceiptMsg cmd )
 
         Mdl msg_ ->
             Material.update Mdl msg_ model
@@ -74,19 +79,18 @@ type alias Mdl =
     Material.Model
 
 
-
-view : Model -> Html Msg
+view : Model -> Html.Html Msg
 view model =
-    div[]
-    [ div[]
-        [ p[][text "tab"]
-        , Html.map TabMsg (Tab.view model.tab)
+    div []
+        [ div []
+            [ Html.map TabMsg (Tab.view model.tab)
+            ]
+        , div []
+            [ p [] [ text "receip" ]
+            , Html.map ReceiptMsg (Receipt.view model.receipt)
+            ]
         ]
-    , div[]
-        [ p [][text "receip"]
-        , Html.map ReceiptMsg (Receipt.view model.receipt)
-        ]
-    ]
+
 
 main : Program Never Model Msg
 main =
