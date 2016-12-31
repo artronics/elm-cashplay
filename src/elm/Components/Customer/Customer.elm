@@ -5,6 +5,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 import String
 
+import Components.Customer.Header as Header exposing (..)
 
 type alias Customer =
     { id : Int
@@ -13,28 +14,33 @@ type alias Customer =
 
 
 type alias Model =
-    {}
+    { header: Header.Model
+    }
 
 
 init : Model
 init =
-    {}
+    { header = Header.init
+    }
 
 
 type Msg
-    = AddToReceipt Customer
+    = HeaderMsg Header.Msg
 
 
-update : Msg -> Model -> ( Model, Cmd Msg, Customer )
+update : Msg -> Model -> Model
 update msg model =
     case msg of
-        AddToReceipt customer ->
-            ( model, Cmd.none, customer )
+        HeaderMsg msg_ ->
+            let
+                (updatedHeader, _) =
+                    Header.update msg_ model.header
+            in
+                {model | header = updatedHeader}
 
 
 view : Model -> Html Msg
 view model =
     div []
-        [ ul []
-            [ li [ onClick (AddToReceipt { id = 1, firstName = "jalal" }) ] [ text "customer 1" ] ]
+        [ Html.map HeaderMsg (Header.view model.header)
         ]
