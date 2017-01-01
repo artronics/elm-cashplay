@@ -3,3 +3,16 @@
 //@import '~bootstrap-sass/assets/stylesheets/_bootstrap.scss';
 
 // can add Boostrap overrides, additional Sass/CSS below...
+
+.art-select {
+  background-color: red;
+}
+.art-menu-options{
+  list-style:none;
+  padding:0;
+}
+
+.art-menu {
+  background-color: tomato;
+  height:400px;
+}

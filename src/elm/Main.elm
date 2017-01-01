@@ -1,10 +1,9 @@
 module Main exposing (..)
 
 import Html exposing (Html, p, text)
-import Html.Events exposing (onClick)
 import Material
 import Material.Options exposing (..)
-import Components.Customer.Customer as Customer
+import Material.Menu as Menu
 import Components.Receipt as Receipt
 import Components.Tab as Tab
 
