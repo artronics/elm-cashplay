@@ -4,7 +4,9 @@ import Json.Decode as Decode exposing (field)
 
 type alias Customer =
     { id:Int
-    , firstName:String}
+    , firstName:String
+    , lastName: String
+    }
 
 type SearchField
     = Name
@@ -17,6 +19,7 @@ customerDecoder = Decode.list memberDecoder
 
 memberDecoder:Decode.Decoder Customer
 memberDecoder =
-    Decode.map2 Customer
+    Decode.map3 Customer
         (field "id" Decode.int)
         (field "first_name" Decode.string)
+        (field "last_name" Decode.string)

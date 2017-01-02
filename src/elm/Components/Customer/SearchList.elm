@@ -4,6 +4,7 @@ import Html exposing (Html, text)
 import Http
 import Material
 import Material.Options exposing (..)
+import Material.Table as Table
 
 import Resources.Customer exposing (Customer)
 import Components.Customer.SearchBar exposing (Query)
@@ -57,4 +58,26 @@ fetchCustomers =
 view : Model -> Html Msg
 view model =
     div []
-        [text (toString model.customers)]
+        [viewTable model]
+
+tableHeaders: List String
+tableHeaders =
+    ["ID", "Name"]
+
+viewTable: Model -> Html Msg
+viewTable model =
+    Table.table []
+        [ Table.thead []
+            [ Table.tr []
+                (tableHeaders |> List.map (\header ->
+                    Table.td [] [text header]
+                ))
+            ]
+        , Table.tbody []
+            (model.customers |> List.map (\customer ->
+                Table.tr []
+                    [ Table.td [Table.numeric] [text (toString customer.id)]
+                    , Table.td [] [text (customer.firstName ++ " " ++ customer.lastName)]
+                    ]
+            ))
+        ]
