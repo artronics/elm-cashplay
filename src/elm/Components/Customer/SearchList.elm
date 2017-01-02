@@ -2,13 +2,12 @@ module Components.Customer.SearchList exposing (..)
 
 import Html exposing (Html, text)
 import Http
-import Json.Decode as Decode exposing (field)
 import Material
 import Material.Options exposing (..)
 
 import Resources.Customer exposing (Customer)
 import Components.Customer.SearchBar exposing (Query)
-import Resources.Customer as Res
+import Resources.Customer as Res exposing (..)
 
 type alias Model =
     { query : Query
@@ -52,16 +51,7 @@ search query model =
 
 fetchCustomers: Cmd Msg
 fetchCustomers =
-    Http.get "http://localhost:6464/customers" customersDecoder |> Http.send OnFetchCustomers
-
-customersDecoder:Decode.Decoder (List Customer)
-customersDecoder = Decode.list memberDecoder
-
-memberDecoder:Decode.Decoder Customer
-memberDecoder =
-    Decode.map2 Customer
-        (field "id" Decode.int)
-        (field "first_name" Decode.string)
+    Http.get "http://localhost:6464/customers" Res.customerDecoder |> Http.send OnFetchCustomers
 
 
 view : Model -> Html Msg
