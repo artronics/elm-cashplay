@@ -3,10 +3,10 @@ module Components.Customer.Header exposing (..)
 import Html exposing (Html, text,select,option)
 import Html.Attributes exposing (class)
 import Material
+import Material.Elevation as Elev
 import Material.Options exposing (..)
-import Material.Textfield as Textfield
 import Material.Button as Button
-import Material.Menu as Menu
+import Material.Icon as Icon
 
 import Components.Customer.SearchBar as SearchBar
 import Components.Select as Select
@@ -41,7 +41,10 @@ update msg model =
 
 view: Model -> Html Msg
 view model =
-        div[]
+        div[Elev.e3, center]
             [ Html.map SearchBarMsg (SearchBar.view model.searchBar)
+            , Button.render Mdl [3] model.mdl
+                [Button.ripple, Button.raised, css "margin-left" "50px"]
+                [Icon.i "person_add",text "New Customer"]
             ]
 

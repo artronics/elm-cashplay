@@ -7,6 +7,7 @@ import Material.Options exposing (..)
 import Material.Textfield as Textfield
 import Material.Button as Button
 import Material.Menu as Menu exposing (..)
+import Material.Icon as Icon
 import Regex
 import Resources.Customer
 
@@ -97,7 +98,7 @@ view model =
             [ 2 ]
             model.mdl
             [ Button.ripple, Button.raised, Button.primary ]
-            [ text "Search" ]
+            [Icon.i "search" ,text "Search" ]
         ]
 
 
