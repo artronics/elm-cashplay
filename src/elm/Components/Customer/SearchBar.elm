@@ -5,9 +5,7 @@ import Html.Attributes exposing (class)
 import Material
 import Material.Options exposing (..)
 import Material.Textfield as Textfield
-import Material.Button as Button
 import Material.Menu as Menu exposing (..)
-import Material.Icon as Icon
 import Regex
 import Resources.Customer
 
@@ -20,6 +18,12 @@ type alias Model =
         --we enable it if input value is ""
     , autoDetection : Bool
     , mdl : Material.Model
+    }
+
+
+type alias Query =
+    { value : String
+    , field : Resources.Customer.SearchField
     }
 
 
@@ -51,8 +55,20 @@ type Msg
     | Mdl (Material.Msg Msg)
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
+update : Msg -> Model -> ( Model, Cmd Msg, Query )
 update msg model =
+    let
+        ( model_, cmd_ ) =
+            update_ msg model
+
+        query =
+            { value = model_.searchValue, field = model_.selectedCustomerField }
+    in
+        ( model_, cmd_, query )
+
+
+update_ : Msg -> Model -> ( Model, Cmd Msg )
+update_ msg model =
     case msg of
         OnSearchInput value ->
             let
@@ -92,19 +108,14 @@ view model =
             model.mdl
             [ Textfield.label "Search Customers", Textfield.floatingLabel, Textfield.text_, onInput OnSearchInput ]
             []
-        , p [][text "In:"]
+        , p [] [ text "In:" ]
         , viewMenu model
-        , Button.render Mdl
-            [ 2 ]
-            model.mdl
-            [ Button.ripple, Button.raised, Button.primary ]
-            [Icon.i "search" ,text "Search" ]
         ]
 
 
 viewMenu : Model -> Html Msg
 viewMenu model =
-    div [cs "art-customer-search-in"]
+    div [ cs "art-customer-search-in" ]
         [ span [] [ text <| searchFieldDisplayName model.selectedCustomerField ]
         , Menu.render Mdl
             [ 1 ]
