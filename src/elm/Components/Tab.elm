@@ -1,7 +1,6 @@
 module Components.Tab exposing (..)
 
 import Html exposing (..)
-import Html.Events exposing (onClick)
 import Material
 import Material.Tabs as Tabs exposing (..)
 import Material.Options as Options exposing (..)

@@ -1,7 +1,6 @@
 module Components.Customer.Customer exposing (..)
 
 import Html exposing (Html, text, select, option)
-import Html.Attributes exposing (class)
 import Material
 import Material.Elevation as Elev
 import Material.Options exposing (..)
@@ -11,10 +10,6 @@ import Components.Customer.SearchBar as SearchBar
 import Components.Customer.SearchList as SearchList
 import Components.Customer.NewCustomer as NewCustomer
 import Resources.Customer as Res
-
-type alias Customer =
-    { id:Int
-    , firstName:String}
 
 type alias Model =
     { currentView : Maybe View

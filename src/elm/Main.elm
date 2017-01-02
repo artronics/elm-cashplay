@@ -3,7 +3,6 @@ module Main exposing (..)
 import Html exposing (Html, p, text)
 import Material
 import Material.Options exposing (..)
-import Material.Menu as Menu
 import Components.Receipt as Receipt
 import Components.Tab as Tab
 
