@@ -35,7 +35,7 @@ init =
 
 
 type View
-    = SearchList
+    = SearchList SearchBar.Query
     | NewCustomer
 
 
@@ -50,8 +50,15 @@ type Msg
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        ChangeView (SearchList query) ->
+            let
+                (updatedSearchList,cmd) =
+                    SearchList.search query model.searchList
+            in
+            ( { model | currentView = Just (SearchList query), searchList = updatedSearchList }, Cmd.map SearchListMsg cmd )
         ChangeView view ->
             ( { model | currentView = Just view }, Cmd.none )
+
 
         SearchBarMsg msg_ ->
             -- query is what we get from SearchBar
@@ -89,7 +96,7 @@ view model =
 
                 Just view ->
                     case view of
-                        SearchList ->
+                        SearchList _->
                             Html.map SearchListMsg (SearchList.view model.searchList)
 
                         NewCustomer ->
@@ -101,7 +108,7 @@ view model =
                 , Button.render Mdl
                     [ 2 ]
                     model.mdl
-                    [ Button.ripple, Button.raised, Button.primary, onClick (ChangeView SearchList) ]
+                    [ Button.ripple, Button.raised, Button.primary, onClick (ChangeView (SearchList model.query)) ]
                     [ Icon.i "search", text "Search" ]
                 , Button.render Mdl
                     [ 3 ]
