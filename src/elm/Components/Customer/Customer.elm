@@ -11,6 +11,7 @@ import Components.Customer.SearchList as SearchList
 import Components.Customer.NewCustomer as NewCustomer
 import Resources.Customer as Res
 
+
 type alias Model =
     { currentView : Maybe View
     , query : SearchBar.Query
@@ -50,13 +51,13 @@ update msg model =
     case msg of
         ChangeView (SearchList query) ->
             let
-                (updatedSearchList,cmd) =
+                ( updatedSearchList, cmd ) =
                     SearchList.search query model.searchList
             in
-            ( { model | currentView = Just (SearchList query), searchList = updatedSearchList }, Cmd.map SearchListMsg cmd )
+                ( { model | currentView = Just (SearchList query), searchList = updatedSearchList }, Cmd.map SearchListMsg cmd )
+
         ChangeView view ->
             ( { model | currentView = Just view }, Cmd.none )
-
 
         SearchBarMsg msg_ ->
             -- query is what we get from SearchBar
@@ -94,7 +95,7 @@ view model =
 
                 Just view ->
                     case view of
-                        SearchList _->
+                        SearchList _ ->
                             Html.map SearchListMsg (SearchList.view model.searchList)
 
                         NewCustomer ->
