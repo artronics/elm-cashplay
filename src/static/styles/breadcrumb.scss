@@ -5,6 +5,7 @@
   overflow: hidden;
 }
 .art-breadcrumb{
+  background-color: #EEEEEE;
   list-style: none;
   overflow: hidden;
   margin:2px 0;
@@ -74,6 +75,7 @@
   }
 }
 .art-breadcrumb .active span{
+  cursor: text;
   background: #E0E0E0;
   &:after{
     background: #E0E0E0;

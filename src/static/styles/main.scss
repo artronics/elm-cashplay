@@ -12,7 +12,7 @@
 }
 
 .art-tab-content{
-  width:800px;
+  @include flex-grow(1);
 }
 
 .art-search-bar > * {
@@ -31,6 +31,11 @@
   min-width: 15ch;
 }
 
+.art-search-table{
+  width:100%;
+  height:200px !important;
+  overflow:auto;
+}
 .art-search-table tr {
   height: 60px !important;
 }
