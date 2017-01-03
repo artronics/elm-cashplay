@@ -21,6 +21,7 @@ type alias Model =
     , error : Maybe String
     , customers : List Customer
     , currentView : View
+    , breadcrumb: Breadcrumb.Model
     , hoverInx : Int
     , mdl : Material.Model
     }
@@ -33,16 +34,18 @@ init =
     , error = Nothing
     , customers = []
     , currentView = Results
+    , breadcrumb = Breadcrumb.init ("","")
     , hoverInx = -1
     , mdl = Material.model
     }
 
-
 type Msg
     = Search Query
     | OnFetchCustomers (Result Http.Error (List Customer))
+    | CreateView View
     | ChangeView View
     | Update (Model -> Model)
+    | BreadcrumbMsg Breadcrumb.Msg
     | Mdl (Material.Msg Msg)
 
 type View
@@ -53,19 +56,62 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Search query ->
-            ( { model | query = query }, fetchCustomers query )
+            ( { model | query = query}, fetchCustomers query )
 
         OnFetchCustomers (Ok fetchedCustomers) ->
-            ( { model | customers = fetchedCustomers, error = Nothing }, Cmd.none )
+            let
+                (updatedBread, cmd) = updateBreadForResults model
+            in
+                ( { model
+                  | customers = fetchedCustomers
+                  , error = Nothing
+                  , currentView = Results
+                  , breadcrumb = updatedBread
+                  }
+                  , Cmd.map BreadcrumbMsg cmd )
 
         OnFetchCustomers (Err error) ->
             ( { model | error = Just "There is a problem with network." }, Cmd.none )
 
-        ChangeView view ->
-            ({model | currentView = view},Cmd.none)
+        CreateView Results -> -- Results is created during Search
+            (model, Cmd.none)
+
+        CreateView Details ->
+            let
+                (updatedBread,cmd) = createBreadForDetails model
+            in
+                ({model | currentView = Details, breadcrumb = updatedBread}, Cmd.map BreadcrumbMsg cmd)
+
+        ChangeView Results ->
+            let
+                (updatedBread, cmd) = updateBreadIndexForResults model
+            in
+                ({model | currentView = Results, breadcrumb = updatedBread},Cmd.map BreadcrumbMsg cmd)
+
+        ChangeView Details ->
+            let
+                (updatedBread, cmd) = updateBreadIndexForDetails model
+            in
+                ({model | currentView = Details, breadcrumb = updatedBread},Cmd.map BreadcrumbMsg cmd)
 
         Update f ->
             ( f model, Cmd.none )
+
+        BreadcrumbMsg (Breadcrumb.Select index) ->
+            case index of
+                0 ->
+                    ({model | currentView = Results}, Cmd.none)
+                1 ->
+                    ({model | currentView = Details}, Cmd.none)
+                _ ->
+                    (model, Cmd.none)
+
+        BreadcrumbMsg msg_ ->
+            let
+                (updatedBread, cmd) =
+                    Breadcrumb.update msg_ model.breadcrumb
+            in
+                ({model | breadcrumb = updatedBread}, Cmd.map BreadcrumbMsg cmd)
 
         Mdl msg_ ->
             Material.update Mdl msg_ model
@@ -84,28 +130,14 @@ fetchCustomers query =
 view : Model -> Html Msg
 view model =
     div []
-        [ viewBreadcrumb model
-        , viewTableOrError model
+        [ Html.map BreadcrumbMsg (Breadcrumb.view model.breadcrumb)
+        , case model.currentView of
+            Results ->
+              viewTableOrError model
+            Details ->
+                customerDetails model
         ]
 
-breadcrumb:Breadcrumb.Model Msg
-breadcrumb =
-    [
-         { header = "Search Customer"
-         , subHeader = "10/34"
-         , active = True
-         , onActive = ChangeView Results
-         }
-     ,
-         { header = "Customer Details"
-         , subHeader = "10/34"
-         , active = False
-         , onActive = ChangeView Details
-         }
-    ]
-
-viewBreadcrumb model =
-    Breadcrumb.view breadcrumb
 
 viewTableOrError model =
     case model.error of
@@ -115,6 +147,8 @@ viewTableOrError model =
             Just err ->
                 div [] [ text err ]
 
+customerDetails model =
+    div [] [ text "customer details"]
 -- Add header strings here
 
 
@@ -155,7 +189,7 @@ viewTable model =
                                             "hidden"
                                         )
                                     ]
-                                    [ span []
+                                    [ span [onClick (CreateView Details)]
                                         [ Icon.i "remove_red_eye" ]
                                     , span []
                                         [ Icon.i "receipt" ]
@@ -165,3 +199,30 @@ viewTable model =
                     )
             )
         ]
+
+
+createBreadForResults model =
+    ("SearchResults","Foo")
+
+updateBreadIndexForResults model =
+    Breadcrumb.update (Breadcrumb.Select 0) model.breadcrumb
+
+updateBreadForResults model =
+    Breadcrumb.update
+        (Breadcrumb.Update (
+            \_->{breads = [createBreadForResults model], activeIndex = 0}
+        ))
+        model.breadcrumb
+
+createBreadForDetails model =
+    let
+        breadModel =
+            {breads = ("Details","Bar")::[createBreadForResults model] , activeIndex = 1}
+    in
+        Breadcrumb.update
+            (Breadcrumb.Update ( \_ -> breadModel ) )
+            model.breadcrumb
+
+updateBreadIndexForDetails model =
+    Breadcrumb.update (Breadcrumb.Select 1) model.breadcrumb
+
