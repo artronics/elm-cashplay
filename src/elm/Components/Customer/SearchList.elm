@@ -33,7 +33,7 @@ init =
     , error = Nothing
     , customers = []
     , currentView = Results
-    , breadcrumb = Breadcrumb.init ( "", "" )
+    , breadcrumb = Breadcrumb.init ( "", "" ,"")
     , hoverInx = -1
     , mdl = Material.model
     }
@@ -231,7 +231,7 @@ updateBreadSelect model index =
 
 
 createBreadForResults model =
-    ( "Search Results", "Foo" )
+    ( "Search Results", "","search" )
 
 
 updateBreadIndexForResults model =
@@ -249,7 +249,7 @@ updateBreadForResults model =
 createBreadForDetails model =
     let
         breadModel =
-            { breads = ( "Details", "Bar" ) :: [ createBreadForResults model ], activeIndex = 1 }
+            { breads = ( "Details", "","person" ) :: [ createBreadForResults model ], activeIndex = 1 }
     in
         Breadcrumb.update
             (Breadcrumb.Update (\_ -> breadModel))

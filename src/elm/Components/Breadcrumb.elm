@@ -7,10 +7,11 @@ import Array exposing (Array)
 import Material
 import Material.Options exposing (..)
 import Material.Typography as Typo
+import Material.Icon as Icon
 
 
 type alias Breadcrumb =
-    ( String, String )
+    ( String, String,String )
 
 
 type alias Model =
@@ -60,16 +61,16 @@ view model =
         (model.breads
             |> List.reverse
             |> List.indexedMap
-                (\index ( header, subHeader ) ->
-                    viewBread model index header subHeader
+                (\index ( header, subHeader,icon ) ->
+                    viewBread model index header subHeader icon
                 )
         )
 
 
-viewBread model index header subHeader =
+viewBread model index header subHeader icon=
     li [ Atr.class (if model.activeIndex == index then "active" else "")
         , E.onClick (Select index) ]
 
         [ span[]
-            [styled p [Typo.headline] [ text header ]]
+            [Icon.i icon,styled p [] [ text header ]]
         ]

@@ -1,3 +1,5 @@
+@import "variables";
+
 .art-breadcrumb-container{
   //margin-top:10px;
   overflow: hidden;
@@ -7,7 +9,13 @@
   overflow: hidden;
   margin:2px 0;
   padding: 0;
+
+  i{
+    float: left;
+    margin-right: 5px;
+  }
   p{
+    display: inline-block;
     font: 18px Sans-Serif;
     margin-bottom: 0;
   }
@@ -19,7 +27,7 @@
 .art-breadcrumb li span{
   cursor: pointer;
   text-decoration: none;
-  padding: 10px 0 10px 65px;
+  padding: 10px 0 10px 50px;
   background: brown; /* fallback color */
   background: #EEEEEE;
   position: relative;
@@ -70,5 +78,8 @@
   &:after{
     background: #E0E0E0;
     border-left-color: #E0E0E0 !important;
+  }
+  i{
+    color: $primary;
   }
 }
