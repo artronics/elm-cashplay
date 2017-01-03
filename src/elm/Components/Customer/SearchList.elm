@@ -15,7 +15,7 @@ import Resources.Customer as Res exposing (..)
 type alias Model =
     { query : Query
     , loading : Bool
-    , error: Maybe String
+    , error : Maybe String
     , customers : List Customer
     , hoverInx : Int
     , mdl : Material.Model
@@ -50,10 +50,10 @@ update msg model =
             ( { model | customers = fetchedCustomers, error = Nothing }, Cmd.none )
 
         OnFetchCustomers (Err error) ->
-            ( {model | error = Just "There is a problem with network." }, Cmd.none )
+            ( { model | error = Just "There is a problem with network." }, Cmd.none )
 
         Update f ->
-            (f model, Cmd.none)
+            ( f model, Cmd.none )
 
         Mdl msg_ ->
             Material.update Mdl msg_ model
@@ -75,20 +75,24 @@ view model =
         [ case model.error of
             Nothing ->
                 viewTable model
+
             Just err ->
-                div [][text err]
+                div [] [ text err ]
         ]
 
 
+
 -- Add header strings here
+
+
 tableHeaders : List String
 tableHeaders =
-    [ "ID", "Name","actions" ]
+    [ "ID", "Name", "View / Add To Receipt" ]
 
 
 viewTable : Model -> Html Msg
 viewTable model =
-    Table.table []
+    Table.table [ cs "art-search-table" ]
         [ Table.thead []
             [ Table.tr []
                 (tableHeaders
@@ -103,17 +107,25 @@ viewTable model =
                 |> List.indexedMap
                     (\inx customer ->
                         Table.tr
-                            [ Update (\m-> {m| hoverInx = inx})|>onMouseEnter
-                            , Update (\m-> {m| hoverInx = -1})|>onMouseLeave
+                            [ Update (\m -> { m | hoverInx = inx }) |> onMouseEnter
+                            , Update (\m -> { m | hoverInx = -1 }) |> onMouseLeave
                             ]
                             [ Table.td [ Table.numeric ] [ text (toString customer.id) ]
                             , Table.td [] [ text (customer.firstName ++ " " ++ customer.lastName) ]
+                              -- This cell is for showing actions buttons (view and add to receipt)
                             , Table.td []
-                                [ span [cs (if model.hoverInx == inx then "" else "hidden")]
-                                    [ Button.render Mdl [inx] model.mdl
-                                        [Button.ripple][Icon.i "receipt"]
-                                    , Button.render Mdl [(List.length model.customers) + inx] model.mdl
-                                        [Button.ripple][Icon.i "remove_red_eye"]
+                                [ span
+                                    [ cs
+                                        (if model.hoverInx == inx then
+                                            "art-search-results-actions"
+                                         else
+                                            "hidden"
+                                        )
+                                    ]
+                                    [ span []
+                                        [ Icon.i "remove_red_eye" ]
+                                    , span []
+                                        [ Icon.i "receipt" ]
                                     ]
                                 ]
                             ]

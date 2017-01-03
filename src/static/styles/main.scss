@@ -4,21 +4,37 @@
 
 // can add Boostrap overrides, additional Sass/CSS below...
 
-.art-page-header{
+.art-page-header {
   border-bottom: solid #E0E0E0 1px;
 }
-.art-search-bar>*{
+
+.art-search-bar > * {
   display: inline-block;
-  margin-right:10px;
+  margin-right: 10px;
 }
-.art-search-bar>p{
+
+.art-search-bar > p {
   font-weight: bold;
 }
-.art-customer-search-in>span{
+
+.art-customer-search-in > span {
   // equivalent of longest menu element which is Customer's Name
   display: inline-block;
   width: 15ch;
   min-width: 15ch;
-
 }
 
+.art-search-table tr {
+  height: 55px !important;
+}
+
+.art-search-results-actions > span {
+  i {
+    &:hover{
+      background-color: #E0E0E0;
+    }
+    padding:3px;
+    cursor: pointer;
+  }
+  margin-left: 20px;
+}
