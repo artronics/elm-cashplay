@@ -1,0 +1,30 @@
+@import "patials/index";
+@import "variables";
+
+html, body, #main, .art-container{
+  height:100%;
+}
+.art-container {
+  @extend %flexbox;
+  @include flex-dir(column);
+}
+.art-main-row {
+  @extend %flexbox;
+  @include flex-dir(row);
+  @include flex(2);
+}
+.art-header {
+  height:64px;
+  background-color: $primary;
+}
+.art-tabs {
+  @include flex-grow(1);
+}
+.art-actions {
+  width:15%;
+  background-color: darkgrey;
+}
+.art-receipt {
+  width:25%;
+  background-color: darkgrey;
+}
