@@ -11,6 +11,7 @@ import Material.Button as Button
 import Material.Icon as Icon
 import Components.Customer.SearchBar exposing (Query)
 import Resources.Customer as Res exposing (..)
+import Components.Customer.ViewCustomer as ViewCustomer
 import Components.Breadcrumb as Breadcrumb
 
 
@@ -20,8 +21,9 @@ type alias Model =
     , error : Maybe String
     , customers : List Customer
     , currentView : View
-    , breadcrumb : Breadcrumb.Model
     , hoverInx : Int
+    , viewCustomer: ViewCustomer.Model
+    , breadcrumb : Breadcrumb.Model
     , mdl : Material.Model
     }
 
@@ -33,8 +35,9 @@ init =
     , error = Nothing
     , customers = []
     , currentView = Results
-    , breadcrumb = Breadcrumb.init ( "", "" ,"")
     , hoverInx = -1
+    , viewCustomer = ViewCustomer.init
+    , breadcrumb = Breadcrumb.init ( "", "" ,"")
     , mdl = Material.model
     }
 
@@ -45,6 +48,7 @@ type Msg
     | CreateView View
     | ChangeView View
     | Update (Model -> Model)
+    | ViewCustomerMsg ViewCustomer.Msg
     | BreadcrumbMsg Breadcrumb.Msg
     | Mdl (Material.Msg Msg)
 
@@ -105,6 +109,13 @@ update msg model =
         Update f ->
             ( f model, Cmd.none )
 
+        ViewCustomerMsg msg_ ->
+            let
+                (updatedView, cmd) =
+                    ViewCustomer.update msg_ model.viewCustomer
+            in
+                ({model | viewCustomer = updatedView}, Cmd.map ViewCustomerMsg cmd)
+
         BreadcrumbMsg (Breadcrumb.Select index) ->
             let
                 (view, updatedBread, cmd) =
@@ -142,7 +153,7 @@ view model =
                 viewTableOrError model
 
             Details ->
-                customerDetails model
+                Html.map ViewCustomerMsg (ViewCustomer.view model.viewCustomer)
         ]
 
 
