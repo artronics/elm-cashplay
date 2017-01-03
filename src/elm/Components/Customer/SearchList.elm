@@ -1,15 +1,18 @@
 module Components.Customer.SearchList exposing (..)
 
-import Html exposing (Html, text)
+import Html exposing (Html,p, text)
 import Http
 import Material
+import Material.Typography as Typo
 import Material.Options exposing (..)
+import Material.Card as Card
 import Material.Table as Table
 import Material.Button as Button
 import Material.Icon as Icon
-import Resources.Customer exposing (Customer)
+
 import Components.Customer.SearchBar exposing (Query)
 import Resources.Customer as Res exposing (..)
+import Components.Breadcrumb as Breadcrumb
 
 
 type alias Model =
@@ -17,6 +20,7 @@ type alias Model =
     , loading : Bool
     , error : Maybe String
     , customers : List Customer
+    , currentView : View
     , hoverInx : Int
     , mdl : Material.Model
     }
@@ -28,6 +32,7 @@ init =
     , loading = False
     , error = Nothing
     , customers = []
+    , currentView = Results
     , hoverInx = -1
     , mdl = Material.model
     }
@@ -36,9 +41,13 @@ init =
 type Msg
     = Search Query
     | OnFetchCustomers (Result Http.Error (List Customer))
+    | ChangeView View
     | Update (Model -> Model)
     | Mdl (Material.Msg Msg)
 
+type View
+    = Results
+    | Details
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -51,6 +60,9 @@ update msg model =
 
         OnFetchCustomers (Err error) ->
             ( { model | error = Just "There is a problem with network." }, Cmd.none )
+
+        ChangeView view ->
+            ({model | currentView = view},Cmd.none)
 
         Update f ->
             ( f model, Cmd.none )
@@ -72,15 +84,36 @@ fetchCustomers query =
 view : Model -> Html Msg
 view model =
     div []
-        [ case model.error of
+        [ viewBreadcrumb model
+        , viewTableOrError model
+        ]
+
+breadcrumb:Breadcrumb.Model Msg
+breadcrumb =
+    [
+         { header = "Search Customer"
+         , subHeader = "10/34"
+         , active = True
+         , onActive = ChangeView Results
+         }
+     ,
+         { header = "Customer Details"
+         , subHeader = "10/34"
+         , active = False
+         , onActive = ChangeView Details
+         }
+    ]
+
+viewBreadcrumb model =
+    Breadcrumb.view breadcrumb
+
+viewTableOrError model =
+    case model.error of
             Nothing ->
                 viewTable model
 
             Just err ->
                 div [] [ text err ]
-        ]
-
-
 
 -- Add header strings here
 
