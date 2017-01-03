@@ -1,0 +1,74 @@
+.art-breadcrumb-container{
+  //margin-top:10px;
+  overflow: hidden;
+}
+.art-breadcrumb{
+  list-style: none;
+  overflow: hidden;
+  margin:2px 0;
+  padding: 0;
+  p{
+    font: 18px Sans-Serif;
+    margin-bottom: 0;
+  }
+}
+.art-breadcrumb li {
+  float: left;
+}
+
+.art-breadcrumb li span{
+  cursor: pointer;
+  text-decoration: none;
+  padding: 10px 0 10px 65px;
+  background: brown; /* fallback color */
+  background: #EEEEEE;
+  position: relative;
+  display: block;
+  float: left;
+}
+.art-breadcrumb li span::after{
+  content: " ";
+  display: block;
+  width: 0;
+  height: 0;
+  border-top: 50px solid transparent; /* Go big on the size, and let overflow hide */
+  border-bottom: 50px solid transparent;
+  border-left: 30px solid #EEEEEE;
+  position: absolute;
+  top: 50%;
+  margin-top: -50px;
+  left: 100%;
+  z-index: 2;
+}
+.art-breadcrumb li span::before{
+  content: " ";
+  display: block;
+  width: 0;
+  height: 0;
+  border-top: 50px solid transparent;
+  border-bottom: 50px solid transparent;
+  border-left: 30px solid white;
+  position: absolute;
+  top: 50%;
+  margin-top: -50px;
+  margin-left: 1px;
+  left: 100%;
+  z-index: 1;
+}
+.art-breadcrumb li:first-child span{
+  padding-left: 10px;
+}
+.art-breadcrumb li span:hover{
+  background: #E0E0E0;
+  &:after{
+    background: #E0E0E0;
+    border-left-color: #E0E0E0 !important;
+  }
+}
+.art-breadcrumb .active span{
+  background: #E0E0E0;
+  &:after{
+    background: #E0E0E0;
+    border-left-color: #E0E0E0 !important;
+  }
+}

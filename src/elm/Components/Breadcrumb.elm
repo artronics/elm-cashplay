@@ -1,9 +1,12 @@
 module Components.Breadcrumb exposing (..)
 
-import Html exposing (Html, p, text)
+import Html exposing (Html, p,ul,li, text)
+import Html.Events as E
+import Html.Attributes as Atr
 import Array exposing (Array)
 import Material
 import Material.Options exposing (..)
+import Material.Typography as Typo
 
 
 type alias Breadcrumb =
@@ -29,7 +32,7 @@ init bread =
         empty_ =
             empty
     in
-        { empty_ | breads = [bread] }
+        { empty_ | breads = [ bread ] }
 
 
 type Msg
@@ -48,23 +51,25 @@ update msg model =
             ( { model | activeIndex = inx }, Cmd.none )
 
         Update f ->
-            (f model, Cmd.none)
+            ( f model, Cmd.none )
 
 
 view : Model -> Html Msg
 view model =
-    div []
-        (
-            model.breads
-                |> List.reverse
-                |> List.indexedMap
-                    (\index (fst, snd) ->
-                        viewBread index fst snd
-                    )
+    ul [Atr.class "art-breadcrumb"]
+        (model.breads
+            |> List.reverse
+            |> List.indexedMap
+                (\index ( header, subHeader ) ->
+                    viewBread model index header subHeader
+                )
         )
 
-viewBread index header subHeader =
-    div [ onClick (Select index) ]
-        [ p [] [ text header ]
-        , p [] [ text subHeader ]
+
+viewBread model index header subHeader =
+    li [ Atr.class (if model.activeIndex == index then "active" else "")
+        , E.onClick (Select index) ]
+
+        [ span[]
+            [styled p [Typo.headline] [ text header ]]
         ]

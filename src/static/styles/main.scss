@@ -4,8 +4,14 @@
 
 // can add Boostrap overrides, additional Sass/CSS below...
 
+@import "breadcrumb";
+
 .art-page-header {
   border-bottom: solid #E0E0E0 1px;
+}
+
+.art-tab-content{
+  width:800px;
 }
 
 .art-search-bar > * {
@@ -24,11 +30,6 @@
   min-width: 15ch;
 }
 
-.art-breadcrumb>p{
-  display: inline-block;
-  margin-right: 20px;
-}
-
 .art-search-table tr {
   height: 60px !important;
 }
@@ -43,3 +44,4 @@
   }
   margin-left: 20px;
 }
+

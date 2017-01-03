@@ -115,6 +115,6 @@ view model =
                     [ Button.ripple, Button.raised, css "margin-left" "50px", onClick (ChangeView NewCustomer) ]
                     [ Icon.i "person_add", text "New Customer" ]
                 ]
-            , div [ Elev.e0, center ]
+            , div [ Elev.e0,center  ]
                 [ subView ]
             ]
