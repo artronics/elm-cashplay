@@ -5,6 +5,8 @@ import Http
 import Material
 import Material.Options exposing (..)
 import Material.Table as Table
+import Material.Button as Button
+import Material.Icon as Icon
 import Resources.Customer exposing (Customer)
 import Components.Customer.SearchBar exposing (Query)
 import Resources.Customer as Res exposing (..)
@@ -13,7 +15,9 @@ import Resources.Customer as Res exposing (..)
 type alias Model =
     { query : Query
     , loading : Bool
+    , error: Maybe String
     , customers : List Customer
+    , hoverInx : Int
     , mdl : Material.Model
     }
 
@@ -22,7 +26,9 @@ init : Model
 init =
     { query = { value = "", field = Res.Name }
     , loading = False
+    , error = Nothing
     , customers = []
+    , hoverInx = -1
     , mdl = Material.model
     }
 
@@ -30,6 +36,7 @@ init =
 type Msg
     = Search Query
     | OnFetchCustomers (Result Http.Error (List Customer))
+    | Update (Model -> Model)
     | Mdl (Material.Msg Msg)
 
 
@@ -37,13 +44,16 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Search query ->
-            ( { model | query = query }, fetchCustomers )
+            ( { model | query = query }, fetchCustomers query )
 
         OnFetchCustomers (Ok fetchedCustomers) ->
-            ( { model | customers = fetchedCustomers }, Cmd.none )
+            ( { model | customers = fetchedCustomers, error = Nothing }, Cmd.none )
 
         OnFetchCustomers (Err error) ->
-            ( model, Cmd.none )
+            ( {model | error = Just "There is a problem with network." }, Cmd.none )
+
+        Update f ->
+            (f model, Cmd.none)
 
         Mdl msg_ ->
             Material.update Mdl msg_ model
@@ -54,21 +64,26 @@ search query model =
     update (Search query) model
 
 
-fetchCustomers : Cmd Msg
-fetchCustomers =
-    Http.get "http://localhost:6464/customers" Res.customerDecoder |> Http.send OnFetchCustomers
+fetchCustomers : Query -> Cmd Msg
+fetchCustomers query =
+    Res.search query OnFetchCustomers
 
 
 view : Model -> Html Msg
 view model =
     div []
-        [ viewTable model ]
+        [ case model.error of
+            Nothing ->
+                viewTable model
+            Just err ->
+                div [][text err]
+        ]
 
 
 -- Add header strings here
 tableHeaders : List String
 tableHeaders =
-    [ "ID", "Name" ]
+    [ "ID", "Name","actions" ]
 
 
 viewTable : Model -> Html Msg
@@ -85,11 +100,22 @@ viewTable model =
             ]
         , Table.tbody []
             (model.customers
-                |> List.map
-                    (\customer ->
-                        Table.tr []
+                |> List.indexedMap
+                    (\inx customer ->
+                        Table.tr
+                            [ Update (\m-> {m| hoverInx = inx})|>onMouseEnter
+                            , Update (\m-> {m| hoverInx = -1})|>onMouseLeave
+                            ]
                             [ Table.td [ Table.numeric ] [ text (toString customer.id) ]
                             , Table.td [] [ text (customer.firstName ++ " " ++ customer.lastName) ]
+                            , Table.td []
+                                [ span [cs (if model.hoverInx == inx then "" else "hidden")]
+                                    [ Button.render Mdl [inx] model.mdl
+                                        [Button.ripple][Icon.i "receipt"]
+                                    , Button.render Mdl [(List.length model.customers) + inx] model.mdl
+                                        [Button.ripple][Icon.i "remove_red_eye"]
+                                    ]
+                                ]
                             ]
                     )
             )
