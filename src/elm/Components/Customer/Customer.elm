@@ -1,22 +1,27 @@
 module Components.Customer.Customer exposing (..)
 
-import Html exposing (Html, text, select, option)
+import Html exposing (Html, text, p)
+import Http
 import Material
 import Material.Elevation as Elev
 import Material.Options exposing (..)
 import Material.Button as Button
 import Material.Icon as Icon
+import Components.MessageBox as MsgBox
 import Components.Customer.SearchBar as SearchBar
 import Components.Customer.Breadcrumb as Breadcrumb
 import Components.Customer.SearchList as SearchList
 import Components.Customer.NewCustomer as NewCustomer
 import Resources.Customer as Res
+import Components.Customer.SearchBar exposing (Query)
 
 
 type alias Model =
     { currentView : Maybe View
     , currentCrumb : Maybe Int
     , query : SearchBar.Query
+    , error : Maybe Http.Error
+    , customers : Maybe (List Res.Customer)
     , searchBar : SearchBar.Model
     , breadcrumb : Breadcrumb.Model
     , searchList : SearchList.Model
@@ -30,6 +35,8 @@ init =
     { currentView = Nothing
     , currentCrumb = Nothing
     , query = { value = "", field = Res.Name }
+    , error = Nothing
+    , customers = Nothing
     , breadcrumb = Breadcrumb.model
     , searchBar = SearchBar.init
     , searchList = SearchList.init
@@ -39,12 +46,13 @@ init =
 
 
 type View
-    = SearchList SearchBar.Query
+    = SearchList
     | NewCustomer
 
 
 type Msg
     = ChangeView View
+    | OnFetchCustomers (Result Http.Error (List Res.Customer))
     | ChangeCrumb (Maybe Int)
     | BreadcrumbMsg (Breadcrumb.Msg Msg)
     | SearchBarMsg SearchBar.Msg
@@ -56,25 +64,23 @@ type Msg
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        ChangeView (SearchList query) ->
-            let
-                ( updatedSearchList, cmd ) =
-                    SearchList.search query model.searchList
-            in
-                ( { model | currentView = Just (SearchList query), searchList = updatedSearchList }, Cmd.map SearchListMsg cmd )
+        OnFetchCustomers (Ok fetchedCustomers) ->
+            ({model | customers = Just fetchedCustomers},Cmd.none)
+
+        OnFetchCustomers (Err err) ->
+            ({model | error = Just err}, Cmd.none)
+
+        ChangeView SearchList -> -- Only when user click on search button we fire api
+                ( { model | currentView = Just SearchList  }, fetchCustomers model.query )
 
         ChangeView NewCustomer ->
             ( { model | currentView = Just NewCustomer }, Cmd.none )
 
         ChangeCrumb index ->
             ({model | currentCrumb = index}, Cmd.none)
+
         BreadcrumbMsg msg_ ->
             Breadcrumb.update BreadcrumbMsg msg_ model
---            let
---                (updatedBread, cmd) =
---                    Breadcrumb.update msg_ model.breadcrumb
---            in
---                ({model | breadcrumb = updatedBread}, Cmd.map BreadcrumbMsg cmd)
 
         SearchBarMsg msg_ ->
             -- query is what we get from SearchBar
@@ -102,27 +108,40 @@ update msg model =
             Material.update Mdl msg_ model
 
 
+fetchCustomers : Query -> Cmd Msg
+fetchCustomers query =
+    Res.search query OnFetchCustomers
+
 view : Model -> Html Msg
 view model =
     div []
         [ viewHeader model
-        , Breadcrumb.render
+        , viewBreadcrumb model
+        , div [ Elev.e0,center  ]
+            [ viewContent model]
+        ]
+
+viewBreadcrumb: Model -> Html Msg
+viewBreadcrumb model =
+    case model.currentView of
+        Nothing ->
+            MsgBox.view "No main view selected"
+        Just SearchList ->
+            Breadcrumb.render
             model.breadcrumb
             [["foo","bar"],["baz"]]
             ChangeCrumb
             (Breadcrumb.selectedCrumb model.currentCrumb)
             [][text "loo"]
-        , div [ Elev.e0,center  ]
-            [ viewContent model]
-        ]
-
+        Just NewCustomer ->
+            p [][text "new customer"]
 viewHeader model =
     div [ Elev.e0, center, cs "art-page-header" ]
         [ Html.map SearchBarMsg (SearchBar.view model.searchBar)
         , Button.render Mdl
             [ 2 ]
             model.mdl
-            [ Button.ripple, Button.raised, Button.primary, onClick (ChangeView (SearchList model.query)) ]
+            [ Button.ripple, Button.raised, Button.primary, onClick (ChangeView SearchList) ]
             [ Icon.i "search", text "Search" ]
         , Button.render Mdl
             [ 3 ]
@@ -131,6 +150,7 @@ viewHeader model =
             [ Icon.i "person_add", text "New Customer" ]
         ]
 
+viewContent: Model -> Html Msg
 viewContent model =
     case model.currentView of
         Nothing ->
@@ -138,7 +158,7 @@ viewContent model =
 
         Just view ->
             case view of
-                SearchList _->
+                SearchList ->
                     Html.map SearchListMsg (SearchList.view model.searchList)
 
                 NewCustomer ->
