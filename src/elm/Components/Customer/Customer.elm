@@ -20,7 +20,6 @@ type alias Model =
     { currentView : Maybe View
     , currentCrumb : Maybe Int
     , query : SearchBar.Query
-    , error : Maybe Http.Error
     , customers : Maybe (List Res.Customer)
     , searchBar : SearchBar.Model
     , breadcrumb : Breadcrumb.Model
@@ -35,7 +34,6 @@ init =
     { currentView = Nothing
     , currentCrumb = Nothing
     , query = { value = "", field = Res.Name }
-    , error = Nothing
     , customers = Nothing
     , breadcrumb = Breadcrumb.model
     , searchBar = SearchBar.init
@@ -48,6 +46,7 @@ init =
 type View
     = SearchList
     | NewCustomer
+    | NetErr Http.Error
 
 
 type Msg
@@ -65,16 +64,25 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         OnFetchCustomers (Ok fetchedCustomers) ->
-            ({model | customers = Just fetchedCustomers},Cmd.none)
+            let
+                searchList = model.searchList
+                updatedSL =
+                    {searchList | customers = fetchedCustomers}
+            in
+                ({model | customers = Just fetchedCustomers, searchList = updatedSL},Cmd.none)
 
         OnFetchCustomers (Err err) ->
-            ({model | error = Just err}, Cmd.none)
+            ({model | currentView = Just <| NetErr err }, Cmd.none)
 
         ChangeView SearchList -> -- Only when user click on search button we fire api
                 ( { model | currentView = Just SearchList  }, fetchCustomers model.query )
 
         ChangeView NewCustomer ->
             ( { model | currentView = Just NewCustomer }, Cmd.none )
+
+            --views like NetErr goes here we don't add any logic for errors just a msg to user
+        ChangeView _ ->
+            (model, Cmd.none)
 
         ChangeCrumb index ->
             ({model | currentCrumb = index}, Cmd.none)
@@ -124,17 +132,19 @@ view model =
 viewBreadcrumb: Model -> Html Msg
 viewBreadcrumb model =
     case model.currentView of
-        Nothing ->
-            MsgBox.view "No main view selected"
         Just SearchList ->
             Breadcrumb.render
             model.breadcrumb
             [["foo","bar"],["baz"]]
             ChangeCrumb
             (Breadcrumb.selectedCrumb model.currentCrumb)
-            [][text "loo"]
+            [][]
         Just NewCustomer ->
             p [][text "new customer"]
+
+        _ ->
+            span[][]
+
 viewHeader model =
     div [ Elev.e0, center, cs "art-page-header" ]
         [ Html.map SearchBarMsg (SearchBar.view model.searchBar)
@@ -163,3 +173,6 @@ viewContent model =
 
                 NewCustomer ->
                     Html.map NewCustomerMsg (NewCustomer.view model.newCustomer)
+
+                NetErr err ->
+                    MsgBox.view <| toString err
