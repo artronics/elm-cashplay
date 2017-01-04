@@ -3,13 +3,16 @@
 .art-breadcrumb-container{
   //margin-top:10px;
   overflow: hidden;
+  background-color: #EEEEEE;
 }
 .is-loading{
-  //float:right;
+  float:right;
+  background-color: #EEEEEE;
 }
 .art-breadcrumb{
-  //float: left;
-  //width:80%;
+  float: left;
+  width:80%;
+
   background-color: #EEEEEE;
   list-style: none;
   overflow: hidden;

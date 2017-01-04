@@ -48,7 +48,7 @@ selectedCrumb i j=
         Just index ->
             if index==j then class("active") else class ("")
 
-render:  Model -> Bread -> (Int -> m) -> (Int -> Html.Attribute m) -> List (Html.Attribute m) -> List (Html m) -> Html m
+render:  Model -> Bread -> (Maybe Int -> m) -> (Int -> Html.Attribute m) -> List (Html.Attribute m) -> List (Html m) -> Html m
 render model bread onSelect activeClass atr el =
     (div atr (
                 (view model bread onSelect activeClass)
@@ -57,7 +57,7 @@ render model bread onSelect activeClass atr el =
     )
 
 
-view: Model -> Bread -> (Int -> m) -> (Int -> Html.Attribute m) -> Html m
+view: Model -> Bread -> (Maybe Int -> m) -> (Int -> Html.Attribute m) -> Html m
 view model bread onSelect activeClass=
     div [class "art-breadcrumb-container"]
         [ ul [class "art-breadcrumb"]
@@ -66,15 +66,15 @@ view model bread onSelect activeClass=
         ]
 
 
-viewBread: Bread -> (Int -> m) -> (Int -> Html.Attribute m) -> List (Html m)
+viewBread: Bread -> (Maybe Int -> m) -> (Int -> Html.Attribute m) -> List (Html m)
 viewBread bread onSelect activeClass=
     bread
         |> List.indexedMap (\index crumb -> viewCrumb index crumb onSelect activeClass)
 
-viewCrumb: Int -> Crumb -> (Int -> m) -> (Int -> Html.Attribute m) -> Html m
+viewCrumb: Int -> Crumb -> (Maybe Int -> m) -> (Int -> Html.Attribute m) -> Html m
 viewCrumb index crumb onSelect activeClass=
     li [activeClass index]
-        [ span [onClick(onSelect index) ]
+        [ span [onClick(onSelect (Just index)) ]
             (crumb |> List.map (\line ->
                 p [][text line]
             ))
