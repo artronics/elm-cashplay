@@ -18,54 +18,63 @@ model =
     , activeCrumb = Nothing
     }
 
-type Msg
-    = IsLoading Bool
-    | Select (Maybe Int)
+type alias Container c =
+    { c | breadcrumb : Model }
 
-update: Msg -> Model -> (Model, Cmd Msg)
-update msg model =
+type Msg m
+    = OnSelect (Maybe Int)
+
+update: (Msg m -> m) -> (Msg m)->(Container c) ->(Container c, Cmd m)
+update lift msg container =
+    let
+        model =
+            .breadcrumb container
+        updatedModel =
+            update_ lift msg model
+    in
+        ({container | breadcrumb = updatedModel}, Cmd.none)
+
+update_: (Msg m -> m) -> (Msg m) -> Model -> Model
+update_ lift msg model =
     case msg of
-        IsLoading loading ->
-            ({model | isLoading = loading}, Cmd.none)
-        Select index ->
-            ({model | activeCrumb = index}, Cmd.none)
+        OnSelect index ->
+            {model | activeCrumb = index}
 
-onCrumbSelect: (Int -> m) -> Html.Attribute (Int -> m)
-onCrumbSelect f =
-    onClick f
 
-render: Model -> (Int -> m) -> List (Html.Attribute m) -> List (Html m) -> Html m
-render model onSelect atr el =
-    div atr (
-                (view model onSelect)
+selectedCrumb: Maybe Int -> Int -> Html.Attribute m
+selectedCrumb i j=
+    case i of
+        Nothing -> class("")
+        Just index ->
+            if index==j then class("active") else class ("")
+
+render:  Model -> Bread -> (Int -> m) -> (Int -> Html.Attribute m) -> List (Html.Attribute m) -> List (Html m) -> Html m
+render model bread onSelect activeClass atr el =
+    (div atr (
+                (view model bread onSelect activeClass)
                 ::el
             )
+    )
 
-view: Model -> (Int ->m) -> Html m
-view model onSelect=
-    div []
-        [ div [onClick(onSelect 0)][text "kir"]
-        , div [onClick(onSelect 1)][text "kos"]
-        ]
 
-render_: Model -> Bread -> Html m
-render_ model bread=
+view: Model -> Bread -> (Int -> m) -> (Int -> Html.Attribute m) -> Html m
+view model bread onSelect activeClass=
     div [class "art-breadcrumb-container"]
         [ ul [class "art-breadcrumb"]
-            (viewBread bread)
+            (viewBread bread onSelect activeClass)
         , p [class "is-loading"][text (toString model.isLoading)]
         ]
 
 
-viewBread: Bread -> List (Html m)
-viewBread bread =
+viewBread: Bread -> (Int -> m) -> (Int -> Html.Attribute m) -> List (Html m)
+viewBread bread onSelect activeClass=
     bread
-        |> List.indexedMap (\index crumb -> viewCrumb index crumb)
+        |> List.indexedMap (\index crumb -> viewCrumb index crumb onSelect activeClass)
 
-viewCrumb: Int -> Crumb -> Html m
-viewCrumb index crumb =
-    li []
-        [ span []
+viewCrumb: Int -> Crumb -> (Int -> m) -> (Int -> Html.Attribute m) -> Html m
+viewCrumb index crumb onSelect activeClass=
+    li [activeClass index]
+        [ span [onClick(onSelect index) ]
             (crumb |> List.map (\line ->
                 p [][text line]
             ))

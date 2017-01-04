@@ -43,7 +43,7 @@ type View
 
 type Msg
     = ChangeView Int
-    | BreadcrumbMsg Breadcrumb.Msg
+    | BreadcrumbMsg (Breadcrumb.Msg Msg)
     | SearchBarMsg SearchBar.Msg
     | SearchListMsg SearchList.Msg
     | NewCustomerMsg NewCustomer.Msg
@@ -65,11 +65,12 @@ update msg model =
 
 
         BreadcrumbMsg msg_ ->
-            let
-                (updatedBread, cmd) =
-                    Breadcrumb.update msg_ model.breadcrumb
-            in
-                ({model | breadcrumb = updatedBread}, Cmd.map BreadcrumbMsg cmd)
+            Breadcrumb.update BreadcrumbMsg msg_ model
+--            let
+--                (updatedBread, cmd) =
+--                    Breadcrumb.update msg_ model.breadcrumb
+--            in
+--                ({model | breadcrumb = updatedBread}, Cmd.map BreadcrumbMsg cmd)
 
         SearchBarMsg msg_ ->
             -- query is what we get from SearchBar
@@ -101,7 +102,12 @@ view : Model -> Html Msg
 view model =
     div []
         [ viewHeader model
-        , Breadcrumb.render model.breadcrumb ChangeView [][text "loo"]
+        , Breadcrumb.render
+            model.breadcrumb
+            [["foo","bar"],["baz"]]
+            ChangeView
+            (Breadcrumb.selectedCrumb model.currentView)
+            [][text "loo"]
         , div [ Elev.e0,center  ]
             [ viewContent model]
         ]
