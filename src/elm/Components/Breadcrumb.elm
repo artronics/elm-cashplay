@@ -1,76 +1,84 @@
 module Components.Breadcrumb exposing (..)
 
-import Html exposing (Html, p,ul,li, text)
-import Html.Events as E
-import Html.Attributes as Atr
-import Array exposing (Array)
-import Material
-import Material.Options exposing (..)
-import Material.Typography as Typo
-import Material.Icon as Icon
+import Html exposing (..)
+import Html.Attributes exposing (class)
+import Html.Events exposing (onClick)
 
-
-type alias Breadcrumb =
-    ( String, String,String )
-
+type alias Crumb = List String
+type alias Bread = List Crumb
 
 type alias Model =
-    { breads : List Breadcrumb
-    , activeIndex : Int
+    { isLoading: Bool
+    , activeCrumb : Maybe Int
     }
 
-
-empty : Model
-empty =
-    { breads = []
-    , activeIndex = 0
+model: Model
+model =
+    { isLoading = True
+    , activeCrumb = Nothing
     }
 
+type alias Container c =
+    { c | breadcrumb : Model }
 
-init : Breadcrumb -> Model
-init bread =
+type Msg m
+    = OnSelect (Maybe Int)
+
+update: (Msg m -> m) -> (Msg m)->(Container c) ->(Container c, Cmd m)
+update lift msg container =
     let
-        empty_ =
-            empty
+        model =
+            .breadcrumb container
+        updatedModel =
+            update_ lift msg model
     in
-        { empty_ | breads = [ bread ] }
+        ({container | breadcrumb = updatedModel}, Cmd.none)
 
-
-type Msg
-    = Select Int
-    | Update (Model -> Model)
-
-
-
---    | SetActive Int
-
-
-update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
+update_: (Msg m -> m) -> (Msg m) -> Model -> Model
+update_ lift msg model =
     case msg of
-        Select inx ->
-            ( { model | activeIndex = inx }, Cmd.none )
-
-        Update f ->
-            ( f model, Cmd.none )
+        OnSelect index ->
+            {model | activeCrumb = index}
 
 
-view : Model -> Html Msg
-view model =
-    ul [Atr.class "art-breadcrumb"]
-        (model.breads
-            |> List.reverse
-            |> List.indexedMap
-                (\index ( header, subHeader,icon ) ->
-                    viewBread model index header subHeader icon
-                )
-        )
+selectedCrumb: Maybe Int -> Int -> Html.Attribute m
+selectedCrumb i j=
+    case i of
+        Nothing -> class("")
+        Just index ->
+            if index==j then class("active") else class ("")
+
+render:  Model -> Bread -> (Maybe Int -> m) -> (Int -> Html.Attribute m) -> List (Html.Attribute m) -> List (Html m) -> Html m
+render model bread onSelect activeClass atr el =
+    (div atr (
+                (view model bread onSelect activeClass)
+                ::el
+            )
+    )
 
 
-viewBread model index header subHeader icon=
-    li [ Atr.class (if model.activeIndex == index then "active" else "")
-        , E.onClick (Select index) ]
-
-        [ span[]
-            [Icon.i icon,styled p [] [ text header ]]
+view: Model -> Bread -> (Maybe Int -> m) -> (Int -> Html.Attribute m) -> Html m
+view model bread onSelect activeClass=
+    div [class "art-breadcrumb-container"]
+        [ ul [class "art-breadcrumb"]
+            (viewBread bread onSelect activeClass)
+        , p [class "is-loading"][text (toString model.isLoading)]
         ]
+
+
+viewBread: Bread -> (Maybe Int -> m) -> (Int -> Html.Attribute m) -> List (Html m)
+viewBread bread onSelect activeClass=
+    bread
+        |> List.indexedMap (\index crumb -> viewCrumb index crumb onSelect activeClass)
+
+viewCrumb: Int -> Crumb -> (Maybe Int -> m) -> (Int -> Html.Attribute m) -> Html m
+viewCrumb index crumb onSelect activeClass=
+    li [activeClass index]
+        [ span [onClick(onSelect (Just index)) ]
+            (crumb |> List.map (\line ->
+                p [][text line]
+            ))
+        ]
+
+
+

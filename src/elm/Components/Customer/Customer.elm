@@ -9,7 +9,7 @@ import Material.Button as Button
 import Material.Icon as Icon
 import Components.MessageBox as MsgBox
 import Components.Customer.SearchBar as SearchBar
-import Components.Customer.Breadcrumb as Breadcrumb
+import Components.Breadcrumb as Breadcrumb
 import Components.Customer.SearchList as SearchList
 import Components.Customer.NewCustomer as NewCustomer
 import Resources.Customer as Res
