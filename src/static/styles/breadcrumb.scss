@@ -4,7 +4,12 @@
   //margin-top:10px;
   overflow: hidden;
 }
+.is-loading{
+  float:right;
+}
 .art-breadcrumb{
+  float: left;
+  width:80%;
   background-color: #EEEEEE;
   list-style: none;
   overflow: hidden;
