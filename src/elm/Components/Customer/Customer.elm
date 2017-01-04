@@ -14,7 +14,7 @@ import Resources.Customer as Res
 
 
 type alias Model =
-    { currentView : Maybe View
+    { currentView : Maybe Int
     , query : SearchBar.Query
     , searchBar : SearchBar.Model
     , breadcrumb : Breadcrumb.Model
@@ -42,7 +42,8 @@ type View
 
 
 type Msg
-    = ChangeView View
+    = ChangeView Int
+    | BreadcrumbMsg Breadcrumb.Msg
     | SearchBarMsg SearchBar.Msg
     | SearchListMsg SearchList.Msg
     | NewCustomerMsg NewCustomer.Msg
@@ -52,15 +53,23 @@ type Msg
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        ChangeView (SearchList query) ->
-            let
-                ( updatedSearchList, cmd ) =
-                    SearchList.search query model.searchList
-            in
-                ( { model | currentView = Just (SearchList query), searchList = updatedSearchList }, Cmd.map SearchListMsg cmd )
+--        ChangeView (SearchList query) ->
+--            let
+--                ( updatedSearchList, cmd ) =
+--                    SearchList.search query model.searchList
+--            in
+--                ( { model | currentView = Just (SearchList query), searchList = updatedSearchList }, Cmd.map SearchListMsg cmd )
 
-        ChangeView view ->
-            ( { model | currentView = Just view }, Cmd.none )
+        ChangeView viewIndex ->
+            ( { model | currentView = Just viewIndex }, Cmd.none )
+
+
+        BreadcrumbMsg msg_ ->
+            let
+                (updatedBread, cmd) =
+                    Breadcrumb.update msg_ model.breadcrumb
+            in
+                ({model | breadcrumb = updatedBread}, Cmd.map BreadcrumbMsg cmd)
 
         SearchBarMsg msg_ ->
             -- query is what we get from SearchBar
@@ -92,7 +101,7 @@ view : Model -> Html Msg
 view model =
     div []
         [ viewHeader model
-        , Breadcrumb.render model.breadcrumb [["hello","foo"],["kir"]]
+        , Breadcrumb.render model.breadcrumb ChangeView [][text "loo"]
         , div [ Elev.e0,center  ]
             [ viewContent model]
         ]
@@ -103,12 +112,12 @@ viewHeader model =
         , Button.render Mdl
             [ 2 ]
             model.mdl
-            [ Button.ripple, Button.raised, Button.primary, onClick (ChangeView (SearchList model.query)) ]
+            [ Button.ripple, Button.raised, Button.primary, onClick (ChangeView 0) ]
             [ Icon.i "search", text "Search" ]
         , Button.render Mdl
             [ 3 ]
             model.mdl
-            [ Button.ripple, Button.raised, css "margin-left" "50px", onClick (ChangeView NewCustomer) ]
+            [ Button.ripple, Button.raised, css "margin-left" "50px", onClick (ChangeView 1) ]
             [ Icon.i "person_add", text "New Customer" ]
         ]
 
@@ -119,8 +128,8 @@ viewContent model =
 
         Just view ->
             case view of
-                SearchList _ ->
+                0 ->
                     Html.map SearchListMsg (SearchList.view model.searchList)
 
-                NewCustomer ->
+                _ ->
                     Html.map NewCustomerMsg (NewCustomer.view model.newCustomer)
