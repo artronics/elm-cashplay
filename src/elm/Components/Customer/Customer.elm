@@ -69,27 +69,30 @@ update msg model =
     case msg of
         OnFetchCustomers (Ok fetchedCustomers) ->
             let
-                searchList = model.searchList
+                searchList =
+                    model.searchList
+
                 updatedSL =
-                    {searchList | customers = fetchedCustomers}
+                    { searchList | customers = fetchedCustomers }
             in
-                ({model | customers = Just fetchedCustomers, searchList = updatedSL},Cmd.none)
+                ( { model | customers = Just fetchedCustomers, searchList = updatedSL }, Cmd.none )
 
         OnFetchCustomers (Err err) ->
-            ({model | currentView = Just <| NetErr err }, Cmd.none)
+            ( { model | currentView = Just <| NetErr err }, Cmd.none )
 
-        ChangeView SearchList -> -- Only when user click on search button we fire api
-                ( { model | currentView = Just SearchList  }, fetchCustomers model.query )
+        ChangeView SearchList ->
+            -- Only when user click on search button we fire api
+            ( { model | currentView = Just SearchList }, fetchCustomers model.query )
 
         ChangeView NewCustomer ->
             ( { model | currentView = Just NewCustomer }, Cmd.none )
 
-            --views like NetErr goes here we don't add any logic for errors just a msg to user
+        --views like NetErr goes here we don't add any logic for errors just a msg to user
         ChangeView _ ->
-            (model, Cmd.none)
+            ( model, Cmd.none )
 
         ChangeCrumb index ->
-            ({model | currentCrumb = index}, Cmd.none)
+            ( { model | currentCrumb = index }, Cmd.none )
 
         BreadcrumbMsg msg_ ->
             Breadcrumb.update BreadcrumbMsg msg_ model
@@ -115,10 +118,12 @@ update msg model =
                             updatedViewCus =
                                 ViewCustomer.update (ViewCustomer.UpdateCustomer (Just customer)) model.viewCustomer
                         in
-                            ({ model
-                             | viewCustomer = updatedViewCus
-                             , searchList = updatedSearchList
-                             },Cmd.none)
+                            ( { model
+                                | viewCustomer = updatedViewCus
+                                , searchList = updatedSearchList
+                              }
+                            , Cmd.none
+                            )
 
         SearchListMsg msg_ ->
             let
@@ -139,7 +144,7 @@ update msg model =
                 updatedViewCustomer =
                     ViewCustomer.update msg_ model.viewCustomer
             in
-                ( { model | viewCustomer = updatedViewCustomer }, Cmd.none)
+                ( { model | viewCustomer = updatedViewCustomer }, Cmd.none )
 
         Mdl msg_ ->
             Material.update Mdl msg_ model
@@ -149,31 +154,36 @@ fetchCustomers : Query -> Cmd Msg
 fetchCustomers query =
     Res.search query OnFetchCustomers
 
+
 view : Model -> Html Msg
 view model =
     div []
         [ viewHeader model
         , viewBreadcrumb model
         , Html.map ViewCustomerMsg (ViewCustomer.view model.viewCustomer)
-        , div [ Elev.e0,center  ]
-            [ viewContent model]
+        , div [ Elev.e0, center ]
+            [ viewContent model ]
         ]
 
-viewBreadcrumb: Model -> Html Msg
+
+viewBreadcrumb : Model -> Html Msg
 viewBreadcrumb model =
     case model.currentView of
         Just SearchList ->
             Breadcrumb.render
-            model.breadcrumb
-            [["foo","bar"],["baz"]]
-            ChangeCrumb
-            (Breadcrumb.selectedCrumb model.currentCrumb)
-            [][]
+                model.breadcrumb
+                [ [ "foo", "bar" ], [ "baz" ] ]
+                ChangeCrumb
+                (Breadcrumb.selectedCrumb model.currentCrumb)
+                []
+                []
+
         Just NewCustomer ->
-            p [][text "new customer"]
+            p [] [ text "new customer" ]
 
         _ ->
-            span[][]
+            span [] []
+
 
 viewHeader model =
     div [ Elev.e0, center, cs "art-page-header" ]
@@ -190,7 +200,8 @@ viewHeader model =
             [ Icon.i "person_add", text "New Customer" ]
         ]
 
-viewContent: Model -> Html Msg
+
+viewContent : Model -> Html Msg
 viewContent model =
     case model.currentView of
         Nothing ->

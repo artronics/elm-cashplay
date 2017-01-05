@@ -32,9 +32,9 @@ type Msg
     | Selected SelectionAction
     | Mdl (Material.Msg Msg)
 
+
 type SelectionAction
     = Details Res.Customer
-
 
 
 update : Msg -> Model -> Model
@@ -44,11 +44,11 @@ update msg model =
             f model
 
         Selected (Details customer) ->
-            {model | viewCustomer = Just customer}
+            { model | viewCustomer = Just customer }
 
         Mdl msg_ ->
             let
-                (m,_) =
+                ( m, _ ) =
                     Material.update Mdl msg_ model
             in
                 m
@@ -56,9 +56,10 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-    div [cs "art-tab-content"]
+    div [ cs "art-tab-content" ]
         [ viewTable model
         ]
+
 
 
 -- Add header strings here
