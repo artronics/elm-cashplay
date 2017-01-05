@@ -1,4 +1,4 @@
-module Components.Customer.ViewCustomer exposing (..)
+module Components.Customer.CustomerView exposing (..)
 
 import Html exposing (Html, text, p)
 import Material

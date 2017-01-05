@@ -1,4 +1,4 @@
-module Components.Customer.SearchList exposing (..)
+module Components.Customer.CustomerList exposing (..)
 
 import Html exposing (Html, p, text)
 import Material
@@ -11,7 +11,7 @@ import Resources.Customer as Res exposing (..)
 
 
 type alias Model =
-    { customers : List Customer
+    { customers : Maybe (List Customer)
     , hoverInx : Int
     , viewCustomer : Maybe Res.Customer
     , mdl : Material.Model
@@ -20,7 +20,7 @@ type alias Model =
 
 init : Model
 init =
-    { customers = []
+    { customers = Nothing
     , hoverInx = -1
     , viewCustomer = Nothing
     , mdl = Material.model
@@ -34,7 +34,7 @@ type Msg
 
 
 type SelectionAction
-    = Details Res.Customer
+    = Details (Maybe Res.Customer)
 
 
 update : Msg -> Model -> Model
@@ -44,7 +44,7 @@ update msg model =
             f model
 
         Selected (Details customer) ->
-            { model | viewCustomer = Just customer }
+            { model | viewCustomer = customer }
 
         Mdl msg_ ->
             let
@@ -83,7 +83,7 @@ viewTable model =
                 )
             ]
         , Table.tbody []
-            (model.customers
+            (Maybe.withDefault [] model.customers
                 |> List.indexedMap
                     (\inx customer ->
                         Table.tr
@@ -102,7 +102,7 @@ viewTable model =
                                             "hidden"
                                         )
                                     ]
-                                    [ span [ onClick (Selected (Details customer)) ]
+                                    [ span [ onClick (Selected (Details (Just customer))) ]
                                         [ Icon.i "remove_red_eye" ]
                                     , span []
                                         [ Icon.i "receipt" ]
