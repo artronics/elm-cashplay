@@ -7,80 +7,84 @@ import Material.Options exposing (styled)
 import Material.Icon as Icon
 import Material.Typography as Typo
 
-type alias Crumb = (Int,List String)
-type alias Bread = List Crumb
 
 type alias Model =
-    { isLoading: Bool
-    , activeCrumb : Maybe Int
+    { activeIndex : Int
     }
 
-model: Model
-model =
-    { isLoading = True
-    , activeCrumb = Nothing
+
+init : Model
+init =
+    { activeIndex = -1
     }
 
-type alias Container c =
-    { c | breadcrumb : Model }
 
-type Msg m
-    = OnSelect (Maybe Int)
+type Msg
+    = Select Int
 
-update: (Msg m -> m) -> (Msg m)->(Container c) ->(Container c, Cmd m)
-update lift msg container =
-    let
-        model =
-            .breadcrumb container
-        updatedModel =
-            update_ lift msg model
-    in
-        ({container | breadcrumb = updatedModel}, Cmd.none)
 
-update_: (Msg m -> m) -> (Msg m) -> Model -> Model
-update_ lift msg model =
+update : Msg -> Model -> Model
+update msg model =
     case msg of
-        OnSelect index ->
-            {model | activeCrumb = index}
+        Select inx ->
+            { model | activeIndex = inx }
 
 
-selectedCrumb: Maybe Int -> Int -> Html.Attribute m
-selectedCrumb i j=
-    case i of
-        Nothing -> class("")
-        Just index ->
-            if index==j then class("active") else class ("")
+render : Model -> List ( Bool, ( List String, Html m ) ) -> ( Html Msg, Html m )
+render model views =
+    let
+        ( _, bread ) =
+            views |> List.filter (\( b, _ ) -> b) |> List.unzip
 
-render:  Model -> Bread -> (Maybe Int -> m) -> (Int -> Html.Attribute m) -> Html m
-render model bread onSelect activeClass =
-    div [] [view model bread onSelect activeClass]
+        ( crumbs_, contents_ ) =
+            bread |> List.unzip
 
+        content =
+            contents_
+                |> List.indexedMap
+                    (\i c ->
+                        if model.activeIndex == i then
+                            c
+                        else
+                            span [ class "hidden" ] []
+                    )
 
-view: Model -> Bread -> (Maybe Int -> m) -> (Int -> Html.Attribute m) -> Html m
-view model bread onSelect activeClass=
-    div [class "art-breadcrumb-container"]
-        [ ul [class "art-breadcrumb"]
-            (viewBread bread onSelect activeClass)
-        , p [class "is-loading"][text (toString model.isLoading)]
-        ]
-
-
-viewBread: Bread -> (Maybe Int -> m) -> (Int -> Html.Attribute m) -> List (Html m)
-viewBread bread onSelect activeClass=
-    bread
---        |> List.sortBy (\(i,_) -> i)
-        |> List.map (\crumb -> viewCrumb crumb onSelect activeClass)
-
-viewCrumb: (Int, List String) -> (Maybe Int -> m) -> (Int -> Html.Attribute m) -> Html m
-viewCrumb crumb onSelect activeClass=
-    let (index, texts) = crumb
+        crumbs =
+            viewBread model crumbs_
     in
-        li [activeClass index]
-            [ span [onClick(onSelect (Just index)) ]
-                (texts |> List.map (\line ->
-                    styled p [Typo.title][text line]
-                ))
+        ( div [ class "art-breadcrumb-container" ] [ crumbs ], div [] content )
+
+
+viewBread : Model -> List (List String) -> Html Msg
+viewBread model crumbs =
+    ul [ class "art-breadcrumb" ]
+        (crumbs
+            |> List.indexedMap (\inx c -> viewCrumb model inx c)
+        )
+
+
+viewCrumb : Model -> Int -> List String -> Html Msg
+viewCrumb model inx crumb =
+    let
+        icon =
+            Icon.i <| Maybe.withDefault "" <| List.head crumb
+
+        texts =
+            Maybe.withDefault [ "" ] <| List.tail crumb
+    in
+        li
+            [ if model.activeIndex == inx then
+                class "active"
+              else
+                class ("")
             ]
-
-
-
+            [ span [ onClick (Select inx) ]
+                (icon
+                    :: (texts
+                            |> List.map
+                                (\str ->
+                                    styled p [ Typo.title ] [ text str ]
+                                )
+                       )
+                )
+            ]

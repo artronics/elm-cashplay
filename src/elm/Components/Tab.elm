@@ -41,10 +41,10 @@ update msg model =
 
         CustomerMsg subMsg ->
             let
-                (updatedCustomer, cmd) =
+                ( updatedCustomer, cmd ) =
                     Customer.update subMsg model.customer
             in
-                ( { model | customer = updatedCustomer }, Cmd.map CustomerMsg cmd)
+                ( { model | customer = updatedCustomer }, Cmd.map CustomerMsg cmd )
 
         Mdl msg_ ->
             Material.update Mdl msg_ model

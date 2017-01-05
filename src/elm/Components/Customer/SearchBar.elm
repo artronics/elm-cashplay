@@ -61,9 +61,11 @@ update msg model =
         ( model_, cmd_ ) =
             update_ msg model
 
-        query = if model_.searchValue == "" then Nothing else
-
-            Just { value = model_.searchValue, field = model_.selectedCustomerField }
+        query =
+            if model_.searchValue == "" then
+                Nothing
+            else
+                Just { value = model_.searchValue, field = model_.selectedCustomerField }
     in
         ( model_, cmd_, query )
 
