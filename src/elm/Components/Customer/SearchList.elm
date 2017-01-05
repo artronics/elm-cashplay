@@ -13,6 +13,7 @@ import Resources.Customer as Res exposing (..)
 type alias Model =
     { customers : List Customer
     , hoverInx : Int
+    , viewCustomer : Maybe Res.Customer
     , mdl : Material.Model
     }
 
@@ -21,28 +22,36 @@ init : Model
 init =
     { customers = []
     , hoverInx = -1
+    , viewCustomer = Nothing
     , mdl = Material.model
     }
 
 
 type Msg
     = Update (Model -> Model)
-    | ShowCustomer Res.Customer
+    | Selected SelectionAction
     | Mdl (Material.Msg Msg)
 
+type SelectionAction
+    = Details Res.Customer
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
+
+update : Msg -> Model -> Model
 update msg model =
     case msg of
         Update f ->
-            ( f model, Cmd.none )
+            f model
 
-        ShowCustomer customer ->
-            (model, Cmd.none)
+        Selected (Details customer) ->
+            {model | viewCustomer = Just customer}
 
         Mdl msg_ ->
-            Material.update Mdl msg_ model
+            let
+                (m,_) =
+                    Material.update Mdl msg_ model
+            in
+                m
 
 
 view : Model -> Html Msg
@@ -92,7 +101,7 @@ viewTable model =
                                             "hidden"
                                         )
                                     ]
-                                    [ span [ onClick (ShowCustomer customer) ]
+                                    [ span [ onClick (Selected (Details customer)) ]
                                         [ Icon.i "remove_red_eye" ]
                                     , span []
                                         [ Icon.i "receipt" ]
@@ -102,34 +111,3 @@ viewTable model =
                     )
             )
         ]
-
-{--
-createBreadForResults model =
-    ( "Search Results", "","search" )
-
-
-updateBreadIndexForResults model =
-    Breadcrumb.update (Breadcrumb.Select 0) model.breadcrumb
-
-
-updateBreadForResults model =
-    Breadcrumb.update
-        (Breadcrumb.Update
-            (\_ -> { breads = [ createBreadForResults model ], activeIndex = 0 })
-        )
-        model.breadcrumb
-
-
-createBreadForDetails model =
-    let
-        breadModel =
-            { breads = ( "Details", "","person" ) :: [ createBreadForResults model ], activeIndex = 1 }
-    in
-        Breadcrumb.update
-            (Breadcrumb.Update (\_ -> breadModel))
-            model.breadcrumb
-
-
-updateBreadIndexForDetails model =
-    Breadcrumb.update (Breadcrumb.Select 1) model.breadcrumb
---}

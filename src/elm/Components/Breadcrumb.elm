@@ -3,6 +3,9 @@ module Components.Breadcrumb exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (class)
 import Html.Events exposing (onClick)
+import Material.Options exposing (styled)
+import Material.Icon as Icon
+import Material.Typography as Typo
 
 type alias Crumb = List String
 type alias Bread = List Crumb
@@ -76,7 +79,7 @@ viewCrumb index crumb onSelect activeClass=
     li [activeClass index]
         [ span [onClick(onSelect (Just index)) ]
             (crumb |> List.map (\line ->
-                p [][text line]
+                styled p [Typo.title][text line]
             ))
         ]
 

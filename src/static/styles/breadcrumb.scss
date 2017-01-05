@@ -3,10 +3,11 @@
 .art-breadcrumb-container{
   //margin-top:10px;
   overflow: hidden;
-  background-color: #EEEEEE;
+  //background-color: #EEEEEE;
 }
 .is-loading{
   float:right;
+  width: 100px;
   background-color: #EEEEEE;
 }
 .art-breadcrumb{
@@ -25,12 +26,13 @@
   }
   p{
     display: inline-block;
-    font: 18px Sans-Serif;
+    //font: 18px Sans-Serif;
     margin-bottom: 0;
   }
 }
 .art-breadcrumb li {
   float: left;
+  //display: inline-block;
 }
 
 .art-breadcrumb li span{

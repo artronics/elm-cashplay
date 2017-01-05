@@ -12,6 +12,7 @@ import Components.Customer.SearchBar as SearchBar
 import Components.Breadcrumb as Breadcrumb
 import Components.Customer.SearchList as SearchList
 import Components.Customer.NewCustomer as NewCustomer
+import Components.Customer.ViewCustomer as ViewCustomer
 import Resources.Customer as Res
 import Components.Customer.SearchBar exposing (Query)
 
@@ -25,6 +26,7 @@ type alias Model =
     , breadcrumb : Breadcrumb.Model
     , searchList : SearchList.Model
     , newCustomer : NewCustomer.Model
+    , viewCustomer : ViewCustomer.Model
     , mdl : Material.Model
     }
 
@@ -39,6 +41,7 @@ init =
     , searchBar = SearchBar.init
     , searchList = SearchList.init
     , newCustomer = NewCustomer.init
+    , viewCustomer = ViewCustomer.init
     , mdl = Material.model
     }
 
@@ -57,6 +60,7 @@ type Msg
     | SearchBarMsg SearchBar.Msg
     | SearchListMsg SearchList.Msg
     | NewCustomerMsg NewCustomer.Msg
+    | ViewCustomerMsg ViewCustomer.Msg
     | Mdl (Material.Msg Msg)
 
 
@@ -98,12 +102,30 @@ update msg model =
             in
                 ( { model | searchBar = updatedSearchBar, query = query }, Cmd.map SearchBarMsg cmd )
 
+        --When user click at actions on SearchList, SearchList dispatch a msg which
+        --we match here in order to update ViewCustomer
+        SearchListMsg (SearchList.Selected action) ->
+            let
+                updatedSearchList =
+                    SearchList.update (SearchList.Selected action) model.searchList
+            in
+                case action of
+                    SearchList.Details customer ->
+                        let
+                            updatedViewCus =
+                                ViewCustomer.update (ViewCustomer.UpdateCustomer (Just customer)) model.viewCustomer
+                        in
+                            ({ model
+                             | viewCustomer = updatedViewCus
+                             , searchList = updatedSearchList
+                             },Cmd.none)
+
         SearchListMsg msg_ ->
             let
-                ( updatedSearchList, cmd ) =
+                updatedSearchList =
                     SearchList.update msg_ model.searchList
             in
-                ( { model | searchList = updatedSearchList }, Cmd.map SearchListMsg cmd )
+                ( { model | searchList = updatedSearchList }, Cmd.none )
 
         NewCustomerMsg msg_ ->
             let
@@ -111,6 +133,13 @@ update msg model =
                     NewCustomer.update msg_ model.newCustomer
             in
                 ( { model | newCustomer = updatedNewCustomer }, Cmd.map NewCustomerMsg cmd )
+
+        ViewCustomerMsg msg_ ->
+            let
+                updatedViewCustomer =
+                    ViewCustomer.update msg_ model.viewCustomer
+            in
+                ( { model | viewCustomer = updatedViewCustomer }, Cmd.none)
 
         Mdl msg_ ->
             Material.update Mdl msg_ model
@@ -125,6 +154,7 @@ view model =
     div []
         [ viewHeader model
         , viewBreadcrumb model
+        , Html.map ViewCustomerMsg (ViewCustomer.view model.viewCustomer)
         , div [ Elev.e0,center  ]
             [ viewContent model]
         ]
