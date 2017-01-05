@@ -55,14 +55,15 @@ type Msg
     | Mdl (Material.Msg Msg)
 
 
-update : Msg -> Model -> ( Model, Cmd Msg, Query )
+update : Msg -> Model -> ( Model, Cmd Msg, Maybe Query )
 update msg model =
     let
         ( model_, cmd_ ) =
             update_ msg model
 
-        query =
-            { value = model_.searchValue, field = model_.selectedCustomerField }
+        query = if model_.searchValue == "" then Nothing else
+
+            Just { value = model_.searchValue, field = model_.selectedCustomerField }
     in
         ( model_, cmd_, query )
 

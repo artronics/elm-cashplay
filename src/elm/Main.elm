@@ -59,12 +59,17 @@ view model =
             ]
         ]
 
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Sub.batch
+        [ Sub.none
+        ]
 
 main : Program Never Model Msg
 main =
     Html.program
         { init = ( model, Cmd.none )
         , view = view
-        , subscriptions = always Sub.none
+        , subscriptions = subscriptions
         , update = update
         }

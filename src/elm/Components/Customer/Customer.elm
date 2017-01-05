@@ -29,10 +29,10 @@ init =
     , mdl = Material.model
     }
 
-
 type Msg
     = SearchBarMsg SearchBar.Msg
     | Mdl (Material.Msg Msg)
+
 
 update: Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -46,7 +46,27 @@ update msg model =
 view: Model -> Html Msg
 view model =
     div []
-        [ Html.map SearchBarMsg (SearchBar.view model.searchBar)]
+        [viewHeader model]
+
+viewHeader: Model -> Html Msg
+viewHeader model =
+    div [ Elev.e0, center, cs "art-page-header" ]
+        [ Html.map SearchBarMsg (SearchBar.view model.searchBar)
+        , Button.render Mdl
+            [ 2 ]
+            model.mdl
+            [ Button.ripple, Button.raised
+            --disable button if query is Nothing
+            , Maybe.withDefault Button.disabled (Maybe.map (\_ -> Button.primary) model.query)
+
+            ]
+            [ Icon.i "search", text "Search" ]
+        , Button.render Mdl
+            [ 3 ]
+            model.mdl
+            [ Button.ripple, Button.raised, css "margin-left" "50px"]
+            [ Icon.i "person_add", text "New Customer" ]
+        ]
 
 updateSearchBar: SearchBar.Msg -> Model -> (Model, Cmd Msg)
 updateSearchBar msg model =
@@ -54,4 +74,4 @@ updateSearchBar msg model =
         (updatedSearchBar, cmd, query) =
             SearchBar.update msg model.searchBar
     in
-        ({model | searchBar = updatedSearchBar, query = Just query}, Cmd.map SearchBarMsg cmd)
+        ({model | searchBar = updatedSearchBar, query = query}, Cmd.map SearchBarMsg cmd)
