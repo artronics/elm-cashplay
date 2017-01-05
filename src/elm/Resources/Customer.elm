@@ -11,6 +11,13 @@ type alias Customer =
     , lastName: String
     }
 
+--TODO change id to Maybe id and change decoder
+empty:Customer
+empty =
+    { id = -1
+    , firstName = ""
+    , lastName = ""
+    }
 type SearchField
     = Name
     | Mobile

@@ -7,6 +7,7 @@ import Material.Elevation as Elev
 import Material.Options exposing (..)
 import Material.Button as Button
 import Material.Icon as Icon
+import Helpers exposing (maybeToBool)
 import Components.MessageBox as MsgBox
 import Components.Customer.SearchBar as SearchBar
 import Components.Breadcrumb as Breadcrumb
@@ -22,8 +23,8 @@ type alias Model =
     , query : Maybe SearchBar.Query
     , breadcrumb : Breadcrumb.Model
     , customerList : CustomerList.Model
+    , newCustomer : NewCustomer.Model
     , customerView : CustomerView.Model
-    , selectedCustomerForDetails : Maybe Res.Customer
     , mdl : Material.Model
     }
 
@@ -34,8 +35,8 @@ init =
     , query = Nothing
     , breadcrumb = Breadcrumb.init
     , customerList = CustomerList.init
+    , newCustomer = NewCustomer.init
     , customerView = CustomerView.init
-    , selectedCustomerForDetails = Nothing
     , mdl = Material.model
     }
 
@@ -43,9 +44,11 @@ init =
 type Msg
     = SearchBarMsg SearchBar.Msg
     | PerformSearch
+    | NewCustomer
     | OnFetchCustomers (Result Http.Error (List Res.Customer))
     | BreadcrumbMsg Breadcrumb.Msg
     | CustomerListMsg CustomerList.Msg
+    | NewCustomerMsg NewCustomer.Msg
     | CustomerViewMsg CustomerView.Msg
     | Mdl (Material.Msg Msg)
 
@@ -81,6 +84,24 @@ update msg model =
             in
                 ( resetModel, Cmd.none )
 
+        NewCustomer ->
+            let
+                resetModel =
+                    resetModelView model
+
+                breadcrumb =
+                    resetModel.breadcrumb
+
+                newCustomer =
+                    resetModel.newCustomer
+            in
+                ( { resetModel
+                    | newCustomer = { newCustomer | customer = Just Res.empty }
+                    , breadcrumb = { breadcrumb | activeIndex = 0 }
+                  }
+                , Cmd.none
+                )
+
         BreadcrumbMsg msg_ ->
             let
                 updated =
@@ -95,6 +116,9 @@ update msg model =
         CustomerListMsg msg_ ->
             updateCustomerList msg_ model
 
+        NewCustomerMsg msg_ ->
+            updateNewCustomer msg_ model
+
         CustomerViewMsg msg_ ->
             updateCustomerView msg_ model
 
@@ -108,6 +132,9 @@ resetModelView model =
         customerList =
             CustomerList.init
 
+        newCustomer =
+            NewCustomer.init
+
         breadcrumb =
             Breadcrumb.init
 
@@ -116,6 +143,7 @@ resetModelView model =
     in
         { model
             | customerList = customerList
+            , newCustomer = newCustomer
             , customerView = customerView
             , breadcrumb = breadcrumb
         }
@@ -143,16 +171,45 @@ viewCustomers model =
 
 viewCustomerDetails : Model -> ( Bool, ( List String, Html Msg ) )
 viewCustomerDetails model =
-    ( maybeToBool model.customerView.customer
-    , ( [ "person", "Details" ]
-      , Html.map CustomerViewMsg <| CustomerView.view model.customerView
-      )
-    )
+    let
+        -- Nothing should never happen but if it happens then fullName will be "Customer Details"
+        firstName =
+            model.customerView.customer |> Maybe.map .firstName |> Maybe.withDefault "Customer"
+
+        lastName =
+            model.customerView.customer |> Maybe.map .lastName |> Maybe.withDefault "Details"
+
+        fullName =
+            firstName ++ " " ++ lastName
+    in
+        ( maybeToBool model.customerView.customer
+        , ( [ "person", fullName ]
+          , Html.map CustomerViewMsg <| CustomerView.view model.customerView
+          )
+        )
 
 
-maybeToBool : Maybe a -> Bool
-maybeToBool m =
-    m |> Maybe.map (\_ -> True) |> Maybe.withDefault False
+viewNewCustomer : Model -> ( Bool, ( List String, Html Msg ) )
+viewNewCustomer model =
+    let
+        -- Nothing should never happen but if it happens then fullName will be "Customer Details"
+        firstName =
+            model.newCustomer.customer |> Maybe.map .firstName |> Maybe.withDefault "Customer"
+
+        lastName =
+            model.newCustomer.customer |> Maybe.map .lastName |> Maybe.withDefault "Details"
+
+        fullName =
+            if firstName == "" && lastName == "" then
+                "New Customer"
+            else
+                firstName ++ " " ++ lastName
+    in
+        ( maybeToBool model.newCustomer.customer
+        , ( [ "person", fullName ]
+          , Html.map NewCustomerMsg <| NewCustomer.view model.newCustomer
+          )
+        )
 
 
 view : Model -> Html Msg
@@ -162,6 +219,7 @@ view model =
             Breadcrumb.render model.breadcrumb
                 [ viewCustomers model
                 , viewCustomerDetails model
+                , viewNewCustomer model
                 ]
 
         bread =
@@ -169,7 +227,6 @@ view model =
     in
         div []
             [ viewHeader model
-            , viewTabCrumb model
             , bread
             , breadContent
             ]
@@ -192,14 +249,13 @@ viewHeader model =
         , Button.render Mdl
             [ 3 ]
             model.mdl
-            [ Button.ripple, Button.raised, css "margin-left" "50px" ]
+            [ Button.ripple
+            , Button.raised
+            , css "margin-left" "50px"
+            , onClick NewCustomer
+            ]
             [ Icon.i "person_add", text "New Customer" ]
         ]
-
-
-viewTabCrumb : Model -> Html Msg
-viewTabCrumb model =
-    div [] []
 
 
 updateSearchBar : SearchBar.Msg -> Model -> ( Model, Cmd Msg )
@@ -219,10 +275,32 @@ updateCustomerList msg model =
     in
         case msg of
             CustomerList.Selected (CustomerList.Details customer) ->
-                ( { model | customerList = updatedList, selectedCustomerForDetails = customer }, Cmd.none )
+                let
+                    customerView =
+                        CustomerView.init
+
+                    breadcrumb =
+                        Breadcrumb.init
+                in
+                    ( { model
+                        | customerList = updatedList
+                        , customerView = { customerView | customer = customer }
+                        , breadcrumb = { breadcrumb | activeIndex = 1 }
+                      }
+                    , Cmd.none
+                    )
 
             _ ->
                 ( { model | customerList = updatedList }, Cmd.none )
+
+
+updateNewCustomer : NewCustomer.Msg -> Model -> ( Model, Cmd Msg )
+updateNewCustomer msg model =
+    let
+        updated =
+            NewCustomer.update msg model.newCustomer
+    in
+        ( { model | newCustomer = updated }, Cmd.none )
 
 
 updateCustomerView : CustomerView.Msg -> Model -> ( Model, Cmd Msg )
