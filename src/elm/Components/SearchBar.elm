@@ -49,12 +49,14 @@ update msg model menu filter performSearch=
     case msg of
         OnSearchInput value ->
             let
-                menuItem = filter value
+                autoDetection = if value == "" then True else model.autoDetection
+                menuItem = if model.autoDetection == True then filter value else model.selectedKey
             in
-                ({model | searchValue = value, selectedKey = menuItem}, Cmd.none, Cmd.none)
+                ({model | searchValue = value, selectedKey = menuItem, autoDetection = autoDetection}, Cmd.none, Cmd.none)
 
         Select key ->
-            ({model | selectedKey = key}, Cmd.none,Cmd.none)
+            --Here we also disable auto detection because user click on select menu
+            ({model | selectedKey = key, autoDetection = False}, Cmd.none,Cmd.none)
 
         Search ->
             let
