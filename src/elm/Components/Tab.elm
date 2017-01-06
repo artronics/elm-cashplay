@@ -6,11 +6,13 @@ import Material.Tabs as Tabs exposing (..)
 import Material.Options as Options exposing (..)
 import Material.Icon as Icon exposing (..)
 import Components.Customer.Customer as Customer
+import Components.Item.Item as Item
 
 
 type alias Model =
     { current : Tab
     , customer : Customer.Model
+    , item : Item.Model
     , mdl : Material.Model
     }
 
@@ -19,6 +21,7 @@ init : Model
 init =
     { current = 0
     , customer = Customer.init
+    , item = Item.init
     , mdl = Material.model
     }
 
@@ -26,6 +29,7 @@ init =
 type Msg
     = SelectTab Tab
     | CustomerMsg Customer.Msg
+    | ItemMsg Item.Msg
     | Mdl (Material.Msg Msg)
 
 
@@ -46,6 +50,12 @@ update msg model =
             in
                 ( { model | customer = updatedCustomer }, Cmd.map CustomerMsg cmd )
 
+        ItemMsg msg_ ->
+            let
+                (updated, cmd) =
+                    Item.update msg_ model.item
+            in
+                ({model | item = updated}, Cmd.map ItemMsg cmd)
         Mdl msg_ ->
             Material.update Mdl msg_ model
 
@@ -76,6 +86,9 @@ view model =
             [ case model.current of
                 0 ->
                     Html.map CustomerMsg (Customer.view model.customer)
+
+                1 ->
+                    Html.map ItemMsg <| Item.view model.item
 
                 _ ->
                     text "foo"
