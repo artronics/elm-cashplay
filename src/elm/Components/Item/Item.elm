@@ -53,6 +53,6 @@ view model =
             , Button.raised
             , cs "new-button"
             ]
-            [ Icon.i "person_add", text "New Customer" ]
+            [ Icon.i "add_to_queue", text "New Item" ]
         ]
 

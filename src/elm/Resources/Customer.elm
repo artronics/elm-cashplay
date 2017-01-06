@@ -31,16 +31,7 @@ type SearchField
 
 
 search query msg =
-    let
-        { field, value } =
-            query
-    in
-        case field of
-            Name ->
-                Api.get ("customer?full_name=ilike.*" ++ value ++ "*") customerDecoder msg
-
-            _ ->
-                Http.get "http://localhost:6464/customers" customerDecoder |> Http.send msg
+    Api.get ("customer?" ++ query ) customerDecoder msg
 
 
 customerDecoder : Decode.Decoder (List Customer)

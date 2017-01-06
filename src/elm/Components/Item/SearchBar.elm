@@ -16,7 +16,7 @@ type alias Model =
 
 init:Model
 init =
-    { searchBar = SearchBar.init
+    { searchBar = SearchBar.init "ID"
     , mdl = Material.model
     }
 

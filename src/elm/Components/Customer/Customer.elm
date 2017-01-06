@@ -255,16 +255,6 @@ viewHeader model =
     div [ Elev.e0, center, cs "art-page-header" ]
         [ Html.map SearchBarMsg (SearchBar.view model.searchBar)
         , Button.render Mdl
-            [ 2 ]
-            model.mdl
-            [ Button.ripple
-            , Button.raised
-              --disable button if query is Nothing
-            , Maybe.withDefault Button.disabled (Maybe.map (\_ -> Button.primary) model.query)
-            , onClick PerformSearch
-            ]
-            [ Icon.i "search", text "Search" ]
-        , Button.render Mdl
             [ 3 ]
             model.mdl
             [ Button.ripple
@@ -279,10 +269,10 @@ viewHeader model =
 updateSearchBar : SearchBar.Msg -> Model -> ( Model, Cmd Msg )
 updateSearchBar msg model =
     let
-        ( updatedSearchBar, cmd, query ) =
+        ( updatedSearchBar, cmd) =
             SearchBar.update msg model.searchBar
     in
-        ( { model | searchBar = updatedSearchBar, query = query }, Cmd.map SearchBarMsg cmd )
+        ( { model | searchBar = updatedSearchBar}, Cmd.map SearchBarMsg cmd )
 
 
 updateCustomerList : CustomerList.Msg -> Model -> ( Model, Cmd Msg )

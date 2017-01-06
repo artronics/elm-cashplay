@@ -21,10 +21,10 @@ type alias Model =
     , mdl : Material.Model
     }
 
-init : Model
-init =
+init : MenuItem -> Model
+init initMenuItem =
     { searchValue = ""
-    , selectedKey = ""
+    , selectedKey = initMenuItem
     , autoDetection = True
     , mdl = Material.model
     }
