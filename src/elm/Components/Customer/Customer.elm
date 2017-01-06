@@ -60,9 +60,11 @@ update msg model =
             let
                 initModel =
                     resetModelView model
-                breadcrumb = initModel.breadcrumb
+
+                breadcrumb =
+                    initModel.breadcrumb
             in
-                ( {initModel | breadcrumb = {breadcrumb| info = Just <| Breadcrumb.Loading}}, fetchCustomers model.query )
+                ( { initModel | breadcrumb = { breadcrumb | info = Just <| Breadcrumb.Loading } }, fetchCustomers model.query )
 
         OnFetchCustomers (Ok customers) ->
             let
@@ -102,7 +104,7 @@ update msg model =
             in
                 ( { resetModel
                     | newCustomer = { newCustomer | customer = Just Res.empty }
-                    , breadcrumb = { breadcrumb | activeIndex = 0, info = Just <|Breadcrumb.Success "Customer Saved" }
+                    , breadcrumb = { breadcrumb | activeIndex = 0, info = Just <| Breadcrumb.Success "Customer Saved" }
                   }
                 , Cmd.none
                 )
@@ -161,13 +163,15 @@ fetchCustomers query =
         |> Maybe.withDefault Cmd.none
 
 
-viewBreadCrumbInfo: Model -> ( Bool, ( List String, Html Msg ) )
+viewBreadCrumbInfo : Model -> ( Bool, ( List String, Html Msg ) )
 viewBreadCrumbInfo model =
     ( maybeToBool model.breadcrumb.info
-    , ( [ ]
-      , span [cs "hidden"][] --we just want to see breadcrumb bar with info. there is no content
+    , ( []
+      , span [ cs "hidden" ] []
+        --we just want to see breadcrumb bar with info. there is no content
       )
     )
+
 
 
 --show ViewCustomers if model.customers js Just X

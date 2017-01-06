@@ -2,43 +2,53 @@ module Resources.Customer exposing (..)
 
 import Http
 import Json.Decode as Decode exposing (field)
-
 import Api
 
+
 type alias Customer =
-    { id:Int
-    , firstName:String
-    , lastName: String
+    { id : Int
+    , firstName : String
+    , lastName : String
     }
 
+
+
 --TODO change id to Maybe id and change decoder
-empty:Customer
+
+
+empty : Customer
 empty =
     { id = -1
     , firstName = ""
     , lastName = ""
     }
+
+
 type SearchField
     = Name
     | Mobile
     | Postcode
 
+
 search query msg =
     let
-        {field,value} =
+        { field, value } =
             query
     in
         case field of
             Name ->
-                Api.get ("customer?full_name=ilike.*"++value++"*") customerDecoder msg
+                Api.get ("customer?full_name=ilike.*" ++ value ++ "*") customerDecoder msg
+
             _ ->
                 Http.get "http://localhost:6464/customers" customerDecoder |> Http.send msg
 
 
-customerDecoder:Decode.Decoder (List Customer)
-customerDecoder = Decode.list memberDecoder
+customerDecoder : Decode.Decoder (List Customer)
+customerDecoder =
+    Decode.list memberDecoder
 
-memberDecoder:Decode.Decoder Customer
+
+memberDecoder : Decode.Decoder Customer
 memberDecoder =
     Decode.map3 Customer
         (field "id" Decode.int)

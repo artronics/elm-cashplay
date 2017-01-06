@@ -48,22 +48,24 @@ type alias Mdl =
 
 view : Model -> Html.Html Msg
 view model =
-    div [cs "art-container"]
-        [ div [cs "art-header"][p [][text "Cashplay"]]
-        , div [cs "art-main-row"]
-            [ div [cs "art-actions"][p [][text "Actions"]]
-            , div [cs "art-tabs"]
-                 [ Html.map TabMsg (Tab.view model.tab)
-                 ]
-            , div [cs "art-receipt"][p [][text "Receipt"]]
+    div [ cs "art-container" ]
+        [ div [ cs "art-header" ] [ p [] [ text "Cashplay" ] ]
+        , div [ cs "art-main-row" ]
+            [ div [ cs "art-actions" ] [ p [] [ text "Actions" ] ]
+            , div [ cs "art-tabs" ]
+                [ Html.map TabMsg (Tab.view model.tab)
+                ]
+            , div [ cs "art-receipt" ] [ p [] [ text "Receipt" ] ]
             ]
         ]
+
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
         [ Sub.none
         ]
+
 
 main : Program Never Model Msg
 main =
