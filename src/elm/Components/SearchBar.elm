@@ -1,13 +1,13 @@
 module Components.SearchBar exposing (..)
 
-import Html exposing (..)
-import Html.Events exposing (onClick,onInput)
-import Html.Attributes exposing (class)
+import Html exposing (Html,text,p)
 import Dict exposing (..)
 import Material
---import Material.Options exposing (..)
+import Material.Options exposing (..)
 import Material.Textfield as Textfield
+import Material.Button as Button
 import Material.Menu as MdlMenu exposing (..)
+import Material.Icon as Icon
 import Regex
 
 import Resources.Customer as ResCus
@@ -44,17 +44,17 @@ type Msg
 
 type alias SearchCmd f m= (f -> Query -> Cmd m)
 
-update : Msg -> Model-> Menu f-> Filter -> SearchCmd f m-> ( Model, Cmd m )
+update :  Msg -> Model-> Menu f-> Filter -> SearchCmd f m-> ( Model,Cmd Msg, Cmd m )
 update msg model menu filter performSearch=
     case msg of
         OnSearchInput value ->
             let
                 menuItem = filter value
             in
-                ({model | searchValue = value, selectedKey = menuItem}, Cmd.none)
+                ({model | searchValue = value, selectedKey = menuItem}, Cmd.none, Cmd.none)
 
         Select key ->
-            ({model | selectedKey = key}, Cmd.none)
+            ({model | selectedKey = key}, Cmd.none,Cmd.none)
 
         Search ->
             let
@@ -64,37 +64,62 @@ update msg model menu filter performSearch=
                         |> Maybe.map (\f -> performSearch f model.searchValue)
                         |> Maybe.withDefault Cmd.none
             in
-                (model, cmd)
+                (model, Cmd.none,cmd)
 
         Mdl msg_ ->
             let
-                (m,_) =
+                (m,c) =
                     Material.update Mdl msg_ model
             in
-                (m,Cmd.none)
+                (m,c,Cmd.none)
 
 
 view : Model -> Menu a-> Html Msg
 view model menu=
-    div []
+    div [ cs "art-search-bar" ]
         [ viewInput model
-        , viewSelectedKey <| model.selectedKey
-        , viewMenuItems <| Dict.keys menu
-        , button[onClick Search][text "search"]
-        , text <| toString model
+        , p [] [ text "In:" ]
+        , viewMenu model  (Dict.keys menu)
+        , viewSearchButton model
         ]
-
-viewSelectedKey: String -> Html Msg
-viewSelectedKey str =
-    p[][text str]
 
 viewInput: Model -> Html Msg
 viewInput model =
-    input [onInput OnSearchInput][]
+    Textfield.render Mdl
+                [ 0 ]
+                model.mdl
+                [ Textfield.label "Search Customers", Textfield.floatingLabel, Textfield.text_, onInput OnSearchInput ]
+                []
+viewSearchButton:Model -> Html Msg
+viewSearchButton model=
+         Button.render Mdl
+            [ 2 ]
+            model.mdl
+            [ Button.ripple
+            , Button.raised
+              --disable button if query is Nothing
+            , if model.searchValue == "" then Button.disabled else Button.primary
+            , onClick Search
+            ]
+            [ Icon.i "search", text "Search" ]
 
-viewMenuItems: List MenuItem -> Html Msg
+viewMenu: Model -> List MenuItem -> Html Msg
+viewMenu model items=
+    div [ cs "art-customer-search-in" ]
+        [ span [] [ text model.selectedKey ]
+        , MdlMenu.render Mdl
+            [ 1 ]
+            model.mdl
+            [ MdlMenu.ripple, MdlMenu.bottomLeft, css "display" "inline" ]
+            (viewMenuItems items)
+        ]
+viewMenuItems: List MenuItem -> List (Item Msg)
 viewMenuItems items =
-    div []
          (items
-            |> List.map (\item -> p[onClick <| Select item][text item])
+            |> List.map
+                (\item ->
+                    MdlMenu.Item
+                        [ onSelect <|Select item ]
+                        [ text item ]
+                )
          )

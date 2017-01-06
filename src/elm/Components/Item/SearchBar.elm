@@ -4,6 +4,7 @@ import Http
 import Dict as Dict exposing (..)
 import Material
 import Material.Options exposing (..)
+import Material.Menu as Menu
 import Components.SearchBar as SearchBar
 
 import Resources.Item as Res
@@ -36,10 +37,12 @@ update msg model =
     case msg of
         SearchBarMsg msg_->
             let
-                (updated,searchCmd) =
+                (updated,cmd , searchCmd) =
                     SearchBar.update msg_ model.searchBar menu filter performSearch
+                batch =
+                    Cmd.batch [searchCmd,Cmd.map SearchBarMsg cmd]
             in
-                ({model | searchBar = updated}, searchCmd)
+                ({model | searchBar = updated}, batch)
         OnFetchItems (Ok items) ->
             (model,Cmd.none)
         OnFetchItems _ ->
@@ -49,7 +52,9 @@ update msg model =
 
 view: Model -> Html Msg
 view model =
-    div[][Html.map SearchBarMsg <| SearchBar.view model.searchBar menu]
+    div[]
+        [ Html.map SearchBarMsg <| SearchBar.view model.searchBar menu
+        ]
 
 
 performSearch: SearchField -> Query -> Cmd Msg

@@ -4,9 +4,13 @@ import Html exposing (Html,p,text)
 import Http
 import Dict as Dict exposing (..)
 import Material
+import Material.Icon as Icon
+import Material.Button as Button
+import Material.Elevation as Elev
 import Material.Options exposing (..)
 import Components.Item.SearchBar as SearchBar
 
+import Material.Menu as Menu
 import Resources.Item as Res
 
 type alias Model =
@@ -40,5 +44,15 @@ update msg model =
 
 view: Model -> Html Msg
 view model =
-    div[][Html.map SearchBarMsg <| SearchBar.view model.searchBar]
+    div[Elev.e0, center, cs "art-page-header"]
+        [ Html.map SearchBarMsg <| SearchBar.view model.searchBar
+        , Button.render Mdl
+            [ 3 ]
+            model.mdl
+            [ Button.ripple
+            , Button.raised
+            , cs "new-button"
+            ]
+            [ Icon.i "person_add", text "New Customer" ]
+        ]
 

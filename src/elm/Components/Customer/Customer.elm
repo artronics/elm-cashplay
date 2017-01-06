@@ -269,7 +269,7 @@ viewHeader model =
             model.mdl
             [ Button.ripple
             , Button.raised
-            , css "margin-left" "50px"
+            , cs "new-button"
             , onClick NewCustomer
             ]
             [ Icon.i "person_add", text "New Customer" ]
