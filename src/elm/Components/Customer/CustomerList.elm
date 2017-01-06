@@ -14,6 +14,7 @@ type alias Model =
     { customers : Maybe (List Customer)
     , hoverInx : Int
     , viewCustomer : Maybe Res.Customer
+    , receiptCustomer : Maybe Res.Customer
     , mdl : Material.Model
     }
 
@@ -23,6 +24,7 @@ init =
     { customers = Nothing
     , hoverInx = -1
     , viewCustomer = Nothing
+    , receiptCustomer = Nothing
     , mdl = Material.model
     }
 
@@ -35,6 +37,7 @@ type Msg
 
 type SelectionAction
     = Details (Maybe Res.Customer)
+    | Receipt (Maybe Res.Customer)
 
 
 update : Msg -> Model -> Model
@@ -45,6 +48,9 @@ update msg model =
 
         Selected (Details customer) ->
             { model | viewCustomer = customer }
+
+        Selected (Receipt customer) ->
+            { model | receiptCustomer = customer }
 
         Mdl msg_ ->
             let
@@ -102,9 +108,9 @@ viewTable model =
                                             "hidden"
                                         )
                                     ]
-                                    [ span [ onClick (Selected (Details (Just customer))) ]
+                                    [ span [ onClick <| Selected <| Details (Just customer) ]
                                         [ Icon.i "remove_red_eye" ]
-                                    , span []
+                                    , span [ onClick <| Selected <| Receipt (Just customer) ]
                                         [ Icon.i "receipt" ]
                                     ]
                                 ]
