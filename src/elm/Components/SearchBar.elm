@@ -1,6 +1,6 @@
 module Components.SearchBar exposing (..)
 
-import Html exposing (Html,text,p)
+import Html exposing (Html, text, p)
 import Dict exposing (..)
 import Material
 import Material.Options exposing (..)
@@ -9,18 +9,20 @@ import Material.Button as Button
 import Material.Menu as MdlMenu exposing (..)
 import Material.Icon as Icon
 import Regex
-
 import Resources.Customer as ResCus
 import Components.Select as Select
 
+
 type alias Model =
     { searchValue : String
-    , selectedKey : MenuItem
+    , selectedKey :
+        MenuItem
         --as soon as user select menu we disable auto detection
         --we enable it if input value is ""
     , autoDetection : Bool
     , mdl : Material.Model
     }
+
 
 init : MenuItem -> Model
 init initMenuItem =
@@ -31,10 +33,21 @@ init initMenuItem =
     }
 
 
-type alias MenuItem = String
-type alias Filter = (String -> MenuItem)
-type alias Menu a= Dict MenuItem a
-type alias Query = String
+type alias MenuItem =
+    String
+
+
+type alias Filter =
+    String -> MenuItem
+
+
+type alias Menu a =
+    Dict MenuItem a
+
+
+type alias Query =
+    String
+
 
 type Msg
     = OnSearchInput String
@@ -43,21 +56,32 @@ type Msg
     | Mdl (Material.Msg Msg)
 
 
-type alias SearchCmd f m= (f -> Query -> Cmd m)
+type alias SearchCmd f m =
+    f -> Query -> Cmd m
 
-update :  Msg -> Model-> Menu f-> Filter -> SearchCmd f m-> ( Model,Cmd Msg, Cmd m )
-update msg model menu filter performSearch=
+
+update : Msg -> Model -> Menu f -> Filter -> SearchCmd f m -> ( Model, Cmd Msg, Cmd m )
+update msg model menu filter performSearch =
     case msg of
         OnSearchInput value ->
             let
-                autoDetection = if value == "" then True else model.autoDetection
-                menuItem = if model.autoDetection == True then filter value else model.selectedKey
+                autoDetection =
+                    if value == "" then
+                        True
+                    else
+                        model.autoDetection
+
+                menuItem =
+                    if model.autoDetection == True then
+                        filter value
+                    else
+                        model.selectedKey
             in
-                ({model | searchValue = value, selectedKey = menuItem, autoDetection = autoDetection}, Cmd.none, Cmd.none)
+                ( { model | searchValue = value, selectedKey = menuItem, autoDetection = autoDetection }, Cmd.none, Cmd.none )
 
         Select key ->
             --Here we also disable auto detection because user click on select menu
-            ({model | selectedKey = key, autoDetection = False}, Cmd.none,Cmd.none)
+            ( { model | selectedKey = key, autoDetection = False }, Cmd.none, Cmd.none )
 
         Search ->
             let
@@ -67,49 +91,58 @@ update msg model menu filter performSearch=
                         |> Maybe.map (\f -> performSearch f model.searchValue)
                         |> Maybe.withDefault Cmd.none
             in
-                (model, Cmd.none,cmd)
+                ( model, Cmd.none, cmd )
 
         Mdl msg_ ->
             let
-                (m,c) =
+                ( m, c ) =
                     Material.update Mdl msg_ model
             in
-                (m,c,Cmd.none)
+                ( m, c, Cmd.none )
 
 
-view : Model -> Menu a-> Html Msg
-view model menu=
+view : Model -> Menu a -> Html Msg
+view model menu =
     div [ cs "art-search-bar" ]
         [ viewInput model
         , p [] [ text "In:" ]
-        , viewMenu model  (Dict.keys menu)
+        , viewMenu model (Dict.keys menu)
         , viewSearchButton model
         ]
 
-viewInput: Model -> Html Msg
+
+viewInput : Model -> Html Msg
 viewInput model =
     Textfield.render Mdl
-                [ 0 ]
-                model.mdl
-                [ Textfield.label "Search Customers", Textfield.floatingLabel, Textfield.text_, onInput OnSearchInput ]
-                []
-viewSearchButton:Model -> Html Msg
-viewSearchButton model=
-         Button.render Mdl
-            [ 2 ]
-            model.mdl
-            [ Button.ripple
-            , Button.raised
-              --disable button if query is Nothing
-            , if model.searchValue == "" then Button.disabled else Button.primary
-            , onClick Search
-            ]
-            [ Icon.i "search", text "Search" ]
+        [ 0 ]
+        model.mdl
+        [ Textfield.label "Search Customers", Textfield.floatingLabel, Textfield.text_, onInput OnSearchInput ]
+        []
 
 
-viewMenu: Model -> List MenuItem -> Html Msg
-viewMenu model items=
-    Select.select Mdl [1] model.mdl items Select model.selectedKey
+viewSearchButton : Model -> Html Msg
+viewSearchButton model =
+    Button.render Mdl
+        [ 2 ]
+        model.mdl
+        [ Button.ripple
+        , Button.raised
+          --disable button if query is Nothing
+        , if model.searchValue == "" then
+            Button.disabled
+          else
+            Button.primary
+        , onClick Search
+        ]
+        [ Icon.i "search", text "Search" ]
+
+
+viewMenu : Model -> List MenuItem -> Html Msg
+viewMenu model items =
+    Select.select Mdl [ 1 ] model.mdl items Select model.selectedKey
+
+
+
 --    div [ cs "art-customer-search-in" ]
 --        [ span [] [ text model.selectedKey ]
 --        , MdlMenu.render Mdl

@@ -52,10 +52,11 @@ update msg model =
 
         ItemMsg msg_ ->
             let
-                (updated, cmd) =
+                ( updated, cmd ) =
                     Item.update msg_ model.item
             in
-                ({model | item = updated}, Cmd.map ItemMsg cmd)
+                ( { model | item = updated }, Cmd.map ItemMsg cmd )
+
         Mdl msg_ ->
             Material.update Mdl msg_ model
 

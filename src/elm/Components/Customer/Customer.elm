@@ -269,10 +269,10 @@ viewHeader model =
 updateSearchBar : SearchBar.Msg -> Model -> ( Model, Cmd Msg )
 updateSearchBar msg model =
     let
-        ( updatedSearchBar, cmd) =
+        ( updatedSearchBar, cmd ) =
             SearchBar.update msg model.searchBar
     in
-        ( { model | searchBar = updatedSearchBar}, Cmd.map SearchBarMsg cmd )
+        ( { model | searchBar = updatedSearchBar }, Cmd.map SearchBarMsg cmd )
 
 
 updateCustomerList : CustomerList.Msg -> Model -> ( Model, Cmd Msg )

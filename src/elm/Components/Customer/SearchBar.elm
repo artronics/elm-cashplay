@@ -18,15 +18,21 @@ type alias Model =
     , mdl : Material.Model
     }
 
-init:Model
+
+init : Model
 init =
     { searchBar = SearchBar.init "Customer's Name"
     , mdl = Material.model
     }
 
 
-type alias Query = String
-type alias MenuItem = String
+type alias Query =
+    String
+
+
+type alias MenuItem =
+    String
+
 
 type SearchField
     = Name
@@ -36,53 +42,63 @@ type SearchField
 
 type Msg
     = SearchBarMsg SearchBar.Msg
-    | OnFetchCustomers (Result Http.Error (List Res.Customer) )
+    | OnFetchCustomers (Result Http.Error (List Res.Customer))
     | Mdl (Material.Msg Msg)
 
-update: Msg -> Model -> (Model, Cmd Msg)
+
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        SearchBarMsg msg_->
+        SearchBarMsg msg_ ->
             let
-                (updated,cmd , searchCmd) =
+                ( updated, cmd, searchCmd ) =
                     SearchBar.update msg_ model.searchBar menu filter performSearch
+
                 batch =
-                    Cmd.batch [searchCmd,Cmd.map SearchBarMsg cmd]
+                    Cmd.batch [ searchCmd, Cmd.map SearchBarMsg cmd ]
             in
-                ({model | searchBar = updated}, batch)
+                ( { model | searchBar = updated }, batch )
+
         OnFetchCustomers (Ok customers) ->
-            (model,Cmd.none)
+            ( model, Cmd.none )
+
         OnFetchCustomers _ ->
-            (model,Cmd.none)
+            ( model, Cmd.none )
+
         Mdl msg_ ->
             Material.update Mdl msg_ model
 
-view: Model -> Html Msg
+
+view : Model -> Html Msg
 view model =
-    div[]
+    div []
         [ Html.map SearchBarMsg <| SearchBar.view model.searchBar menu
         ]
 
 
-performSearch: SearchField -> Query -> Cmd Msg
+performSearch : SearchField -> Query -> Cmd Msg
 performSearch field q =
     case field of
         Name ->
-            Res.search ("full_name=ilike.*"++ q ++"*") OnFetchCustomers
+            Res.search ("full_name=ilike.*" ++ q ++ "*") OnFetchCustomers
+
         _ ->
             Res.search "" OnFetchCustomers
 
-filter: Query -> MenuItem
+
+filter : Query -> MenuItem
 filter q =
     searchFieldDisplayName <| searchInMatch q
 
-menu: Dict MenuItem SearchField
+
+menu : Dict MenuItem SearchField
 menu =
     Dict.fromList
-        [ ("Customer's Name",Name)
-        , ("Mobile Number",Mobile)
-        , ("Postcode",Postcode)
+        [ ( "Customer's Name", Name )
+        , ( "Mobile Number", Mobile )
+        , ( "Postcode", Postcode )
         ]
+
 
 searchFieldDisplayName : SearchField -> MenuItem
 searchFieldDisplayName field =
