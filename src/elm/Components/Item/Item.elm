@@ -11,12 +11,16 @@ import Components.Item.SearchBar as SearchBar
 import Material.Menu as Menu
 import Resources.Item as Res
 import Components.Item.Breadcrumb as Breadcrumb
+import Components.Item.List as List
 
 
 type alias Model =
     { currentView : Maybe View
+    , fetchedItems : List Res.Item
+    , netErr : Maybe Http.Error
     , searchBar : SearchBar.Model
     , breadcrumb : Breadcrumb.Model
+    , list : List.Model
     , mdl : Material.Model
     }
 
@@ -24,8 +28,11 @@ type alias Model =
 init : Model
 init =
     { currentView = Nothing
+    , fetchedItems = []
+    , netErr = Nothing
     , searchBar = SearchBar.init
     , breadcrumb = Breadcrumb.init
+    , list = List.init
     , mdl = Material.model
     }
 
@@ -33,18 +40,41 @@ init =
 type Msg
     = SearchBarMsg SearchBar.Msg
     | BreadcrumbMsg Breadcrumb.Msg
+    | ListMsg List.Msg
     | Mdl (Material.Msg Msg)
+
+
+updateSearchBar : SearchBar.Msg -> Model -> ( Model, Cmd Msg )
+updateSearchBar msg model =
+    let
+        ( updated, cmd, itemsResult ) =
+            SearchBar.update msg model.searchBar
+
+        ( netErr, fetchedItem ) =
+            case itemsResult of
+                Just (Ok items) ->
+                    ( Nothing, items )
+
+                Just (Err err) ->
+                    ( Just err, model.fetchedItems )
+
+                Nothing ->
+                    ( model.netErr, model.fetchedItems )
+    in
+        ( { model
+            | searchBar = updated
+            , fetchedItems = fetchedItem
+            , netErr = netErr
+          }
+        , Cmd.map SearchBarMsg cmd
+        )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         SearchBarMsg msg_ ->
-            let
-                ( updated, cmd ) =
-                    SearchBar.update msg_ model.searchBar
-            in
-                ( { model | searchBar = updated }, Cmd.map SearchBarMsg cmd )
+            updateSearchBar msg_ model
 
         BreadcrumbMsg msg_ ->
             let
@@ -52,6 +82,13 @@ update msg model =
                     Breadcrumb.update msg_ model.breadcrumb renderCrumbContent
             in
                 ( { model | breadcrumb = updated, currentView = currentView }, Cmd.map BreadcrumbMsg cmd )
+
+        ListMsg msg_ ->
+            let
+                ( updated, cmd ) =
+                    List.update msg_ model.list
+            in
+                ( { model | list = updated }, Cmd.map ListMsg cmd )
 
         Mdl msg_ ->
             Material.update Mdl msg_ model
@@ -63,6 +100,7 @@ view model =
         [ viewHeader model
         , Html.map BreadcrumbMsg <| Breadcrumb.view model.breadcrumb bread
         , viewBreadcrumbContent model.currentView
+        , Html.map ListMsg <| List.view model.list <| Res.itemsToList model.fetchedItems
         ]
 
 

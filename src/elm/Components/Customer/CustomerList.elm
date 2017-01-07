@@ -6,7 +6,7 @@ import Material.Typography as Typo
 import Material.Options exposing (..)
 import Material.Table as Table
 import Material.Button as Button
-import Material.Icon as Icon
+import Material.Icon as MdlIcon
 import Resources.Customer as Res exposing (..)
 
 
@@ -79,15 +79,7 @@ tableHeaders =
 viewTable : Model -> Html Msg
 viewTable model =
     Table.table [ cs "art-search-table" ]
-        [ Table.thead []
-            [ Table.tr []
-                (tableHeaders
-                    |> List.map
-                        (\header ->
-                            Table.td [] [ text header ]
-                        )
-                )
-            ]
+        [ viewTableHeaders tableHeaders
         , Table.tbody []
             (Maybe.withDefault [] model.customers
                 |> List.indexedMap
@@ -99,22 +91,57 @@ viewTable model =
                             [ Table.td [ Table.numeric ] [ text (toString customer.id) ]
                             , Table.td [] [ text (customer.firstName ++ " " ++ customer.lastName) ]
                               -- This cell is for showing actions buttons (view and add to receipt)
-                            , Table.td []
-                                [ span
-                                    [ cs
-                                        (if model.hoverInx == inx then
-                                            "art-search-results-actions"
-                                         else
-                                            "hidden"
-                                        )
-                                    ]
-                                    [ span [ onClick <| Selected <| Details (Just customer) ]
-                                        [ Icon.i "remove_red_eye" ]
-                                    , span [ onClick <| Selected <| Receipt (Just customer) ]
-                                        [ Icon.i "receipt" ]
-                                    ]
+                            , viewActions
+                                [ ( "remove_red_eye", Selected <| Details (Just customer) )
+                                , ( "receipt", Selected <| Receipt (Just customer) )
                                 ]
+                                (model.hoverInx == inx)
                             ]
+                    )
+            )
+        ]
+
+
+type alias Icon =
+    String
+
+
+type alias Show =
+    Bool
+
+
+viewTableHeaders : List String -> Html m
+viewTableHeaders headers =
+    Table.thead []
+        [ Table.tr []
+            (headers
+                |> List.map
+                    (\header ->
+                        Table.td [] [ text header ]
+                    )
+            )
+        ]
+
+
+type alias Action m =
+    ( Icon, m )
+
+
+viewActions : List (Action m) -> Show -> Html m
+viewActions actions show =
+    Table.td []
+        [ span
+            [ cs
+                (if show then
+                    "art-search-results-actions"
+                 else
+                    "hidden"
+                )
+            ]
+            (actions
+                |> List.map
+                    (\( icon, msg ) ->
+                        span [ onClick msg ] [ MdlIcon.i icon ]
                     )
             )
         ]

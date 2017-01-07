@@ -12,6 +12,7 @@ import Resources.Item as Res
 
 type alias Model =
     { searchBar : SearchBar.Model
+    , fetchedItems : Maybe (Result Http.Error (List Res.Item))
     , mdl : Material.Model
     }
 
@@ -19,6 +20,7 @@ type alias Model =
 init : Model
 init =
     { searchBar = SearchBar.init "ID"
+    , fetchedItems = Nothing
     , mdl = Material.model
     }
 
@@ -42,7 +44,7 @@ type Msg
     | Mdl (Material.Msg Msg)
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
+update : Msg -> Model -> ( Model, Cmd Msg, Maybe (Result Http.Error (List Res.Item)) )
 update msg model =
     case msg of
         SearchBarMsg msg_ ->
@@ -53,16 +55,17 @@ update msg model =
                 batch =
                     Cmd.batch [ searchCmd, Cmd.map SearchBarMsg cmd ]
             in
-                ( { model | searchBar = updated }, batch )
+                ( { model | searchBar = updated }, batch, model.fetchedItems )
 
-        OnFetchItems (Ok items) ->
-            ( model, Cmd.none )
-
-        OnFetchItems _ ->
-            ( model, Cmd.none )
+        OnFetchItems result ->
+            ( { model | fetchedItems = Just result }, Cmd.none, Just result )
 
         Mdl msg_ ->
-            Material.update Mdl msg_ model
+            let
+                ( m, c ) =
+                    Material.update Mdl msg_ model
+            in
+                ( m, c, model.fetchedItems )
 
 
 view : Model -> Html Msg
