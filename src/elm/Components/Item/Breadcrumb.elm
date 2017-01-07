@@ -3,26 +3,22 @@ module Components.Item.Breadcrumb exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (class)
 import Html.Events exposing (onClick)
-import Dict as Dict exposing (..)
 import Material
 
 
 type alias Model =
     { activeIndex : Int
-    , mdl : Material.Model
     }
 
 
 init : Model
 init =
     { activeIndex = 0
-    , mdl = Material.model
     }
 
 
 type Msg
     = Select Int
-    | Mdl (Material.Msg Msg)
 
 
 type alias Icon =
@@ -37,22 +33,23 @@ type alias Crumb =
     ( Icon, Title )
 
 
-type alias Action =
-    String
+type alias Action m =
+    Int -> Maybe m
 
 
 type alias Bread =
-    List ( Int, ( Crumb, Action ) )
+    List ( Int, Crumb )
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
+update : Msg -> Model -> Action m -> ( Model, Cmd Msg, Maybe m )
+update msg model action =
     case msg of
         Select index ->
-            ( { model | activeIndex = index }, Cmd.none )
-
-        Mdl msg_ ->
-            Material.update Mdl msg_ model
+            let
+                renderContent =
+                    action index
+            in
+                ( { model | activeIndex = index }, Cmd.none, renderContent )
 
 
 view : Model -> Bread -> Html Msg
@@ -71,11 +68,11 @@ viewBread model bread =
             (viewCrumbs model sortedBread)
 
 
-viewCrumbs : Model -> List ( Int, ( Crumb, Action ) ) -> List (Html Msg)
+viewCrumbs : Model -> List ( Int, Crumb ) -> List (Html Msg)
 viewCrumbs model bread =
     bread
         |> List.map
-            (\( index, ( ( icon, title ), action ) ) ->
+            (\( index, ( icon, title ) ) ->
                 (li
                     [ if model.activeIndex == index then
                         class "active"

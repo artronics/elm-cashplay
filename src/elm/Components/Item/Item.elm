@@ -2,7 +2,6 @@ module Components.Item.Item exposing (..)
 
 import Html exposing (Html, p, text)
 import Http
-import Dict as Dict exposing (..)
 import Material
 import Material.Icon as Icon
 import Material.Button as Button
@@ -15,7 +14,8 @@ import Components.Item.Breadcrumb as Breadcrumb
 
 
 type alias Model =
-    { searchBar : SearchBar.Model
+    { currentView : Maybe View
+    , searchBar : SearchBar.Model
     , breadcrumb : Breadcrumb.Model
     , mdl : Material.Model
     }
@@ -23,7 +23,8 @@ type alias Model =
 
 init : Model
 init =
-    { searchBar = SearchBar.init
+    { currentView = Nothing
+    , searchBar = SearchBar.init
     , breadcrumb = Breadcrumb.init
     , mdl = Material.model
     }
@@ -47,10 +48,10 @@ update msg model =
 
         BreadcrumbMsg msg_ ->
             let
-                ( updated, cmd ) =
-                    Breadcrumb.update msg_ model.breadcrumb
+                ( updated, cmd, currentView ) =
+                    Breadcrumb.update msg_ model.breadcrumb renderCrumbContent
             in
-                ( { model | breadcrumb = updated }, Cmd.map BreadcrumbMsg cmd )
+                ( { model | breadcrumb = updated, currentView = currentView }, Cmd.map BreadcrumbMsg cmd )
 
         Mdl msg_ ->
             Material.update Mdl msg_ model
@@ -61,6 +62,7 @@ view model =
     div []
         [ viewHeader model
         , Html.map BreadcrumbMsg <| Breadcrumb.view model.breadcrumb bread
+        , viewBreadcrumbContent model.currentView
         ]
 
 
@@ -77,6 +79,19 @@ viewHeader model =
             ]
             [ Icon.i "add_to_queue", text "New Item" ]
         ]
+
+
+viewBreadcrumbContent : Maybe View -> Html Msg
+viewBreadcrumbContent view =
+    case view of
+        Just Search ->
+            text "fuck you"
+
+        Just Details ->
+            text "fuck details"
+
+        Nothing ->
+            text "well i fucked up"
 
 
 
@@ -96,23 +111,37 @@ type alias Crumb =
 
 
 type alias Action =
-    String
+    String -> Html Msg
+
+
+type View
+    = Search
+    | Details
 
 
 type alias Bread =
-    List ( Int, ( Crumb, Action ) )
+    List ( Int, Crumb )
+
+
+renderCrumbContent : Int -> Maybe View
+renderCrumbContent index =
+    case index of
+        0 ->
+            Just Search
+
+        1 ->
+            Just Details
+
+        _ ->
+            Nothing
 
 
 bread : Bread
 bread =
     [ ( 0
-      , ( ( "search", "Search Results" )
-        , "act0"
-        )
+      , ( "search", "Search Results" )
       )
     , ( 1
-      , ( ( "person", "customer details" )
-        , "act1"
-        )
+      , ( "person", "customer details" )
       )
     ]
