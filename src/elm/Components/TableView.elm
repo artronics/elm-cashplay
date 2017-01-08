@@ -33,6 +33,7 @@ render headers resDict tableData viewActions rowAtr isHover =
             (resDict
                 |> Dict.map
                     (\key item ->
+                        --TODO fix this mess, repeated key as param
                         viewTableRow item tableData (viewActions key) (rowAtr key) (isHover key)
                     )
                 |> Dict.values

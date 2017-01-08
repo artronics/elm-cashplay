@@ -12,6 +12,7 @@ import Material.Table as Table
 import Components.Item.SearchBar as SearchBar
 import Material.Menu as Menu
 import Resources.Item as Res
+import Components.MessageBox as MsgBox
 import Components.Item.Breadcrumb as Breadcrumb
 import Components.ViewReceipt as ViewReceipt
 
@@ -48,27 +49,34 @@ type Msg
     | Mdl (Material.Msg Msg)
 
 
+type View
+    = SearchResults
+    | Details
+    | NetErr
+
+
 updateSearchBar : SearchBar.Msg -> Model -> ( Model, Cmd Msg )
 updateSearchBar msg model =
     let
         ( updated, cmd, itemsResult ) =
             SearchBar.update msg model.searchBar
 
-        ( netErr, fetchedItem ) =
+        ( netErr, fetchedItem, view ) =
             case itemsResult of
                 Just (Ok items) ->
-                    ( Nothing, itemsToDict items )
+                    ( Nothing, itemsToDict items, Just SearchResults )
 
                 Just (Err err) ->
-                    ( Just err, model.fetchedItems )
+                    ( Just err, model.fetchedItems, Just NetErr )
 
                 Nothing ->
-                    ( model.netErr, model.fetchedItems )
+                    ( model.netErr, model.fetchedItems, Nothing )
     in
         ( { model
             | searchBar = updated
             , fetchedItems = fetchedItem
             , netErr = netErr
+            , currentView = view
           }
         , Cmd.map SearchBarMsg cmd
         )
@@ -104,6 +112,11 @@ update msg model =
                             model.viewItem
                         else
                             viewItem
+                    , currentView =
+                        if viewItem == Nothing then
+                            model.currentView
+                        else
+                            Just Details
                   }
                 , Cmd.map ViewReceiptMsg cmd
                 )
@@ -117,19 +130,6 @@ tableHeaders =
     [ "ID", "Description", "View / Add To Receipt" ]
 
 
-resToDict : List a -> (a -> String) -> Dict String a
-resToDict res keygen =
-    fromList
-        (res
-            |> List.map (\r -> ( keygen r, r ))
-        )
-
-
-itemsToDict : List Res.Item -> Dict String Res.Item
-itemsToDict items =
-    resToDict items (\i -> toString <| .id i)
-
-
 viewTableData : Res.Item -> List (Html m)
 viewTableData item =
     [ Table.td [] [ text <| toString item.id ]
@@ -141,9 +141,8 @@ view : Model -> Html Msg
 view model =
     div []
         [ viewHeader model
-        , Html.map BreadcrumbMsg <| Breadcrumb.view model.breadcrumb bread
-        , viewBreadcrumbContent model.currentView
-        , Html.map ViewReceiptMsg <| ViewReceipt.view model.list tableHeaders model.fetchedItems viewTableData
+        , Html.map BreadcrumbMsg <| Breadcrumb.view model.breadcrumb (bread model)
+        , viewBreadcrumbContent model
         ]
 
 
@@ -162,17 +161,20 @@ viewHeader model =
         ]
 
 
-viewBreadcrumbContent : Maybe View -> Html Msg
-viewBreadcrumbContent view =
-    case view of
-        Just Search ->
-            text "fuck you"
+viewBreadcrumbContent : Model -> Html Msg
+viewBreadcrumbContent model =
+    case model.currentView of
+        Just SearchResults ->
+            Html.map ViewReceiptMsg <| ViewReceipt.view model.list tableHeaders model.fetchedItems viewTableData
 
         Just Details ->
             text "fuck details"
 
+        Just NetErr ->
+            MsgBox.view "net error"
+
         Nothing ->
-            text "well i fucked up"
+            MsgBox.view "view is nothing"
 
 
 
@@ -195,11 +197,6 @@ type alias Action =
     String -> Html Msg
 
 
-type View
-    = Search
-    | Details
-
-
 type alias Bread =
     List ( Int, Crumb )
 
@@ -208,7 +205,7 @@ renderCrumbContent : Int -> Maybe View
 renderCrumbContent index =
     case index of
         0 ->
-            Just Search
+            Just SearchResults
 
         1 ->
             Just Details
@@ -217,12 +214,54 @@ renderCrumbContent index =
             Nothing
 
 
-bread : Bread
-bread =
-    [ ( 0
-      , ( "search", "Search Results" )
-      )
-    , ( 1
-      , ( "person", "customer details" )
-      )
-    ]
+bread : Model -> Bread
+bread model =
+    case model.currentView of
+        Nothing ->
+            []
+
+        Just NetErr ->
+            []
+
+        Just SearchResults ->
+            [ searchResultBread ]
+
+        Just Details ->
+            searchResultBread :: [ detailsBread model ]
+
+
+searchResultBread : ( Int, Crumb )
+searchResultBread =
+    ( 0, ( "search", "Search Results" ) )
+
+
+detailsBread : Model -> ( Int, Crumb )
+detailsBread model =
+    let
+        title =
+            model.viewItem |> Maybe.map (.description) |> Maybe.withDefault "Item Details"
+    in
+        ( 1, ( "person", title ) )
+
+
+
+--    [ ( 0
+--      , ( "search", "Search Results" )
+--      )
+--    , ( 1
+--      , ( "person", "customer details" )
+--      )
+--    ]
+
+
+resToDict : List a -> (a -> String) -> Dict String a
+resToDict res keygen =
+    fromList
+        (res
+            |> List.map (\r -> ( keygen r, r ))
+        )
+
+
+itemsToDict : List Res.Item -> Dict String Res.Item
+itemsToDict items =
+    resToDict items (\i -> toString <| .id i)

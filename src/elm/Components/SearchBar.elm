@@ -140,24 +140,3 @@ viewSearchButton model =
 viewMenu : Model -> List MenuItem -> Html Msg
 viewMenu model items =
     Select.select Mdl [ 1 ] model.mdl items Select model.selectedKey
-
-
-
---    div [ cs "art-customer-search-in" ]
---        [ span [] [ text model.selectedKey ]
---        , MdlMenu.render Mdl
---            [ 1 ]
---            model.mdl
---            [ MdlMenu.ripple, MdlMenu.bottomLeft, css "display" "inline" ]
---            (viewMenuItems items)
---        ]
---viewMenuItems: List MenuItem -> List (Item Msg)
---viewMenuItems items =
---         (items
---            |> List.map
---                (\item ->
---                    MdlMenu.Item
---                        [ onSelect <|Select item ]
---                        [ text item ]
---                )
---         )
