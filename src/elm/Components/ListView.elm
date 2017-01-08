@@ -7,50 +7,35 @@ import Material.Table as Table
 import Material.Icon as MdlIcon
 
 
---view : Model -> Html Msg
-
-
-render headers =
-    viewTable headers
-
-
-type alias Id =
-    Int
+type alias Icon =
+    String
 
 
 type alias ViewAction m =
     ( Icon, m )
 
 
-type alias Icon =
-    String
+
+--render :
+--    List String
+--    -> List a
+--    -> (a -> List (Html m))
+--    -> (a -> List (ViewAction m))
+--    -> (Int -> List (Property c m))
+--    -> Html m
 
 
-type alias Show =
-    Bool
-
-
-type alias TableData m =
-    Html m
-
-
-
---viewTable :
-
-
-viewTable : List String -> List (Html m) -> Html m
-viewTable headers rows =
+render headers items tableData viewActions rowAtr isHover =
     Table.table [ cs "art-search-table" ]
         [ viewTableHeaders headers
         , Table.tbody []
-            rows
+            (items
+                |> List.indexedMap
+                    (\index item ->
+                        viewTableRow item tableData viewActions (rowAtr index) (isHover index)
+                    )
+            )
         ]
-
-
-viewTableRows : List (List (Html m)) -> List (Html m)
-viewTableRows rows =
-    rows
-        |> List.indexedMap (\index row -> Table.tr [] row)
 
 
 viewTableHeaders : List String -> Html m
@@ -66,23 +51,28 @@ viewTableHeaders headers =
         ]
 
 
-viewTableBody : List (List (Html m)) -> Html m
-viewTableBody rows =
-    Table.tbody []
-        (rows
-            |> List.indexedMap (\index row -> text "foo")
-        )
+
+--viewTableRow :
+--    a
+--    -> (a -> List (Html m))
+--    -> (a -> List (ViewAction m))
+--    -> List (Property c m)
+--    -> Html m
 
 
-viewTableRow : Int -> List (Html m) -> Html m
-viewTableRow index row =
-    Table.tr
-        [ cs ""
-        ]
-        row
+viewTableRow item tableData createActions rowAtr isHover =
+    let
+        tblData =
+            tableData item
+
+        actions =
+            [ viewActions (createActions item) isHover ]
+    in
+        Table.tr (rowAtr)
+            (tblData ++ actions)
 
 
-viewActions : List (ViewAction m) -> Show -> Html m
+viewActions : List (ViewAction m) -> Bool -> Html m
 viewActions actions show =
     Table.td []
         [ span

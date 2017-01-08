@@ -50,38 +50,11 @@ tableHeaders =
     [ "ID", "Description", "View / Add To Receipt" ]
 
 
-
---viewTableRows : List Res.Item -> Html Msg
---viewTableRows items =
-
-
-tableRows : Model -> List Res.Item -> List (Html Msg)
-tableRows model items =
-    items
-        |> List.indexedMap (\index item -> viewTableRow model index item)
-
-
-viewTableRow : Model -> Int -> Res.Item -> Html Msg
-viewTableRow model index item =
-    Table.tr (hoverAtr index)
-        [ ListView.viewActions (viewActions item) (isHovered model index)
-        ]
-
-
 viewTableData : Res.Item -> List (Html Msg)
 viewTableData item =
     [ Table.td [] [ text <| toString item.id ]
     , Table.td [] [ text item.description ]
     ]
-
-
-
---viewTableRow_ : Int -> List (Property c Msg)-> List (Html Msg) -> List ( String, Msg ) -> (Int -> Bool) -> Html Msg
-
-
-viewTableRow_ index atr tableData actions isHovered =
-    Table.tr ([] ++ atr)
-        ((tableData) :: [ ListView.viewActions actions (isHovered index) ])
 
 
 isHovered : Model -> Int -> Bool
@@ -94,7 +67,10 @@ viewActions item =
     [ ( "remove_red_eye", ListAction <| View item ), ( "receipt", ListAction <| Receipt item ) ]
 
 
-hoverAtr : Int -> List (Property c Msg)
+
+--hoverAtr : Int -> List a
+
+
 hoverAtr index =
     [ onMouseEnter <| Update (\m -> { m | hoveredIndex = index })
     , onMouseLeave <| Update (\m -> { m | hoveredIndex = -1 })
@@ -104,4 +80,4 @@ hoverAtr index =
 view : Model -> List Res.Item -> Html Msg
 view model items =
     div []
-        [ ListView.render tableHeaders (tableRows model items) ]
+        [ ListView.render tableHeaders items viewTableData viewActions hoverAtr (isHovered model) ]
