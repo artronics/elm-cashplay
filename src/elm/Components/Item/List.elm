@@ -1,6 +1,7 @@
 module Components.Item.List exposing (..)
 
 import Html exposing (Html, text, p)
+import Dict exposing (Dict)
 import Material
 import Material.Options exposing (..)
 import Material.Table as Table
@@ -45,11 +46,6 @@ update msg model =
             Material.update Mdl msg_ model
 
 
-tableHeaders : List String
-tableHeaders =
-    [ "ID", "Description", "View / Add To Receipt" ]
-
-
 viewTableData : Res.Item -> List (Html Msg)
 viewTableData item =
     [ Table.td [] [ text <| toString item.id ]
@@ -77,7 +73,7 @@ hoverAtr index =
     ]
 
 
-view : Model -> List Res.Item -> Html Msg
-view model items =
+view : Model -> List String -> Dict String r -> (r -> List (Html m)) -> List Res.Item -> Html Msg
+view model headers resDict viewRes items =
     div []
-        [ TableView.render tableHeaders items viewTableData viewActions hoverAtr (isHovered model) ]
+        [ TableView.render headers items viewTableData viewActions hoverAtr (isHovered model) ]

@@ -2,11 +2,13 @@ module Components.Item.Item exposing (..)
 
 import Html exposing (Html, p, text)
 import Http
+import Dict exposing (..)
 import Material
 import Material.Icon as Icon
 import Material.Button as Button
 import Material.Elevation as Elev
 import Material.Options exposing (..)
+import Material.Table as Table
 import Components.Item.SearchBar as SearchBar
 import Material.Menu as Menu
 import Resources.Item as Res
@@ -94,13 +96,38 @@ update msg model =
             Material.update Mdl msg_ model
 
 
+tableHeaders : List String
+tableHeaders =
+    [ "ID", "Description", "View / Add To Receipt" ]
+
+
+resToDict : List a -> (a -> String) -> Dict String a
+resToDict res keygen =
+    fromList
+        (res
+            |> List.map (\r -> ( keygen r, r ))
+        )
+
+
+itemsToDict : List Res.Item -> Dict String Res.Item
+itemsToDict items =
+    resToDict items (\i -> toString <| .id i)
+
+
+viewTableData : Res.Item -> List (Html Msg)
+viewTableData item =
+    [ Table.td [] [ text <| toString item.id ]
+    , Table.td [] [ text item.description ]
+    ]
+
+
 view : Model -> Html Msg
 view model =
     div []
         [ viewHeader model
         , Html.map BreadcrumbMsg <| Breadcrumb.view model.breadcrumb bread
         , viewBreadcrumbContent model.currentView
-        , Html.map ListMsg <| List.view model.list <| model.fetchedItems
+        , Html.map ListMsg <| List.view model.list tableHeaders (itemsToDict model.fetchedItems) viewTableData model.fetchedItems
         ]
 
 
