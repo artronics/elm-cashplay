@@ -114,7 +114,7 @@ itemsToDict items =
     resToDict items (\i -> toString <| .id i)
 
 
-viewTableData : Res.Item -> List (Html Msg)
+viewTableData : Res.Item -> List (Html m)
 viewTableData item =
     [ Table.td [] [ text <| toString item.id ]
     , Table.td [] [ text item.description ]
@@ -127,7 +127,7 @@ view model =
         [ viewHeader model
         , Html.map BreadcrumbMsg <| Breadcrumb.view model.breadcrumb bread
         , viewBreadcrumbContent model.currentView
-        , Html.map ListMsg <| List.view model.list tableHeaders (itemsToDict model.fetchedItems) viewTableData model.fetchedItems
+        , Html.map ListMsg <| List.view model.list tableHeaders (itemsToDict model.fetchedItems) viewTableData
         ]
 
 

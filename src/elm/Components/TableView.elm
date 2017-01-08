@@ -1,6 +1,7 @@
 module Components.TableView exposing (..)
 
 import Html exposing (Html, text)
+import Dict exposing (..)
 import Material
 import Material.Options exposing (..)
 import Material.Table as Table
@@ -25,15 +26,16 @@ type alias ViewAction m =
 --    -> Html m
 
 
-render headers items tableData viewActions rowAtr isHover =
+render headers resDict tableData viewActions rowAtr isHover =
     Table.table [ cs "art-search-table" ]
         [ viewTableHeaders headers
         , Table.tbody []
-            (items
-                |> List.indexedMap
-                    (\index item ->
-                        viewTableRow item tableData viewActions (rowAtr index) (isHover index)
+            (resDict
+                |> Dict.map
+                    (\key item ->
+                        viewTableRow item tableData viewActions (rowAtr key) (isHover key)
                     )
+                |> Dict.values
             )
         ]
 
@@ -66,7 +68,7 @@ viewTableRow item tableData createActions rowAtr isHover =
             tableData item
 
         actions =
-            [ viewActions (createActions item) isHover ]
+            [ viewActions (createActions "foo") isHover ]
     in
         Table.tr (rowAtr)
             (tblData ++ actions)

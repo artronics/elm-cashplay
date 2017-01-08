@@ -10,14 +10,14 @@ import Components.TableView as TableView
 
 
 type alias Model =
-    { hoveredIndex : Int
+    { hoveredIndex : String
     , mdl : Material.Model
     }
 
 
 init : Model
 init =
-    { hoveredIndex = -1
+    { hoveredIndex = ""
     , mdl = Material.model
     }
 
@@ -29,8 +29,8 @@ type Msg
 
 
 type RowAction
-    = View Res.Item
-    | Receipt Res.Item
+    = View String
+    | Receipt String
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -46,34 +46,28 @@ update msg model =
             Material.update Mdl msg_ model
 
 
-viewTableData : Res.Item -> List (Html Msg)
-viewTableData item =
-    [ Table.td [] [ text <| toString item.id ]
-    , Table.td [] [ text item.description ]
+isHovered : Model -> String -> Bool
+isHovered model key =
+    model.hoveredIndex == key
+
+
+viewActions : String -> List ( String, Msg )
+viewActions key =
+    [ ( "remove_red_eye", ListAction <| View key ), ( "receipt", ListAction <| Receipt key ) ]
+
+
+
+--TODO add type annotation
+--Problem is Material Property c m causing type mismatch
+
+
+hoverAtr key =
+    [ onMouseEnter <| Update (\m -> { m | hoveredIndex = key })
+    , onMouseLeave <| Update (\m -> { m | hoveredIndex = "" })
     ]
 
 
-isHovered : Model -> Int -> Bool
-isHovered model index =
-    model.hoveredIndex == index
-
-
-viewActions : Res.Item -> List ( String, Msg )
-viewActions item =
-    [ ( "remove_red_eye", ListAction <| View item ), ( "receipt", ListAction <| Receipt item ) ]
-
-
-
---hoverAtr : Int -> List a
-
-
-hoverAtr index =
-    [ onMouseEnter <| Update (\m -> { m | hoveredIndex = index })
-    , onMouseLeave <| Update (\m -> { m | hoveredIndex = -1 })
-    ]
-
-
-view : Model -> List String -> Dict String r -> (r -> List (Html m)) -> List Res.Item -> Html Msg
-view model headers resDict viewRes items =
+view : Model -> List String -> Dict String r -> (r -> List (Html Msg)) -> Html Msg
+view model headers resDict viewRes =
     div []
-        [ TableView.render headers items viewTableData viewActions hoverAtr (isHovered model) ]
+        [ TableView.render headers resDict viewRes viewActions hoverAtr (isHovered model) ]
