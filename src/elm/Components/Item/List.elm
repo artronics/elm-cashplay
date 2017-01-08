@@ -5,7 +5,7 @@ import Material
 import Material.Options exposing (..)
 import Material.Table as Table
 import Resources.Item as Res
-import Components.ListView as ListView
+import Components.TableView as TableView
 
 
 type alias Model =
@@ -80,4 +80,4 @@ hoverAtr index =
 view : Model -> List Res.Item -> Html Msg
 view model items =
     div []
-        [ ListView.render tableHeaders items viewTableData viewActions hoverAtr (isHovered model) ]
+        [ TableView.render tableHeaders items viewTableData viewActions hoverAtr (isHovered model) ]

@@ -1,4 +1,4 @@
-module Components.ListView exposing (..)
+module Components.TableView exposing (..)
 
 import Html exposing (Html, text)
 import Material
