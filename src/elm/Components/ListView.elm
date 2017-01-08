@@ -7,37 +7,19 @@ import Material.Table as Table
 import Material.Icon as MdlIcon
 
 
-type alias Model =
-    { hoverIndex : Int
-    , mdl : Material.Model
-    }
+--view : Model -> Html Msg
 
 
-init : Model
-init =
-    { hoverIndex = -1
-    , mdl = Material.model
-    }
+render headers =
+    viewTable headers
 
 
-type Msg
-    = Update (Model -> Model)
-    | Mdl (Material.Msg Msg)
+type alias Id =
+    Int
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
-    case msg of
-        Update f ->
-            ( f model, Cmd.none )
-
-        Mdl msg_ ->
-            Material.update Mdl msg_ model
-
-
-view : Model -> Html Msg
-view model =
-    text "List view"
+type alias ViewAction m =
+    ( Icon, m )
 
 
 type alias Icon =
@@ -46,6 +28,29 @@ type alias Icon =
 
 type alias Show =
     Bool
+
+
+type alias TableData m =
+    Html m
+
+
+
+--viewTable :
+
+
+viewTable : List String -> List (Html m) -> Html m
+viewTable headers rows =
+    Table.table [ cs "art-search-table" ]
+        [ viewTableHeaders headers
+        , Table.tbody []
+            rows
+        ]
+
+
+viewTableRows : List (List (Html m)) -> List (Html m)
+viewTableRows rows =
+    rows
+        |> List.indexedMap (\index row -> Table.tr [] row)
 
 
 viewTableHeaders : List String -> Html m
@@ -61,11 +66,23 @@ viewTableHeaders headers =
         ]
 
 
-type alias Action m =
-    ( Icon, m )
+viewTableBody : List (List (Html m)) -> Html m
+viewTableBody rows =
+    Table.tbody []
+        (rows
+            |> List.indexedMap (\index row -> text "foo")
+        )
 
 
-viewActions : List (Action m) -> Show -> Html m
+viewTableRow : Int -> List (Html m) -> Html m
+viewTableRow index row =
+    Table.tr
+        [ cs ""
+        ]
+        row
+
+
+viewActions : List (ViewAction m) -> Show -> Html m
 viewActions actions show =
     Table.td []
         [ span
@@ -79,7 +96,7 @@ viewActions actions show =
             (actions
                 |> List.map
                     (\( icon, msg ) ->
-                        span [ onClick msg ] [ MdlIcon.i icon ]
+                        span [ onClick <| msg ] [ MdlIcon.i icon ]
                     )
             )
         ]

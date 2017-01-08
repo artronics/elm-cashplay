@@ -100,7 +100,7 @@ view model =
         [ viewHeader model
         , Html.map BreadcrumbMsg <| Breadcrumb.view model.breadcrumb bread
         , viewBreadcrumbContent model.currentView
-        , Html.map ListMsg <| List.view model.list <| Res.itemsToList model.fetchedItems
+        , Html.map ListMsg <| List.view model.list <| model.fetchedItems
         ]
 
 
