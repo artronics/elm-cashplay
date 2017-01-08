@@ -13,7 +13,7 @@ import Components.Item.SearchBar as SearchBar
 import Material.Menu as Menu
 import Resources.Item as Res
 import Components.Item.Breadcrumb as Breadcrumb
-import Components.Item.List as List
+import Components.ViewReceipt as ViewReceipt
 
 
 type alias Model =
@@ -23,7 +23,7 @@ type alias Model =
     , netErr : Maybe Http.Error
     , searchBar : SearchBar.Model
     , breadcrumb : Breadcrumb.Model
-    , list : List.Model
+    , list : ViewReceipt.Model
     , mdl : Material.Model
     }
 
@@ -36,7 +36,7 @@ init =
     , netErr = Nothing
     , searchBar = SearchBar.init
     , breadcrumb = Breadcrumb.init
-    , list = List.init
+    , list = ViewReceipt.init
     , mdl = Material.model
     }
 
@@ -44,7 +44,7 @@ init =
 type Msg
     = SearchBarMsg SearchBar.Msg
     | BreadcrumbMsg Breadcrumb.Msg
-    | ListMsg List.Msg
+    | ViewReceiptMsg ViewReceipt.Msg
     | Mdl (Material.Msg Msg)
 
 
@@ -92,10 +92,10 @@ update msg model =
             in
                 ( { model | breadcrumb = updated, currentView = currentView }, Cmd.map BreadcrumbMsg cmd )
 
-        ListMsg msg_ ->
+        ViewReceiptMsg msg_ ->
             let
                 ( updated, cmd, ( viewItem, receiptItem ) ) =
-                    List.update msg_ model.list (getRes model.fetchedItems)
+                    ViewReceipt.update msg_ model.list (getRes model.fetchedItems)
             in
                 ( { model
                     | list = updated
@@ -105,7 +105,7 @@ update msg model =
                         else
                             viewItem
                   }
-                , Cmd.map ListMsg cmd
+                , Cmd.map ViewReceiptMsg cmd
                 )
 
         Mdl msg_ ->
@@ -143,7 +143,7 @@ view model =
         [ viewHeader model
         , Html.map BreadcrumbMsg <| Breadcrumb.view model.breadcrumb bread
         , viewBreadcrumbContent model.currentView
-        , Html.map ListMsg <| List.view model.list tableHeaders model.fetchedItems viewTableData
+        , Html.map ViewReceiptMsg <| ViewReceipt.view model.list tableHeaders model.fetchedItems viewTableData
         ]
 
 

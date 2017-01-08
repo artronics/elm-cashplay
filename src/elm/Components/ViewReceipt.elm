@@ -1,4 +1,4 @@
-module Components.Item.List exposing (..)
+module Components.ViewReceipt exposing (..)
 
 import Html exposing (Html, text, p)
 import Dict exposing (Dict)
