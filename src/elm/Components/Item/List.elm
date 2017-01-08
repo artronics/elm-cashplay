@@ -33,17 +33,24 @@ type RowAction
     | Receipt String
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
+update : Msg -> Model -> (String -> Maybe r) -> ( Model, Cmd Msg, ( Maybe r, Maybe r ) )
+update msg model getRes =
     case msg of
         Update f ->
-            ( f model, Cmd.none )
+            ( f model, Cmd.none, ( Nothing, Nothing ) )
 
-        ListAction msg ->
-            ( model, Cmd.none )
+        ListAction (View msg) ->
+            ( model, Cmd.none, ( getRes msg, Nothing ) )
+
+        ListAction (Receipt msg) ->
+            ( model, Cmd.none, ( Nothing, getRes msg ) )
 
         Mdl msg_ ->
-            Material.update Mdl msg_ model
+            let
+                ( m, c ) =
+                    Material.update Mdl msg_ model
+            in
+                ( m, c, ( Nothing, Nothing ) )
 
 
 isHovered : Model -> String -> Bool

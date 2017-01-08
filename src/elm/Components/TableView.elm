@@ -33,7 +33,7 @@ render headers resDict tableData viewActions rowAtr isHover =
             (resDict
                 |> Dict.map
                     (\key item ->
-                        viewTableRow item tableData viewActions (rowAtr key) (isHover key)
+                        viewTableRow item tableData (viewActions key) (rowAtr key) (isHover key)
                     )
                 |> Dict.values
             )
@@ -68,7 +68,7 @@ viewTableRow item tableData createActions rowAtr isHover =
             tableData item
 
         actions =
-            [ viewActions (createActions "foo") isHover ]
+            [ viewActions createActions isHover ]
     in
         Table.tr (rowAtr)
             (tblData ++ actions)

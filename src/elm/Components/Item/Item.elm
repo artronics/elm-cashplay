@@ -18,7 +18,8 @@ import Components.Item.List as List
 
 type alias Model =
     { currentView : Maybe View
-    , fetchedItems : List Res.Item
+    , fetchedItems : Dict String Res.Item
+    , viewItem : Maybe Res.Item
     , netErr : Maybe Http.Error
     , searchBar : SearchBar.Model
     , breadcrumb : Breadcrumb.Model
@@ -30,7 +31,8 @@ type alias Model =
 init : Model
 init =
     { currentView = Nothing
-    , fetchedItems = []
+    , fetchedItems = Dict.empty
+    , viewItem = Nothing
     , netErr = Nothing
     , searchBar = SearchBar.init
     , breadcrumb = Breadcrumb.init
@@ -55,7 +57,7 @@ updateSearchBar msg model =
         ( netErr, fetchedItem ) =
             case itemsResult of
                 Just (Ok items) ->
-                    ( Nothing, items )
+                    ( Nothing, itemsToDict items )
 
                 Just (Err err) ->
                     ( Just err, model.fetchedItems )
@@ -70,6 +72,11 @@ updateSearchBar msg model =
           }
         , Cmd.map SearchBarMsg cmd
         )
+
+
+getRes : Dict String Res.Item -> String -> Maybe Res.Item
+getRes itemsDict key =
+    Dict.get key itemsDict
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -87,10 +94,19 @@ update msg model =
 
         ListMsg msg_ ->
             let
-                ( updated, cmd ) =
-                    List.update msg_ model.list
+                ( updated, cmd, ( viewItem, receiptItem ) ) =
+                    List.update msg_ model.list (getRes model.fetchedItems)
             in
-                ( { model | list = updated }, Cmd.map ListMsg cmd )
+                ( { model
+                    | list = updated
+                    , viewItem =
+                        if viewItem == Nothing then
+                            model.viewItem
+                        else
+                            viewItem
+                  }
+                , Cmd.map ListMsg cmd
+                )
 
         Mdl msg_ ->
             Material.update Mdl msg_ model
@@ -127,7 +143,7 @@ view model =
         [ viewHeader model
         , Html.map BreadcrumbMsg <| Breadcrumb.view model.breadcrumb bread
         , viewBreadcrumbContent model.currentView
-        , Html.map ListMsg <| List.view model.list tableHeaders (itemsToDict model.fetchedItems) viewTableData
+        , Html.map ListMsg <| List.view model.list tableHeaders model.fetchedItems viewTableData
         ]
 
 
