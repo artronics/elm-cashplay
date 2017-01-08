@@ -63,16 +63,42 @@ tableRows model items =
 
 viewTableRow : Model -> Int -> Res.Item -> Html Msg
 viewTableRow model index item =
-    let
-        actionsView item =
-            [ ( "remove_red_eye", ListAction <| View item ), ( "receipt", ListAction <| Receipt item ) ]
-    in
-        --        ListView.viewTableRow index
-        Table.tr [ onMouseEnter <| Update (\m -> { m | hoveredIndex = index }) ]
-            [ Table.td [] [ text <| toString item.id ]
-            , Table.td [] [ text item.description ]
-            , ListView.viewActions (actionsView item) (model.hoveredIndex == index)
-            ]
+    Table.tr (hoverAtr index)
+        [ ListView.viewActions (viewActions item) (isHovered model index)
+        ]
+
+
+viewTableData : Res.Item -> List (Html Msg)
+viewTableData item =
+    [ Table.td [] [ text <| toString item.id ]
+    , Table.td [] [ text item.description ]
+    ]
+
+
+
+--viewTableRow_ : Int -> List (Property c Msg)-> List (Html Msg) -> List ( String, Msg ) -> (Int -> Bool) -> Html Msg
+
+
+viewTableRow_ index atr tableData actions isHovered =
+    Table.tr ([] ++ atr)
+        ((tableData) :: [ ListView.viewActions actions (isHovered index) ])
+
+
+isHovered : Model -> Int -> Bool
+isHovered model index =
+    model.hoveredIndex == index
+
+
+viewActions : Res.Item -> List ( String, Msg )
+viewActions item =
+    [ ( "remove_red_eye", ListAction <| View item ), ( "receipt", ListAction <| Receipt item ) ]
+
+
+hoverAtr : Int -> List (Property c Msg)
+hoverAtr index =
+    [ onMouseEnter <| Update (\m -> { m | hoveredIndex = index })
+    , onMouseLeave <| Update (\m -> { m | hoveredIndex = -1 })
+    ]
 
 
 view : Model -> List Res.Item -> Html Msg
