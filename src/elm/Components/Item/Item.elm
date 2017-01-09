@@ -19,11 +19,12 @@ import Components.ViewReceipt as ViewReceipt
 
 type alias Model =
     { currentView : Maybe View
+    , currentCrumb : Int
+    , bread : List Crumb
     , fetchedItems : Dict String Res.Item
     , viewItem : Maybe Res.Item
     , netErr : Maybe Http.Error
     , searchBar : SearchBar.Model
-    , breadcrumb : Breadcrumb.Model
     , list : ViewReceipt.Model
     , mdl : Material.Model
     }
@@ -32,11 +33,12 @@ type alias Model =
 init : Model
 init =
     { currentView = Nothing
+    , currentCrumb = 0
+    , bread = []
     , fetchedItems = Dict.empty
     , viewItem = Nothing
     , netErr = Nothing
     , searchBar = SearchBar.init
-    , breadcrumb = Breadcrumb.init
     , list = ViewReceipt.init
     , mdl = Material.model
     }
@@ -44,7 +46,7 @@ init =
 
 type Msg
     = SearchBarMsg SearchBar.Msg
-    | BreadcrumbMsg Breadcrumb.Msg
+    | SelectCrumb Int
     | ViewReceiptMsg ViewReceipt.Msg
     | Mdl (Material.Msg Msg)
 
@@ -61,25 +63,33 @@ updateSearchBar msg model =
         ( updated, cmd, itemsResult ) =
             SearchBar.update msg model.searchBar
 
-        ( netErr, fetchedItem, view ) =
+        ( netErr, fetchedItem, view, currentCrumb ) =
             case itemsResult of
                 Just (Ok items) ->
-                    ( Nothing, itemsToDict items, Just SearchResults )
+                    ( Nothing, itemsToDict items, Just SearchResults, 0 )
 
                 Just (Err err) ->
-                    ( Just err, model.fetchedItems, Just NetErr )
+                    ( Just err, model.fetchedItems, Just NetErr, 0 )
 
                 Nothing ->
-                    ( model.netErr, model.fetchedItems, Nothing )
+                    ( model.netErr, model.fetchedItems, model.currentView, model.currentCrumb )
+
+        newModel =
+            { model
+                | searchBar = updated
+                , fetchedItems = fetchedItem
+                , netErr = netErr
+                , currentCrumb = currentCrumb
+                , currentView = view
+            }
+
+        bread =
+            if itemsResult == Nothing then
+                model.bread
+            else
+                createBread newModel
     in
-        ( { model
-            | searchBar = updated
-            , fetchedItems = fetchedItem
-            , netErr = netErr
-            , currentView = view
-          }
-        , Cmd.map SearchBarMsg cmd
-        )
+        ( { newModel | bread = bread }, Cmd.map SearchBarMsg cmd )
 
 
 getRes : Dict String Res.Item -> String -> Maybe Res.Item
@@ -93,36 +103,69 @@ update msg model =
         SearchBarMsg msg_ ->
             updateSearchBar msg_ model
 
-        BreadcrumbMsg msg_ ->
+        SelectCrumb index ->
             let
-                ( updated, cmd, currentView ) =
-                    Breadcrumb.update msg_ model.breadcrumb renderCrumbContent
+                view =
+                    changeView model index
             in
-                ( { model | breadcrumb = updated, currentView = currentView }, Cmd.map BreadcrumbMsg cmd )
+                ( { model | currentCrumb = index, currentView = view }, Cmd.none )
 
         ViewReceiptMsg msg_ ->
             let
                 ( updated, cmd, ( viewItem, receiptItem ) ) =
                     ViewReceipt.update msg_ model.list (getRes model.fetchedItems)
+
+                ( viewItemModel, currentView, currentCrumb ) =
+                    if viewItem == Nothing then
+                        ( model.viewItem, model.currentView, model.currentCrumb )
+                    else
+                        ( viewItem, Just Details, 1 )
+
+                newModel =
+                    { model
+                        | list = updated
+                        , viewItem = viewItemModel
+                        , currentView = currentView
+                        , currentCrumb = currentCrumb
+                    }
+
+                --We only create new bread if there is a viewItem from child
+                bread =
+                    if viewItem == Nothing then
+                        model.bread
+                    else
+                        createBread newModel
             in
-                ( { model
-                    | list = updated
-                    , viewItem =
-                        if viewItem == Nothing then
-                            model.viewItem
-                        else
-                            viewItem
-                    , currentView =
-                        if viewItem == Nothing then
-                            model.currentView
-                        else
-                            Just Details
-                  }
-                , Cmd.map ViewReceiptMsg cmd
-                )
+                ( { newModel | bread = bread }, Cmd.map ViewReceiptMsg cmd )
 
         Mdl msg_ ->
             Material.update Mdl msg_ model
+
+
+changeView : Model -> Int -> Maybe View
+changeView model index =
+    case model.currentView of
+        Nothing ->
+            Nothing
+
+        Just SearchResults ->
+            case index of
+                1 ->
+                    Just Details
+
+                _ ->
+                    Just SearchResults
+
+        Just Details ->
+            case index of
+                0 ->
+                    Just SearchResults
+
+                _ ->
+                    Just Details
+
+        _ ->
+            Nothing
 
 
 tableHeaders : List String
@@ -141,7 +184,7 @@ view : Model -> Html Msg
 view model =
     div []
         [ viewHeader model
-        , Html.map BreadcrumbMsg <| Breadcrumb.view model.breadcrumb (bread model)
+        , Breadcrumb.view model.bread SelectCrumb model.currentCrumb
         , viewBreadcrumbContent model
         ]
 
@@ -198,24 +241,11 @@ type alias Action =
 
 
 type alias Bread =
-    List ( Int, Crumb )
+    List Crumb
 
 
-renderCrumbContent : Int -> Maybe View
-renderCrumbContent index =
-    case index of
-        0 ->
-            Just SearchResults
-
-        1 ->
-            Just Details
-
-        _ ->
-            Nothing
-
-
-bread : Model -> Bread
-bread model =
+createBread : Model -> Bread
+createBread model =
     case model.currentView of
         Nothing ->
             []
@@ -230,28 +260,18 @@ bread model =
             searchResultBread :: [ detailsBread model ]
 
 
-searchResultBread : ( Int, Crumb )
+searchResultBread : Crumb
 searchResultBread =
-    ( 0, ( "search", "Search Results" ) )
+    ( "search", "Search Results" )
 
 
-detailsBread : Model -> ( Int, Crumb )
+detailsBread : Model -> Crumb
 detailsBread model =
     let
         title =
             model.viewItem |> Maybe.map (.description) |> Maybe.withDefault "Item Details"
     in
-        ( 1, ( "person", title ) )
-
-
-
---    [ ( 0
---      , ( "search", "Search Results" )
---      )
---    , ( 1
---      , ( "person", "customer details" )
---      )
---    ]
+        ( "person", title )
 
 
 resToDict : List a -> (a -> String) -> Dict String a
