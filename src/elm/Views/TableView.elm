@@ -1,4 +1,4 @@
-module Components.TableView exposing (..)
+module Views.TableView exposing (..)
 
 import Html exposing (Html, text)
 import Dict exposing (..)

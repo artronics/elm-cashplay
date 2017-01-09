@@ -1,4 +1,4 @@
-module Components.Item.Breadcrumb exposing (..)
+module Views.Breadcrumb exposing (..)
 
 import Html exposing (..)
 import Html.Attributes exposing (class)
