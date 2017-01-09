@@ -184,7 +184,7 @@ view : Model -> Html Msg
 view model =
     div []
         [ viewHeader model
-        , Breadcrumb.view model.bread SelectCrumb model.currentCrumb
+        , Breadcrumb.view model.bread SelectCrumb model.currentCrumb Breadcrumb.None
         , viewBreadcrumbContent model
         ]
 
