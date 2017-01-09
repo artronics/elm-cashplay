@@ -1,27 +1,44 @@
 module Main exposing (..)
 
 import Html exposing (Html, p, text)
+import Navigation exposing (Location)
 import Material.Options exposing (..)
+import Routing exposing (..)
 
 
 type alias Model =
-    {}
+    { route : Route
+    }
 
 
-model : Model
-model =
-    {}
+model : Route -> Model
+model route =
+    { route = route
+    }
+
+
+init : Location -> ( Model, Cmd Msg )
+init location =
+    let
+        currentRoute =
+            parseLocation location
+    in
+        ( model currentRoute, Cmd.none )
 
 
 type Msg
-    = NoOp
+    = OnLocationChange Location
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        NoOp ->
-            ( model, Cmd.none )
+        OnLocationChange loc ->
+            let
+                newLoc =
+                    parseLocation loc
+            in
+                ( { route = newLoc }, Cmd.none )
 
 
 
@@ -35,10 +52,23 @@ view model =
         , div [ cs "art-main-row" ]
             [ div [ cs "art-actions" ] [ p [] [ text "Actions" ] ]
             , div [ cs "art-tabs" ]
-                [ text "foo" ]
+                [ page model ]
             , div [ cs "art-receipt" ] [ p [] [ text "Receipt" ] ]
             ]
         ]
+
+
+page : Model -> Html Msg
+page model =
+    case model.route of
+        Home ->
+            text "home"
+
+        Cashplay ->
+            text "cashplay"
+
+        NotFound ->
+            text "page not found"
 
 
 subscriptions : Model -> Sub Msg
@@ -50,8 +80,8 @@ subscriptions model =
 
 main : Program Never Model Msg
 main =
-    Html.program
-        { init = ( model, Cmd.none )
+    Navigation.program OnLocationChange
+        { init = init
         , view = view
         , subscriptions = subscriptions
         , update = update
