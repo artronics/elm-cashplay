@@ -92,6 +92,36 @@ updateSearchBar msg model =
         ( { newModel | bread = bread }, Cmd.map SearchBarMsg cmd )
 
 
+updateViewReceipt : ViewReceipt.Msg -> Model -> ( Model, Cmd Msg )
+updateViewReceipt msg model =
+    let
+        ( updated, cmd, ( viewItem, receiptItem ) ) =
+            ViewReceipt.update msg model.list (getRes model.fetchedItems)
+
+        ( viewItemModel, currentView, currentCrumb ) =
+            if viewItem == Nothing then
+                ( model.viewItem, model.currentView, model.currentCrumb )
+            else
+                ( viewItem, Just Details, 1 )
+
+        newModel =
+            { model
+                | list = updated
+                , viewItem = viewItemModel
+                , currentView = currentView
+                , currentCrumb = currentCrumb
+            }
+
+        --We only create new bread if there is a viewItem from child
+        bread =
+            if viewItem == Nothing then
+                model.bread
+            else
+                createBread newModel
+    in
+        ( { newModel | bread = bread }, Cmd.map ViewReceiptMsg cmd )
+
+
 getRes : Dict String Res.Item -> String -> Maybe Res.Item
 getRes itemsDict key =
     Dict.get key itemsDict
@@ -100,9 +130,6 @@ getRes itemsDict key =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        SearchBarMsg msg_ ->
-            updateSearchBar msg_ model
-
         SelectCrumb index ->
             let
                 view =
@@ -110,33 +137,11 @@ update msg model =
             in
                 ( { model | currentCrumb = index, currentView = view }, Cmd.none )
 
+        SearchBarMsg msg_ ->
+            updateSearchBar msg_ model
+
         ViewReceiptMsg msg_ ->
-            let
-                ( updated, cmd, ( viewItem, receiptItem ) ) =
-                    ViewReceipt.update msg_ model.list (getRes model.fetchedItems)
-
-                ( viewItemModel, currentView, currentCrumb ) =
-                    if viewItem == Nothing then
-                        ( model.viewItem, model.currentView, model.currentCrumb )
-                    else
-                        ( viewItem, Just Details, 1 )
-
-                newModel =
-                    { model
-                        | list = updated
-                        , viewItem = viewItemModel
-                        , currentView = currentView
-                        , currentCrumb = currentCrumb
-                    }
-
-                --We only create new bread if there is a viewItem from child
-                bread =
-                    if viewItem == Nothing then
-                        model.bread
-                    else
-                        createBread newModel
-            in
-                ( { newModel | bread = bread }, Cmd.map ViewReceiptMsg cmd )
+            updateViewReceipt msg_ model
 
         Mdl msg_ ->
             Material.update Mdl msg_ model
