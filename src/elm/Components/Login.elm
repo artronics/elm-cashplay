@@ -9,8 +9,8 @@ type alias Login =
     }
 
 
-init : Login
-init =
+loginInit : Login
+loginInit =
     { email = ""
     , password = ""
     }
@@ -19,7 +19,7 @@ init =
 type Msg
     = UpEmail String
     | UpPass String
-    | Login
+    | OnLogin
 
 
 update : Msg -> Login -> ( Login, Cmd Msg )
@@ -31,7 +31,7 @@ update msg login =
         UpPass pass ->
             ( { login | password = pass }, Cmd.none )
 
-        Login ->
+        OnLogin ->
             ( login, Cmd.none )
 
 

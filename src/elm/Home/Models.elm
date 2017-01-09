@@ -1,14 +1,14 @@
-module Home.Models exposing (Home)
+module Home.Models exposing (Home, init)
 
-import Components.Login as Login exposing (Login)
+import Components.Login exposing (Login, loginInit)
 
 
 type alias Home =
-    { login : Login
+    { login : Components.Login.Login
     }
 
 
 init : Home
 init =
-    { login = Login.init
+    { login = loginInit
     }

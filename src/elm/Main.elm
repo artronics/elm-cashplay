@@ -4,16 +4,22 @@ import Html exposing (Html, p, text)
 import Navigation exposing (Location)
 import Material.Options exposing (..)
 import Routing exposing (..)
+import Home.Messages as HomePage
+import Home.View as HomePage
+import Home.Update as HomePage
+import Home.Models as HomePage
 
 
 type alias Model =
     { route : Route
+    , home : HomePage.Home
     }
 
 
 model : Route -> Model
 model route =
     { route = route
+    , home = HomePage.init
     }
 
 
@@ -28,6 +34,7 @@ init location =
 
 type Msg
     = OnLocationChange Location
+    | HomeMsg HomePage.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -38,7 +45,14 @@ update msg model =
                 newLoc =
                     parseLocation loc
             in
-                ( { route = newLoc }, Cmd.none )
+                ( { model | route = newLoc }, Cmd.none )
+
+        HomeMsg msg_ ->
+            let
+                ( newHome, cmd ) =
+                    HomePage.update msg_ model.home
+            in
+                ( { model | home = newHome }, Cmd.map HomeMsg cmd )
 
 
 
@@ -62,7 +76,7 @@ page : Model -> Html Msg
 page model =
     case model.route of
         Home ->
-            text "home"
+            Html.map HomeMsg <| HomePage.view model.home
 
         Cashplay ->
             text "cashplay"
