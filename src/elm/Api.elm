@@ -26,7 +26,6 @@ type alias User =
 
 type alias JwtToken =
     { token : String
-    , email : String
     }
 
 
@@ -46,9 +45,8 @@ login credential msg =
 
 jwtDecoder : Decode.Decoder JwtToken
 jwtDecoder =
-    Decode.map2 JwtToken
+    Decode.map JwtToken
         (field "token" Decode.string)
-        (field "email" Decode.string)
 
 
 signup : User -> (Result Http.Error Signup -> msg) -> Cmd msg

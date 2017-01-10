@@ -10,6 +10,7 @@ import Material.Textfield as Textfield
 import Material.Button as Button
 import Material.Typography as Typo
 import Api as Api exposing (login)
+import Debug
 
 
 type alias Login =
@@ -49,12 +50,8 @@ update msg login =
         OnLogin ->
             ( { login | msg = "" }, Api.login { email = login.email, password = login.password } OnLoginRes, Nothing )
 
-        OnLoginRes (Ok res) ->
-            let
-                jwt =
-                    { res | email = login.email }
-            in
-                ( login, Navigation.newUrl "#cashplay", Just jwt )
+        OnLoginRes (Ok jwt) ->
+            ( { login | msg = "" }, Navigation.newUrl "#cashplay", Just jwt )
 
         OnLoginRes (Err err) ->
             let
