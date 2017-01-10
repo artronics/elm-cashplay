@@ -56,8 +56,14 @@ type alias SearchCmd f m =
     f -> String -> Cmd m
 
 
-update : Msg -> SearchBar -> Filter -> ( SearchBar, Cmd Msg, Maybe String )
-update msg model filter =
+type alias Query a =
+    { value : String
+    , field : a
+    }
+
+
+update : Msg -> SearchBar -> Filter -> Menu a -> ( SearchBar, Cmd Msg, Maybe (Query a) )
+update msg model filter menu =
     case msg of
         OnSearchInput value ->
             let
@@ -80,14 +86,23 @@ update msg model filter =
             ( { model | selectedKey = key, autoDetection = False }, Cmd.none, Nothing )
 
         Search ->
-            --            let
-            --                cmd =
-            --                    menu
-            --                        |> Dict.get model.selectedKey
-            --                        |> Maybe.map (\f -> performSearch f model.searchValue)
-            --                        |> Maybe.withDefault Cmd.none
-            --            in
-            ( model, Cmd.none, Just model.searchValue )
+            let
+                query =
+                    if model.searchValue == "" then
+                        Nothing
+                    else
+                        menu
+                            |> Dict.get model.selectedKey
+                            |> Maybe.map (\f -> { value = model.searchValue, field = f })
+            in
+                --            let
+                --                cmd =
+                --                    menu
+                --                        |> Dict.get model.selectedKey
+                --                        |> Maybe.map (\f -> performSearch f model.searchValue)
+                --                        |> Maybe.withDefault Cmd.none
+                --            in
+                ( model, Cmd.none, query )
 
         Mdl msg_ ->
             let

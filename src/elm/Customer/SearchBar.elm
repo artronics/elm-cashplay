@@ -7,6 +7,7 @@ import Customer.Models exposing (CustomerTab)
 import Customer.Customer exposing (..)
 import Customer.Messages exposing (Msg(..))
 import Shared.SearchBar as SearchBar
+import Customer.Customer exposing (search)
 
 
 type alias Query =
@@ -17,13 +18,21 @@ type alias MenuItem =
     String
 
 
-update : SearchBar.Msg -> SearchBar.SearchBar -> ( SearchBar.SearchBar, Cmd SearchBar.Msg )
-update msg searchBar =
+update : SearchBar.Msg -> CustomerTab -> ( CustomerTab, Cmd Msg )
+update msg customerTab =
     let
-        ( newSearchBar, cmd, _ ) =
-            SearchBar.update msg searchBar filter
+        ( newSearchBar, cmd, query ) =
+            SearchBar.update msg customerTab.searchBar filter menu
+
+        searchCmd =
+            query
+                |> Maybe.map (\q -> search q OnSearch)
+                |> Maybe.withDefault (Cmd.none)
+
+        batchCmd =
+            Cmd.batch [ Cmd.map SearchBarMsg cmd, searchCmd ]
     in
-        ( newSearchBar, cmd )
+        ( { customerTab | searchBar = newSearchBar }, batchCmd )
 
 
 view : CustomerTab -> Html Msg
