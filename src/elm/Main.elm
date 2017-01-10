@@ -9,19 +9,27 @@ import Home.Messages as HomePage
 import Home.View as HomePage
 import Home.Update as HomePage
 import Home.Models as HomePage
+import Cashplay.Messages as Cashplay
+import Cashplay.View as Cashplay
+import Cashplay.Models as Cashplay
+import Cashplay.Update as Cashplay
 import Api
 
 
 type alias Model =
-    { route : Route
+    { login : Bool
+    , route : Route
     , home : HomePage.Home
+    , cashplay : Cashplay.Cashplay
     }
 
 
 model : Route -> Model
 model route =
-    { route = route
+    { login = False
+    , route = route
     , home = HomePage.init
+    , cashplay = Cashplay.init
     }
 
 
@@ -37,6 +45,7 @@ init location =
 type Msg
     = OnLocationChange Location
     | HomeMsg HomePage.Msg
+    | CashplayMsg Cashplay.Msg
       -- When we start app in dev mode, we send a login req to the server.
       -- Server in dev mode is seeded with given user.
       -- This is required because server will store current user email in server settings
@@ -59,7 +68,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         OnDevLogin (Ok jwt) ->
-            ( model, Navigation.newUrl "#cashplay" )
+            ( { model | login = True }, Navigation.newUrl "#cashplay" )
 
         OnDevLogin (Err _) ->
             ( model, Cmd.none )
@@ -78,6 +87,13 @@ update msg model =
             in
                 ( { model | home = newHome }, Cmd.map HomeMsg cmd )
 
+        CashplayMsg msg_ ->
+            let
+                ( newCashplay, cmd ) =
+                    Cashplay.update msg_ model.cashplay
+            in
+                ( { model | cashplay = newCashplay }, Cmd.map CashplayMsg cmd )
+
 
 
 -- VIEW
@@ -86,14 +102,7 @@ update msg model =
 view : Model -> Html.Html Msg
 view model =
     div [ cs "art-container" ]
-        [ div [ cs "art-header" ] [ p [] [ text "Cashplay" ] ]
-        , div [ cs "art-main-row" ]
-            [ div [ cs "art-actions" ] [ p [] [ text "Actions" ] ]
-            , div [ cs "art-tabs" ]
-                [ page model ]
-            , div [ cs "art-receipt" ] [ p [] [ text "Receipt" ] ]
-            ]
-        ]
+        [ page model ]
 
 
 page : Model -> Html Msg
@@ -103,7 +112,7 @@ page model =
             Html.map HomeMsg <| HomePage.view model.home
 
         Cashplay ->
-            text "cashplay"
+            Html.map CashplayMsg <| Cashplay.view model.cashplay
 
         NotFound ->
             text "page not found"

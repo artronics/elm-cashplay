@@ -5,63 +5,41 @@ import Material
 import Material.Tabs as Tabs exposing (..)
 import Material.Options as Options exposing (..)
 import Material.Icon as Icon exposing (..)
-import Components.Customer.Customer as Customer
-import Components.Item.Item as Item
 
 
-type alias Model =
-    { current : Tab
-    , customer : Customer.Model
-    , item : Item.Model
+type alias Tab =
+    { current : TabIndex
     , mdl : Material.Model
     }
 
 
-init : Model
-init =
+initTab : Tab
+initTab =
     { current = 0
-    , customer = Customer.init
-    , item = Item.init
     , mdl = Material.model
     }
 
 
 type Msg
-    = SelectTab Tab
-    | CustomerMsg Customer.Msg
-    | ItemMsg Item.Msg
+    = SelectTab TabIndex
     | Mdl (Material.Msg Msg)
 
 
-type alias Tab =
+type alias TabIndex =
     Int
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
+update : Msg -> Tab -> ( Tab, Cmd Msg )
 update msg model =
     case msg of
         SelectTab tab ->
             ( { model | current = tab }, Cmd.none )
 
-        CustomerMsg subMsg ->
-            let
-                ( updatedCustomer, cmd ) =
-                    Customer.update subMsg model.customer
-            in
-                ( { model | customer = updatedCustomer }, Cmd.map CustomerMsg cmd )
-
-        ItemMsg msg_ ->
-            let
-                ( updated, cmd ) =
-                    Item.update msg_ model.item
-            in
-                ( { model | item = updated }, Cmd.map ItemMsg cmd )
-
         Mdl msg_ ->
             Material.update Mdl msg_ model
 
 
-view : Model -> Html Msg
+view : Tab -> Html Msg
 view model =
     Options.div []
         [ Tabs.render Mdl
@@ -73,23 +51,23 @@ view model =
             ]
             [ Tabs.label
                 [ Options.center ]
-                [ Icon.i "info_outline"
+                [ Icon.i "person"
                 , Options.span [ css "width" "4px" ] []
                 , text "Customer"
                 ]
             , Tabs.label
                 [ Options.center ]
-                [ Icon.i "code"
+                [ Icon.i "devices_other"
                 , Options.span [ css "width" "4px" ] []
                 , text "Item"
                 ]
             ]
             [ case model.current of
                 0 ->
-                    Html.map CustomerMsg (Customer.view model.customer)
+                    text "first tab"
 
                 1 ->
-                    Html.map ItemMsg <| Item.view model.item
+                    text "second tab"
 
                 _ ->
                     text "foo"

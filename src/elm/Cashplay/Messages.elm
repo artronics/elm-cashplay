@@ -1,5 +1,9 @@
 module Cashplay.Messages exposing (..)
 
+import Material
+import Components.Tab as Tab
+
 
 type Msg
-    = NoOp
+    = TabMsg Tab.Msg
+    | Mdl (Material.Msg Msg)
