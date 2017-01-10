@@ -1,15 +1,15 @@
-module Customer.Models exposing (Customer, init)
+module Customer.Models exposing (CustomerTab, init)
 
 import Html exposing (Html, text, p)
 import Material
 
 
-type alias Customer =
+type alias CustomerTab =
     { mdl : Material.Model
     }
 
 
-init : Customer
+init : CustomerTab
 init =
     { mdl = Material.model
     }

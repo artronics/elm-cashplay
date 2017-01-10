@@ -6,5 +6,5 @@ import Customer.Messages as Customer
 
 type Msg
     = SelectTab Int
-    | CustomerMsg Customer.Msg
+    | CustomerTabMsg Customer.Msg
     | Mdl (Material.Msg Msg)

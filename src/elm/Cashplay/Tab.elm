@@ -7,6 +7,7 @@ import Material.Options as Options exposing (..)
 import Material.Icon as Icon exposing (..)
 import Cashplay.Models exposing (Cashplay)
 import Cashplay.Messages exposing (Msg(..))
+import Customer.View as CustomerTab
 
 
 view : Cashplay -> Html Msg
@@ -34,7 +35,7 @@ view cashplay =
             ]
             [ case cashplay.currentTab of
                 0 ->
-                    text "custome"
+                    Html.map CustomerTabMsg <| CustomerTab.view cashplay.customerTab
 
                 1 ->
                     text "item"
