@@ -1,7 +1,7 @@
 module Home.Models exposing (Home, init)
 
-import Components.Login exposing (Login, initLogin)
-import Components.Signup exposing (Signup, initSignup)
+import Shared.Login exposing (Login, initLogin)
+import Shared.Signup exposing (Signup, initSignup)
 
 
 type alias Home =

@@ -1,4 +1,4 @@
-module Components.Select exposing (..)
+module Views.Select exposing (..)
 
 import Html exposing (text)
 import Material.Options exposing (..)

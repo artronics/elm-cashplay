@@ -1,7 +1,7 @@
 module Home.Messages exposing (..)
 
-import Components.Login as Login
-import Components.Signup as Signup
+import Shared.Login as Login
+import Shared.Signup as Signup
 
 
 type Msg

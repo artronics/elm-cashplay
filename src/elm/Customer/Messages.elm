@@ -1,7 +1,9 @@
 module Customer.Messages exposing (Msg(..))
 
 import Material
+import Shared.SearchBar as SearchBar
 
 
 type Msg
-    = Mdl (Material.Msg Msg)
+    = SearchBarMsg SearchBar.Msg
+    | Mdl (Material.Msg Msg)

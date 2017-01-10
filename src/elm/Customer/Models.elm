@@ -2,14 +2,17 @@ module Customer.Models exposing (CustomerTab, init)
 
 import Html exposing (Html, text, p)
 import Material
+import Shared.SearchBar as SearchBar exposing (SearchBar)
 
 
 type alias CustomerTab =
-    { mdl : Material.Model
+    { searchBar : SearchBar
+    , mdl : Material.Model
     }
 
 
 init : CustomerTab
 init =
-    { mdl = Material.model
+    { searchBar = SearchBar.initSearchBar "Customer's Name"
+    , mdl = Material.model
     }

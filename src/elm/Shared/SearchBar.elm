@@ -1,4 +1,4 @@
-module Components.SearchBar exposing (..)
+module Shared.SearchBar exposing (SearchBar, initSearchBar, Msg, update)
 
 import Html exposing (Html, text, p)
 import Dict exposing (..)
@@ -10,10 +10,10 @@ import Material.Menu as MdlMenu exposing (..)
 import Material.Icon as Icon
 import Regex
 import Resources.Customer as ResCus
-import Components.Select as Select
+import Views.Select as Select
 
 
-type alias Model =
+type alias SearchBar =
     { searchValue : String
     , selectedKey :
         MenuItem
@@ -24,8 +24,8 @@ type alias Model =
     }
 
 
-init : MenuItem -> Model
-init initMenuItem =
+initSearchBar : MenuItem -> SearchBar
+initSearchBar initMenuItem =
     { searchValue = ""
     , selectedKey = initMenuItem
     , autoDetection = True
@@ -60,7 +60,7 @@ type alias SearchCmd f m =
     f -> Query -> Cmd m
 
 
-update : Msg -> Model -> Menu f -> Filter -> SearchCmd f m -> ( Model, Cmd Msg, Cmd m )
+update : Msg -> SearchBar -> Menu f -> Filter -> SearchCmd f m -> ( SearchBar, Cmd Msg, Cmd m )
 update msg model menu filter performSearch =
     case msg of
         OnSearchInput value ->
@@ -101,7 +101,7 @@ update msg model menu filter performSearch =
                 ( m, c, Cmd.none )
 
 
-view : Model -> Menu a -> Html Msg
+view : SearchBar -> Menu a -> Html Msg
 view model menu =
     div [ cs "art-search-bar" ]
         [ viewInput model
@@ -111,7 +111,7 @@ view model menu =
         ]
 
 
-viewInput : Model -> Html Msg
+viewInput : SearchBar -> Html Msg
 viewInput model =
     Textfield.render Mdl
         [ 0 ]
@@ -120,7 +120,7 @@ viewInput model =
         []
 
 
-viewSearchButton : Model -> Html Msg
+viewSearchButton : SearchBar -> Html Msg
 viewSearchButton model =
     Button.render Mdl
         [ 2 ]
@@ -137,6 +137,6 @@ viewSearchButton model =
         [ Icon.i "search", text "Search" ]
 
 
-viewMenu : Model -> List MenuItem -> Html Msg
+viewMenu : SearchBar -> List MenuItem -> Html Msg
 viewMenu model items =
     Select.select Mdl [ 1 ] model.mdl items Select model.selectedKey

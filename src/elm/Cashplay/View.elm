@@ -6,7 +6,6 @@ import Cashplay.Models exposing (Cashplay)
 import Cashplay.Messages exposing (Msg(..))
 import Views.Layout as Layout
 import Cashplay.Tab as Tab
-import Customer.View as Customer
 
 
 view : Cashplay -> Html Msg

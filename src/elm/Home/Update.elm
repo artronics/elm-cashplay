@@ -2,8 +2,8 @@ module Home.Update exposing (update)
 
 import Home.Models exposing (Home)
 import Home.Messages exposing (Msg(..))
-import Components.Login as Login
-import Components.Signup as Signup
+import Shared.Login as Login
+import Shared.Signup as Signup
 import Api
 
 

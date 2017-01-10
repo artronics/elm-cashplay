@@ -1,4 +1,4 @@
-module Components.Login exposing (..)
+module Shared.Login exposing (..)
 
 import Html exposing (Html, text, p)
 import Http exposing (Error(..))

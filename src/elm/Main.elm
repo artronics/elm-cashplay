@@ -54,6 +54,7 @@ type Msg
     | OnDevLogin (Result Http.Error Api.JwtToken)
 
 
+devLogin : Cmd Msg
 devLogin =
     Api.login { email = "dev@dev.com", password = "admin" } OnDevLogin
 
