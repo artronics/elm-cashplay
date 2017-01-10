@@ -2,6 +2,7 @@ module Components.Login exposing (..)
 
 import Html exposing (Html, text, p)
 import Http exposing (Error(..))
+import Navigation
 import String
 import Material
 import Material.Options exposing (..)
@@ -36,20 +37,24 @@ type Msg
     | Mdl (Material.Msg Msg)
 
 
-update : Msg -> Login -> ( Login, Cmd Msg )
+update : Msg -> Login -> ( Login, Cmd Msg, Maybe Api.JwtToken )
 update msg login =
     case msg of
         UpEmail email ->
-            ( { login | email = email }, Cmd.none )
+            ( { login | email = email }, Cmd.none, Nothing )
 
         UpPass pass ->
-            ( { login | password = pass }, Cmd.none )
+            ( { login | password = pass }, Cmd.none, Nothing )
 
         OnLogin ->
-            ( { login | msg = "" }, Api.login { email = login.email, password = login.password } OnLoginRes )
+            ( { login | msg = "" }, Api.login { email = login.email, password = login.password } OnLoginRes, Nothing )
 
-        OnLoginRes (Ok _) ->
-            ( login, Cmd.none )
+        OnLoginRes (Ok res) ->
+            let
+                jwt =
+                    { res | email = login.email }
+            in
+                ( login, Navigation.newUrl "#cashplay", Just jwt )
 
         OnLoginRes (Err err) ->
             let
@@ -64,10 +69,14 @@ update msg login =
                         _ ->
                             "Network Error"
             in
-                ( { login | msg = errMsg }, Cmd.none )
+                ( { login | msg = errMsg }, Cmd.none, Nothing )
 
         Mdl msg_ ->
-            Material.update Mdl msg_ login
+            let
+                ( m, c ) =
+                    Material.update Mdl msg_ login
+            in
+                ( m, c, Nothing )
 
 
 view : Login -> Html Msg

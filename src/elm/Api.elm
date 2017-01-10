@@ -15,17 +15,23 @@ type alias Credential =
     }
 
 
-credentialValue : Credential -> Value
-credentialValue cred =
-    object
-        [ ( "email", string cred.email )
-        , ( "pass", string cred.password )
-        ]
+type alias User =
+    { firstName : String
+    , lastName : String
+    , company : String
+    , password : String
+    , email : String
+    }
 
 
 type alias JwtToken =
     { token : String
+    , email : String
     }
+
+
+type alias Signup =
+    { signup : Maybe String }
 
 
 baseUrl =
@@ -40,8 +46,40 @@ login credential msg =
 
 jwtDecoder : Decode.Decoder JwtToken
 jwtDecoder =
-    Decode.map JwtToken
+    Decode.map2 JwtToken
         (field "token" Decode.string)
+        (field "email" Decode.string)
+
+
+signup : User -> (Result Http.Error Signup -> msg) -> Cmd msg
+signup user msg =
+    Http.post (baseUrl ++ "rpc/signup") (Http.jsonBody <| userValue user) signupDecoder
+        |> Http.send msg
+
+
+signupDecoder : Decode.Decoder Signup
+signupDecoder =
+    Decode.map Signup
+        (field "signup" (Decode.nullable Decode.string))
+
+
+userValue : User -> Value
+userValue user =
+    object
+        [ ( "first_name", string user.firstName )
+        , ( "last_name", string user.lastName )
+        , ( "company", string user.company )
+        , ( "email", string user.email )
+        , ( "pass", string user.password )
+        ]
+
+
+credentialValue : Credential -> Value
+credentialValue cred =
+    object
+        [ ( "email", string cred.email )
+        , ( "pass", string cred.password )
+        ]
 
 
 

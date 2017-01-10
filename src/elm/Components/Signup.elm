@@ -1,10 +1,15 @@
 module Components.Signup exposing (..)
 
 import Html exposing (Html, text, p)
+import Http exposing (Response, Error(..))
+import Navigation
+import String
+import Regex exposing (regex)
 import Material
 import Material.Options exposing (..)
 import Material.Textfield as Textfield
 import Material.Button as Button
+import Api
 
 
 type alias Signup =
@@ -16,6 +21,9 @@ type alias Signup =
     , company : String
     , matched : Bool
     , matchStarted : Bool
+    , validateEmail : Bool
+    , emailErr : String
+    , netErr : String
     , mdl : Material.Model
     }
 
@@ -30,6 +38,9 @@ initSignup =
     , company = ""
     , matched = True
     , matchStarted = False
+    , validateEmail = False
+    , emailErr = ""
+    , netErr = ""
     , mdl = Material.model
     }
 
@@ -37,6 +48,10 @@ initSignup =
 type Msg
     = Update (Signup -> String -> Signup) String
     | StartMatching
+    | StartValEmail
+    | OnSignup
+    | OnLogin (Result Http.Error Api.JwtToken)
+    | OnSignupRes (Result Http.Error Api.Signup)
     | Mdl (Material.Msg Msg)
 
 
@@ -48,6 +63,49 @@ update msg signup =
 
         StartMatching ->
             ( { signup | matchStarted = True }, Cmd.none )
+
+        StartValEmail ->
+            ( { signup | validateEmail = True }, Cmd.none )
+
+        OnSignup ->
+            let
+                batchCmd =
+                    [ Api.login { email = signup.email, password = signup.password } OnLogin
+                    , Api.signup
+                        { firstName = signup.firstName
+                        , lastName = signup.lastName
+                        , company = signup.company
+                        , email = signup.email
+                        , password = signup.password
+                        }
+                        OnSignupRes
+                    ]
+            in
+                ( signup, Cmd.batch batchCmd )
+
+        OnSignupRes (Err err) ->
+            let
+                ( emailErr, netErr ) =
+                    case err of
+                        NetworkError ->
+                            ( "", "No Internet Connection" )
+
+                        BadStatus _ ->
+                            ( "This email is already registered.", "" )
+
+                        _ ->
+                            ( "", "Network Error" )
+            in
+                ( { signup | emailErr = emailErr, netErr = netErr }, Cmd.none )
+
+        OnSignupRes (Ok res) ->
+            ( signup, Cmd.none )
+
+        OnLogin (Ok jwt) ->
+            ( signup, Navigation.newUrl "#cashplay" )
+
+        OnLogin (Err err) ->
+            ( { signup | netErr = "No Internet connection." }, Cmd.none )
 
         Mdl msg_ ->
             Material.update Mdl msg_ signup
@@ -75,6 +133,11 @@ view signup =
             signup.mdl
             [ Textfield.label "Email"
             , onInput <| Update (\m s -> { m | email = s })
+              --            , onBlur StartValEmail
+              --            , Textfield.error "Email has wrong format."
+              --                |> when (matchEmail signup.email || signup.validateEmail)
+              --            , Textfield.error signup.emailErr
+              --                |> when (not <| String.isEmpty signup.emailErr)
             ]
             []
         , Textfield.render Mdl
@@ -104,6 +167,21 @@ view signup =
         , Button.render Mdl
             [ 6 ]
             signup.mdl
-            [ Button.raised, Button.primary, Button.ripple ]
+            [ Button.raised
+            , Button.primary
+            , Button.ripple
+            , onClick OnSignup
+            ]
             [ text "Signup" ]
         ]
+
+
+emailRx : String
+emailRx =
+    "\\S+@\\S+\\.\\S+"
+
+
+matchEmail : String -> Bool
+matchEmail email =
+    email
+        |> Regex.contains (regex emailRx)

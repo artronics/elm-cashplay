@@ -49,7 +49,7 @@ update msg model =
 
         HomeMsg msg_ ->
             let
-                ( newHome, cmd ) =
+                ( newHome, cmd, jwt ) =
                     HomePage.update msg_ model.home
             in
                 ( { model | home = newHome }, Cmd.map HomeMsg cmd )
