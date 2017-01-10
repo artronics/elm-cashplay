@@ -1,53 +1,23 @@
-module Components.Tab exposing (..)
+module Cashplay.Tab exposing (..)
 
 import Html exposing (..)
 import Material
-import Material.Tabs as Tabs exposing (..)
+import Material.Tabs as Tabs
 import Material.Options as Options exposing (..)
 import Material.Icon as Icon exposing (..)
+import Cashplay.Models exposing (Cashplay)
+import Cashplay.Messages exposing (Msg(..))
 
 
-type alias Tab =
-    { current : TabIndex
-    , mdl : Material.Model
-    }
-
-
-initTab : Tab
-initTab =
-    { current = 0
-    , mdl = Material.model
-    }
-
-
-type Msg
-    = SelectTab TabIndex
-    | Mdl (Material.Msg Msg)
-
-
-type alias TabIndex =
-    Int
-
-
-update : Msg -> Tab -> ( Tab, Cmd Msg )
-update msg model =
-    case msg of
-        SelectTab tab ->
-            ( { model | current = tab }, Cmd.none )
-
-        Mdl msg_ ->
-            Material.update Mdl msg_ model
-
-
-view : Tab -> Html Msg
-view model =
+view : Cashplay -> Html Msg
+view cashplay =
     Options.div []
         [ Tabs.render Mdl
             [ 0 ]
-            model.mdl
+            cashplay.mdl
             [ Tabs.ripple
             , Tabs.onSelectTab SelectTab
-            , Tabs.activeTab model.current
+            , Tabs.activeTab cashplay.currentTab
             ]
             [ Tabs.label
                 [ Options.center ]
@@ -62,14 +32,14 @@ view model =
                 , text "Item"
                 ]
             ]
-            [ case model.current of
+            [ case cashplay.currentTab of
                 0 ->
-                    text "first tab"
+                    text "custome"
 
                 1 ->
-                    text "second tab"
+                    text "item"
 
                 _ ->
-                    text "foo"
+                    text "new tab... add content"
             ]
         ]

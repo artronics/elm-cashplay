@@ -5,7 +5,8 @@ import Material.Options exposing (..)
 import Cashplay.Models exposing (Cashplay)
 import Cashplay.Messages exposing (Msg(..))
 import Views.Layout as Layout
-import Components.Tab as Tab
+import Cashplay.Tab as Tab
+import Customer.View as Customer
 
 
 view : Cashplay -> Html Msg
@@ -13,7 +14,7 @@ view cashplay =
     div []
         [ Layout.view
             ( p [] [ text "nav" ]
-            , Html.map TabMsg <| Tab.view cashplay.tab
+            , Tab.view cashplay
             , p [] [ text "transaction" ]
             )
         ]

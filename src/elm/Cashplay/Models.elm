@@ -1,17 +1,19 @@
 module Cashplay.Models exposing (..)
 
 import Material
-import Components.Tab as Tab
+import Customer.Models as Customer exposing (Customer)
 
 
 type alias Cashplay =
-    { tab : Tab.Tab
+    { currentTab : Int
+    , customer : Customer
     , mdl : Material.Model
     }
 
 
 init : Cashplay
 init =
-    { tab = Tab.initTab
+    { currentTab = 0
+    , customer = Customer.init
     , mdl = Material.model
     }

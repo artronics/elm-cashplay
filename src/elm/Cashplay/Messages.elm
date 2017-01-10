@@ -1,9 +1,10 @@
 module Cashplay.Messages exposing (..)
 
 import Material
-import Components.Tab as Tab
+import Customer.Messages as Customer
 
 
 type Msg
-    = TabMsg Tab.Msg
+    = SelectTab Int
+    | CustomerMsg Customer.Msg
     | Mdl (Material.Msg Msg)
