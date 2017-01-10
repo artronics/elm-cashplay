@@ -13,6 +13,6 @@ type alias CustomerTab =
 
 init : CustomerTab
 init =
-    { searchBar = SearchBar.initSearchBar "Customer's Name"
+    { searchBar = SearchBar.initSearchBar
     , mdl = Material.model
     }

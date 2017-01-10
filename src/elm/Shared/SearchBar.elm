@@ -1,4 +1,4 @@
-module Shared.SearchBar exposing (SearchBar, initSearchBar, Msg, update)
+module Shared.SearchBar exposing (SearchBar, initSearchBar, Msg, update, view)
 
 import Html exposing (Html, text, p)
 import Dict exposing (..)
@@ -24,10 +24,10 @@ type alias SearchBar =
     }
 
 
-initSearchBar : MenuItem -> SearchBar
-initSearchBar initMenuItem =
+initSearchBar : SearchBar
+initSearchBar =
     { searchValue = ""
-    , selectedKey = initMenuItem
+    , selectedKey = "Customer's Name"
     , autoDetection = True
     , mdl = Material.model
     }

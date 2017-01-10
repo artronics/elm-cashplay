@@ -10,4 +10,4 @@ import Customer.SearchBar as SearchBar exposing (view)
 view : CustomerTab -> Html Msg
 view customer =
     div []
-        [ SearchBar.view ]
+        [ SearchBar.view customer ]

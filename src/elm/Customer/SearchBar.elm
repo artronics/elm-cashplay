@@ -19,12 +19,16 @@ type alias MenuItem =
 
 update : SearchBar.Msg -> SearchBar.SearchBar -> ( SearchBar.SearchBar, Cmd SearchBar.Msg )
 update msg searchBar =
-    ( searchBar, Cmd.none )
+    let
+        ( newSearchBar, cmd, _ ) =
+            SearchBar.update msg searchBar filter
+    in
+        ( newSearchBar, cmd )
 
 
-view : Html Msg
-view =
-    text "search bar"
+view : CustomerTab -> Html Msg
+view customerTab =
+    Html.map SearchBarMsg <| SearchBar.view customerTab.searchBar menu
 
 
 filter : Query -> MenuItem
