@@ -45,10 +45,6 @@ type alias Menu a =
     Dict MenuItem a
 
 
-type alias Query =
-    String
-
-
 type Msg
     = OnSearchInput String
     | Select MenuItem
@@ -57,11 +53,11 @@ type Msg
 
 
 type alias SearchCmd f m =
-    f -> Query -> Cmd m
+    f -> String -> Cmd m
 
 
-update : Msg -> SearchBar -> Menu f -> Filter -> SearchCmd f m -> ( SearchBar, Cmd Msg, Cmd m )
-update msg model menu filter performSearch =
+update : Msg -> SearchBar -> Filter -> ( SearchBar, Cmd Msg, Maybe String )
+update msg model filter =
     case msg of
         OnSearchInput value ->
             let
@@ -77,28 +73,28 @@ update msg model menu filter performSearch =
                     else
                         model.selectedKey
             in
-                ( { model | searchValue = value, selectedKey = menuItem, autoDetection = autoDetection }, Cmd.none, Cmd.none )
+                ( { model | searchValue = value, selectedKey = menuItem, autoDetection = autoDetection }, Cmd.none, Nothing )
 
         Select key ->
             --Here we also disable auto detection because user click on select menu
-            ( { model | selectedKey = key, autoDetection = False }, Cmd.none, Cmd.none )
+            ( { model | selectedKey = key, autoDetection = False }, Cmd.none, Nothing )
 
         Search ->
-            let
-                cmd =
-                    menu
-                        |> Dict.get model.selectedKey
-                        |> Maybe.map (\f -> performSearch f model.searchValue)
-                        |> Maybe.withDefault Cmd.none
-            in
-                ( model, Cmd.none, cmd )
+            --            let
+            --                cmd =
+            --                    menu
+            --                        |> Dict.get model.selectedKey
+            --                        |> Maybe.map (\f -> performSearch f model.searchValue)
+            --                        |> Maybe.withDefault Cmd.none
+            --            in
+            ( model, Cmd.none, Just model.searchValue )
 
         Mdl msg_ ->
             let
                 ( m, c ) =
                     Material.update Mdl msg_ model
             in
-                ( m, c, Cmd.none )
+                ( m, c, Nothing )
 
 
 view : SearchBar -> Menu a -> Html Msg
