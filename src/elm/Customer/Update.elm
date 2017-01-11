@@ -2,7 +2,7 @@ module Customer.Update exposing (update)
 
 import Material
 import Customer.Messages exposing (Msg(..))
-import Customer.Models exposing (CustomerTab)
+import Customer.Models exposing (CustomerTab, View(..))
 import Customer.SearchBar as SearchBar
 
 
@@ -13,10 +13,20 @@ update msg customerTab =
             SearchBar.update msg_ customerTab
 
         OnSearch (Ok fetchedCustomers) ->
-            ( customerTab, Cmd.none )
+            ( { customerTab
+                | views = [ SearchResults fetchedCustomers ]
+                , currentView = 0
+              }
+            , Cmd.none
+            )
 
         OnSearch (Err err) ->
-            ( customerTab, Cmd.none )
+            ( { customerTab
+                | views = [ NetErr "Network Err" ]
+                , currentView = 0
+              }
+            , Cmd.none
+            )
 
         Mdl msg_ ->
             Material.update Mdl msg_ customerTab
