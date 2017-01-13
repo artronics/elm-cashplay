@@ -24,6 +24,7 @@ update msg customerTab =
         ( newSearchBar, cmd, query ) =
             SearchBar.update msg customerTab.searchBar filter menu
 
+        -- an string which is comming from Shared.SearchBar
         searchCmd =
             query
                 |> Maybe.map (\q -> search q OnSearch)

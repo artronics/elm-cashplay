@@ -1,6 +1,5 @@
 module Customer.Models exposing (CustomerTab, View(..), init)
 
-import Html exposing (Html, text, p)
 import Material
 import Shared.SearchBar as SearchBar exposing (SearchBar)
 import Customer.Customer exposing (Customer)

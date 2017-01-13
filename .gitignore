@@ -3,3 +3,4 @@ node_modules/
 tmp/
 dist/
 /.idea/
+npm_debug.log

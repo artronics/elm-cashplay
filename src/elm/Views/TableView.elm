@@ -1,8 +1,8 @@
-module Views.TableView exposing (..)
+module Views.TableView exposing (render)
 
 import Html exposing (Html, text)
 import Dict exposing (..)
-import Material
+import Material.Table
 import Material.Options exposing (..)
 import Material.Table as Table
 import Material.Icon as MdlIcon
@@ -14,16 +14,6 @@ type alias Icon =
 
 type alias ViewAction m =
     ( Icon, m )
-
-
-
---render :
---    List String
---    -> List a
---    -> (a -> List (Html m))
---    -> (a -> List (ViewAction m))
---    -> (Int -> List (Property c m))
---    -> Html m
 
 
 render headers resDict tableData viewActions rowAtr isHover =
@@ -55,12 +45,14 @@ viewTableHeaders headers =
 
 
 
---viewTableRow :
---    a
---    -> (a -> List (Html m))
---    -> (a -> List (ViewAction m))
---    -> List (Property c m)
---    -> Html m
+-- viewTableRow:
+-- viewTableRow :
+--     a
+--     -> (a -> List (Html m))
+--     -> List (ViewAction m)
+--     -> List (Property c m)
+--     -> Bool
+--     -> Html m
 
 
 viewTableRow item tableData createActions rowAtr isHover =
