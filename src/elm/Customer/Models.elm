@@ -7,7 +7,7 @@ import Customer.Customer exposing (Customer)
 
 type alias CustomerTab =
     { searchBar : SearchBar
-    , currentView : Int
+    , currentView : View
     , views : List View
     , mdl : Material.Model
     }
@@ -22,7 +22,7 @@ type View
 init : CustomerTab
 init =
     { searchBar = SearchBar.initSearchBar
-    , currentView = 0
+    , currentView = None
     , views = []
     , mdl = Material.model
     }

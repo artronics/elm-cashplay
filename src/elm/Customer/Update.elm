@@ -15,7 +15,7 @@ update msg customerTab =
         OnSearch (Ok fetchedCustomers) ->
             ( { customerTab
                 | views = [ SearchResults fetchedCustomers ]
-                , currentView = 0
+                , currentView = SearchResults fetchedCustomers
               }
             , Cmd.none
             )
@@ -23,7 +23,7 @@ update msg customerTab =
         OnSearch (Err err) ->
             ( { customerTab
                 | views = [ NetErr "Network Err" ]
-                , currentView = 0
+                , currentView = NetErr "Network Err"
               }
             , Cmd.none
             )

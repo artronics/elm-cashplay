@@ -6,7 +6,7 @@ import Material
 import Material.Options exposing (..)
 import Material.Table as Table
 import Resources.Item as Res
-import Components.TableView as TableView
+import Views.TableView as TableView
 
 
 type alias Model =
