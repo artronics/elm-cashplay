@@ -58,3 +58,15 @@
   margin-left: 20px;
 }
 
+.art-lbl{
+  display: inline-block;
+  padding-right: 16px;
+  padding-left: 16px;
+  margin:0;
+  * {
+    padding-right: 16px;
+  }
+  *:last-child{
+    padding-right: 0;
+  }
+}
