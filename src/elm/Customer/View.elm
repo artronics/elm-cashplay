@@ -7,6 +7,7 @@ import Customer.Messages exposing (Msg(..))
 import Customer.SearchBar as SearchBar exposing (view)
 import Customer.ResultList as ResultList
 import Views.Elements.Layout as Layout
+import Views.Elements.Button as Btn
 
 
 view : CustomerTab -> Html Msg
@@ -14,7 +15,7 @@ view customerTab =
     div []
         [ Layout.hbox []
             [ SearchBar.view customerTab
-            , text "new customer"
+            , Btn.btn [ Btn.primary ] [ text "New Customer" ]
             ]
         , viewView customerTab
         ]

@@ -9,6 +9,17 @@ type ElmCss
     = Layout
 
 
+type Color
+    = Primary
+
+
+color : Color -> String
+color clr =
+    case clr of
+        Primary ->
+            "primary"
+
+
 
 --layout : List (Attribute msg)
 
