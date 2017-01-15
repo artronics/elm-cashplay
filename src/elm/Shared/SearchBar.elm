@@ -9,7 +9,6 @@ import Material.Button as Button
 import Material.Menu as MdlMenu exposing (..)
 import Material.Icon as Icon
 import Regex
-import Resources.Customer as ResCus
 import Views.Select as Select
 
 

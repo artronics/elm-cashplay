@@ -6,12 +6,16 @@ import Customer.Models exposing (CustomerTab, View(..))
 import Customer.Messages exposing (Msg(..))
 import Customer.SearchBar as SearchBar exposing (view)
 import Customer.ResultList as ResultList
+import Views.Elements.Layout as Layout
 
 
 view : CustomerTab -> Html Msg
 view customerTab =
     div []
-        [ SearchBar.view customerTab
+        [ Layout.hbox []
+            [ SearchBar.view customerTab
+            , text "new customer"
+            ]
         , viewView customerTab
         ]
 
