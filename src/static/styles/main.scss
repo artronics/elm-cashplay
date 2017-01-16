@@ -6,6 +6,10 @@
 @import "layout";
 @import "theme";
 
+.art-inline>*{
+  display: inline-block;
+  margin-right: 12px;
+}
 
 .art-page-header {
   border-bottom: solid #E0E0E0 1px;
@@ -21,14 +25,10 @@
   @include flex-grow(1);
 }
 
-.art-search-bar > * {
-  display: inline-block;
-  margin-right: 10px;
+.art-search-bar input{
+  width:300px
 }
 
-.art-search-bar > p {
-  font-weight: bold;
-}
 
 .art-customer-search-in > span {
   // equivalent of longest menu element which is Customer's Name

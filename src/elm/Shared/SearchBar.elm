@@ -5,7 +5,6 @@ import Html.Attributes exposing (..)
 import Dict exposing (..)
 import Html.Events exposing (..)
 import Regex
-import Views.Select as Select
 import Views.Elements.Textfield exposing (txt)
 import Views.Elements.Button as Btn exposing (btn)
 import Views.Elements.Label exposing (labelIcon)
@@ -96,7 +95,7 @@ update msg model filter menu =
 
 view : SearchBar -> Menu a -> Html Msg
 view model menu =
-    div [ class "art-search-bar" ]
+    div [ class "art-inline" ]
         [ viewInput model
         , p [] [ text "In:" ]
         , viewMenu model menu
@@ -106,7 +105,7 @@ view model menu =
 
 viewInput : SearchBar -> Html Msg
 viewInput model =
-    txt "search" [ onInput OnSearchInput ] []
+    txt "Search" [ onInput OnSearchInput, placeholder "Search" ] []
 
 
 viewSearchButton : SearchBar -> Html Msg

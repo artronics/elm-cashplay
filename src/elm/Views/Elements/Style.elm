@@ -10,12 +10,16 @@ type ElmCss
 
 
 type Color
-    = Primary
+    = Default
+    | Primary
 
 
 color : Color -> String
 color clr =
     case clr of
+        Default ->
+            "default"
+
         Primary ->
             "primary"
 

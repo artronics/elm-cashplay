@@ -28,3 +28,8 @@ html, body, #main, .art-container{
   width:20%;
   background-color: darkgrey;
 }
+
+.art-hbox{
+  @extend %flexbox;
+  @include flex-dir(row);
+}

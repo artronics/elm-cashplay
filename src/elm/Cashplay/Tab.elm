@@ -11,14 +11,14 @@ import Views.Elements.Label exposing (labelIcon)
 
 viewTab : Cashplay -> Html Msg
 viewTab cashplay =
-    div [ class "art-tab-container" ]
-        [ nav [ class "art-tab-bar" ]
+    div [ class "art-tab-container panel panel-default" ]
+        [ nav [ class "art-tab-bar panel-heading" ]
             [ ul []
-                [ viewTabName cashplay CustomerTab ( "Customrs", "user-o" )
+                [ viewTabName cashplay CustomerTab ( "Customers", "user-o" )
                 , viewTabName cashplay ItemTab ( "Items", "mobile" )
                 ]
             ]
-        , div [ class "art-tab-content" ]
+        , div [ class "art-tab-content panel-body" ]
             [ case cashplay.currentTab of
                 CustomerTab ->
                     Html.map CustomerTabMsg <| CustomerTab.view cashplay.customerTab

@@ -27,20 +27,24 @@ select.form-control {
   background-position: 90% center;
 }
 
+.art-tab-container .panel-heading{
+  padding-bottom: 0;
+  padding-top: 0;
+
+}
 .art-tab-bar ul{
   list-style:none;
-  border-bottom: solid $gray-lighter 1px;
+  //border-bottom: solid $gray-lighter 1px;
   margin:0;
   padding:0;
   .active {
-    background-color: $gray-lighter;
+    background-color: white;
     border-bottom: solid $brand-primary 2px;
     cursor: text;
     pointer-events: none;
   }
 }
 .art-tab-bar li{
-  border-bottom: solid white 2px;
   display: inline-block;
   margin-right: 20px;
   padding: 5px 10px;
