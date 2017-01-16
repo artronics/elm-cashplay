@@ -17,6 +17,7 @@ type View
     = None
     | SearchResults
     | CustomerDetails
+    | NewCustomer
     | NetErr
 
 

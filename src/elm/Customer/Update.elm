@@ -15,6 +15,7 @@ update msg customerTab =
             ( { customerTab
                 | views = [ SearchResults ]
                 , currentView = SearchResults
+                , fetchedCustomers = fetchedCustomers
               }
             , Cmd.none
             )
@@ -42,3 +43,11 @@ update msg customerTab =
                   }
                 , Cmd.none
                 )
+
+        OnNewCustomer ->
+            ( { customerTab
+                | views = [ NewCustomer ]
+                , currentView = NewCustomer
+              }
+            , Cmd.none
+            )

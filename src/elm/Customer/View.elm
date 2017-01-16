@@ -1,15 +1,16 @@
 module Customer.View exposing (view)
 
 import Html exposing (..)
+import Html.Events exposing (onClick)
 import Html.Attributes exposing (class, style)
 import Customer.Models exposing (CustomerTab, View(..))
 import Customer.Messages exposing (Msg(..))
 import Customer.SearchBar as SearchBar exposing (view)
 import Customer.ResultList as ResultList
-import Views.Elements.Layout as Layout
 import Views.Elements.Button as Btn
 import Views.Elements.Label exposing (labelIcon)
 import Views.Breadcrumb as Bread
+import Views.MessageBox as MsgBox
 
 
 view : CustomerTab -> Html Msg
@@ -20,6 +21,7 @@ view customerTab =
             , Btn.btn
                 [ Btn.default
                 , style [ ( "margin-left", "100px" ) ]
+                , onClick OnNewCustomer
                 ]
                 [ labelIcon "New Customer" "user-plus" ]
             ]
@@ -38,7 +40,16 @@ createCrumb customerTab =
                         ( "search", "Search Results", SearchResults )
 
                     CustomerDetails ->
-                        ( "user", "customr details", CustomerDetails )
+                        let
+                            title =
+                                customerTab.customerDetails
+                                    |> Maybe.map (\c -> c.firstName ++ " " ++ c.lastName)
+                                    |> Maybe.withDefault "Customer Details"
+                        in
+                            ( "user", title, CustomerDetails )
+
+                    NewCustomer ->
+                        ( "user-plus", "New Customer", NewCustomer )
 
                     NetErr ->
                         ( "", "", NetErr )
@@ -54,5 +65,14 @@ viewContent customerTab =
         SearchResults ->
             ResultList.view customerTab.fetchedCustomers
 
-        _ ->
-            text "unimplemented view"
+        CustomerDetails ->
+            text "customer details"
+
+        NewCustomer ->
+            text "new customer"
+
+        NetErr ->
+            MsgBox.view "Network err"
+
+        None ->
+            MsgBox.view "Use search. You can add customer to receipt or view customer details."
