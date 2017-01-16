@@ -3,10 +3,7 @@ module Views.Breadcrumb exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (class)
 import Html.Events exposing (onClick)
-import Material.Icon as Icon
-import Material.Options exposing (styled)
-import Material.Typography as Typo
-import Material.Spinner as Loading
+import Views.Elements.Label exposing (labelIcon)
 
 
 type Info
@@ -60,8 +57,10 @@ viewCrumb crumbs msg currentActive =
                         )
                     ]
                     [ span [ onClick <| msg index ]
-                        [ Icon.i icon
-                        , styled p [ Typo.subhead ] [ text title ]
+                        [ p []
+                            [ i [ class <| "fa fa-" ++ icon ] []
+                            , text title
+                            ]
                         ]
                     ]
             )
@@ -75,7 +74,7 @@ viewInfo info =
             span [ class "hidden" ] []
 
         Loading ->
-            span [ class "art-breadcrumb-info loading" ] [ Loading.spinner [ Loading.active True ] ]
+            span [ class "art-breadcrumb-info loading" ] [ text "daram micharlham" ]
 
         Success str ->
-            span [ class "art-breadcrumb-info success" ] [ Icon.i "check", styled p [ Typo.subhead ] [ text str ] ]
+            span [ class "art-breadcrumb-info success" ] [ text "tick ba msg" ]

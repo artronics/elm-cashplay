@@ -8,3 +8,4 @@ import Customer.Customer exposing (Customer)
 type Msg
     = SearchBarMsg SearchBar.Msg
     | OnSearch (Result Http.Error (List Customer))
+    | SelectCrumb Int

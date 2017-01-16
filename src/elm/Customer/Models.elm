@@ -6,6 +6,7 @@ import Customer.Customer exposing (Customer)
 
 type alias CustomerTab =
     { searchBar : SearchBar
+    , fetchedCustomers : List Customer
     , currentView : View
     , views : List View
     }
@@ -13,13 +14,14 @@ type alias CustomerTab =
 
 type View
     = None
-    | SearchResults (List Customer)
-    | NetErr String
+    | SearchResults
+    | NetErr
 
 
 init : CustomerTab
 init =
     { searchBar = SearchBar.initSearchBar
+    , fetchedCustomers = []
     , currentView = None
     , views = []
     }

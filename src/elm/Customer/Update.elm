@@ -13,16 +13,23 @@ update msg customerTab =
 
         OnSearch (Ok fetchedCustomers) ->
             ( { customerTab
-                | views = [ SearchResults fetchedCustomers ]
-                , currentView = SearchResults fetchedCustomers
+                | views = [ SearchResults ]
+                , currentView = SearchResults
               }
             , Cmd.none
             )
 
         OnSearch (Err err) ->
             ( { customerTab
-                | views = [ NetErr "Network Err" ]
-                , currentView = NetErr "Network Err"
+                | views = []
+                , currentView = NetErr
               }
             , Cmd.none
             )
+
+        SelectCrumb index ->
+            let
+                currentView =
+                    SearchResults
+            in
+                ( customerTab, Cmd.none )

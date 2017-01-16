@@ -9,6 +9,7 @@ import Customer.ResultList as ResultList
 import Views.Elements.Layout as Layout
 import Views.Elements.Button as Btn
 import Views.Elements.Label exposing (labelIcon)
+import Views.Breadcrumb as Bread
 
 
 view : CustomerTab -> Html Msg
@@ -22,15 +23,46 @@ view customerTab =
                 ]
                 [ labelIcon "New Customer" "user-plus" ]
             ]
-        , viewView customerTab
+        , Bread.view (createCrumb customerTab) SelectCrumb (getCurrentCrumbIndex customerTab) Bread.None
+        , viewContent customerTab
         ]
 
 
-viewView : CustomerTab -> Html Msg
-viewView customerTab =
+getCurrentCrumbIndex : CustomerTab -> Int
+getCurrentCrumbIndex customerTab =
+    let
+        indices =
+            customerTab.views
+                |> List.indexedMap
+                    (\i v ->
+                        if v == customerTab.currentView then
+                            i
+                        else
+                            -1
+                    )
+    in
+        List.head indices |> Maybe.withDefault -1
+
+
+createCrumb : CustomerTab -> List ( String, String )
+createCrumb customerTab =
+    customerTab.views
+        |> List.map
+            (\v ->
+                case v of
+                    SearchResults ->
+                        ( "search", "Search Results" )
+
+                    _ ->
+                        ( "", "Not a crumb" )
+            )
+
+
+viewContent : CustomerTab -> Html Msg
+viewContent customerTab =
     case customerTab.currentView of
-        SearchResults customers ->
-            ResultList.view customers
+        SearchResults ->
+            ResultList.view customerTab.fetchedCustomers
 
         _ ->
             text "unimplemented view"
