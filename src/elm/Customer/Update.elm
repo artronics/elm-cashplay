@@ -1,6 +1,5 @@
 module Customer.Update exposing (update)
 
-import Material
 import Customer.Messages exposing (Msg(..))
 import Customer.Models exposing (CustomerTab, View(..))
 import Customer.SearchBar as SearchBar
@@ -27,6 +26,3 @@ update msg customerTab =
               }
             , Cmd.none
             )
-
-        Mdl msg_ ->
-            Material.update Mdl msg_ customerTab

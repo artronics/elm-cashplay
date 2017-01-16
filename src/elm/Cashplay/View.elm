@@ -1,11 +1,11 @@
 module Cashplay.View exposing (view)
 
-import Html exposing (Html, text, p)
-import Material.Options exposing (..)
+import Html exposing (..)
+import Html.Attributes exposing (class)
 import Cashplay.Models exposing (Cashplay)
 import Cashplay.Messages exposing (Msg(..))
 import Views.Layout as Layout
-import Cashplay.Tab as Tab
+import Cashplay.Tab exposing (viewTab)
 
 
 view : Cashplay -> Html Msg
@@ -13,7 +13,7 @@ view cashplay =
     div []
         [ Layout.view
             ( p [] [ text "nav" ]
-            , Tab.view cashplay
+            , viewTab cashplay
             , p [] [ text "transaction" ]
             )
         ]

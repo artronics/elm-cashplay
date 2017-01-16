@@ -1,9 +1,9 @@
 module Main exposing (..)
 
-import Html exposing (Html, p, text)
+import Html exposing (..)
+import Html.Attributes exposing (class)
 import Http
 import Navigation exposing (Location)
-import Material.Options exposing (..)
 import Routing exposing (..)
 import Home.Messages as HomePage
 import Home.View as HomePage
@@ -102,7 +102,7 @@ update msg model =
 
 view : Model -> Html.Html Msg
 view model =
-    div [ cs "art-container" ]
+    div [ class "art-container" ]
         [ page model ]
 
 

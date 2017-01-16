@@ -1,10 +1,9 @@
 module Cashplay.Messages exposing (..)
 
-import Material
 import Customer.Messages as Customer
+import Cashplay.Models exposing (Tab)
 
 
 type Msg
-    = SelectTab Int
+    = SelectTab Tab
     | CustomerTabMsg Customer.Msg
-    | Mdl (Material.Msg Msg)

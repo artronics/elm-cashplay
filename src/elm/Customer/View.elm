@@ -1,7 +1,6 @@
 module Customer.View exposing (view)
 
-import Html exposing (Html, text, p)
-import Material.Options exposing (..)
+import Html exposing (..)
 import Customer.Models exposing (CustomerTab, View(..))
 import Customer.Messages exposing (Msg(..))
 import Customer.SearchBar as SearchBar exposing (view)
