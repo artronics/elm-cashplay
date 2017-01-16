@@ -1,15 +1,15 @@
 module Shared.SearchBar exposing (SearchBar, initSearchBar, Msg, update, view)
 
-import Html exposing (Html, text, p)
+import Html exposing (..)
+import Html.Attributes exposing (..)
 import Dict exposing (..)
-import Material
-import Material.Options exposing (..)
-import Material.Textfield as Textfield
-import Material.Button as Button
-import Material.Menu as MdlMenu exposing (..)
-import Material.Icon as Icon
+import Html.Events exposing (..)
 import Regex
 import Views.Select as Select
+import Views.Elements.Textfield exposing (txt)
+import Views.Elements.Button as Btn exposing (btn)
+import Views.Elements.Label exposing (labelIcon)
+import Views.Elements.Select exposing (slt)
 
 
 type alias SearchBar =
@@ -19,7 +19,6 @@ type alias SearchBar =
         --as soon as user select menu we disable auto detection
         --we enable it if input value is ""
     , autoDetection : Bool
-    , mdl : Material.Model
     }
 
 
@@ -28,7 +27,6 @@ initSearchBar =
     { searchValue = ""
     , selectedKey = "Customer's Name"
     , autoDetection = True
-    , mdl = Material.model
     }
 
 
@@ -48,7 +46,6 @@ type Msg
     = OnSearchInput String
     | Select MenuItem
     | Search
-    | Mdl (Material.Msg Msg)
 
 
 type alias SearchCmd f m =
@@ -94,59 +91,37 @@ update msg model filter menu =
                             |> Dict.get model.selectedKey
                             |> Maybe.map (\f -> { value = model.searchValue, field = f })
             in
-                --            let
-                --                cmd =
-                --                    menu
-                --                        |> Dict.get model.selectedKey
-                --                        |> Maybe.map (\f -> performSearch f model.searchValue)
-                --                        |> Maybe.withDefault Cmd.none
-                --            in
                 ( model, Cmd.none, query )
-
-        Mdl msg_ ->
-            let
-                ( m, c ) =
-                    Material.update Mdl msg_ model
-            in
-                ( m, c, Nothing )
 
 
 view : SearchBar -> Menu a -> Html Msg
 view model menu =
-    div [ cs "art-search-bar" ]
+    div [ class "art-search-bar" ]
         [ viewInput model
         , p [] [ text "In:" ]
-        , viewMenu model (Dict.keys menu)
+        , viewMenu model menu
         , viewSearchButton model
         ]
 
 
 viewInput : SearchBar -> Html Msg
 viewInput model =
-    Textfield.render Mdl
-        [ 0 ]
-        model.mdl
-        [ Textfield.label "Search Customers", Textfield.floatingLabel, Textfield.text_, onInput OnSearchInput ]
-        []
+    txt "search" [ onInput OnSearchInput ] []
 
 
 viewSearchButton : SearchBar -> Html Msg
 viewSearchButton model =
-    Button.render Mdl
-        [ 2 ]
-        model.mdl
-        [ Button.ripple
-        , Button.raised
-          --disable button if query is Nothing
-        , if model.searchValue == "" then
-            Button.disabled
-          else
-            Button.primary
+    btn
+        [ Btn.primary
         , onClick Search
+        , if model.searchValue == "" then
+            disabled True
+          else
+            disabled False
         ]
-        [ Icon.i "search", text "Search" ]
+        [ labelIcon "Search" "search" ]
 
 
-viewMenu : SearchBar -> List MenuItem -> Html Msg
+viewMenu : SearchBar -> Dict String a -> Html Msg
 viewMenu model items =
-    Select.select Mdl [ 1 ] model.mdl items Select model.selectedKey
+    slt items model.selectedKey Select
