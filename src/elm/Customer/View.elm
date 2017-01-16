@@ -23,38 +23,28 @@ view customerTab =
                 ]
                 [ labelIcon "New Customer" "user-plus" ]
             ]
-        , Bread.view (createCrumb customerTab) SelectCrumb (getCurrentCrumbIndex customerTab) Bread.None
+        , Bread.view (createCrumb customerTab) SelectCrumb customerTab.currentView Bread.None
         , viewContent customerTab
         ]
 
 
-getCurrentCrumbIndex : CustomerTab -> Int
-getCurrentCrumbIndex customerTab =
-    let
-        indices =
-            customerTab.views
-                |> List.indexedMap
-                    (\i v ->
-                        if v == customerTab.currentView then
-                            i
-                        else
-                            -1
-                    )
-    in
-        List.head indices |> Maybe.withDefault -1
-
-
-createCrumb : CustomerTab -> List ( String, String )
+createCrumb : CustomerTab -> List ( String, String, View )
 createCrumb customerTab =
     customerTab.views
         |> List.map
             (\v ->
                 case v of
                     SearchResults ->
-                        ( "search", "Search Results" )
+                        ( "search", "Search Results", SearchResults )
 
-                    _ ->
-                        ( "", "Not a crumb" )
+                    CustomerDetails ->
+                        ( "user", "customr details", CustomerDetails )
+
+                    NetErr ->
+                        ( "", "", NetErr )
+
+                    None ->
+                        ( "", "", None )
             )
 
 

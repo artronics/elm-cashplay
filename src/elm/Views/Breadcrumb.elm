@@ -20,19 +20,19 @@ type alias Title =
     String
 
 
-type alias Crumb =
-    ( Icon, Title )
+type alias Crumb a =
+    ( Icon, Title, a )
 
 
 type alias Action m =
     Int -> Maybe m
 
 
-type alias Bread =
-    List Crumb
+type alias Bread a =
+    List (Crumb a)
 
 
-view : Bread -> (Int -> m) -> Int -> Info -> Html m
+view : Bread a -> (a -> msg) -> a -> Info -> Html msg
 view bread msg currentActive info =
     div [ class "art-breadcrumb-container" ]
         [ ul [ class "art-breadcrumb" ]
@@ -43,20 +43,20 @@ view bread msg currentActive info =
         ]
 
 
-viewCrumb : List Crumb -> (Int -> m) -> Int -> List (Html m)
+viewCrumb : List (Crumb a) -> (a -> msg) -> a -> List (Html msg)
 viewCrumb crumbs msg currentActive =
     (crumbs
-        |> List.indexedMap
-            (\index ( icon, title ) ->
+        |> List.map
+            (\( icon, title, view ) ->
                 li
                     [ class
-                        (if index == currentActive then
+                        (if view == currentActive then
                             "active"
                          else
                             ""
                         )
                     ]
-                    [ span [ onClick <| msg index ]
+                    [ span [ onClick <| msg view ]
                         [ p []
                             [ i [ class <| "fa fa-" ++ icon ] []
                             , text title

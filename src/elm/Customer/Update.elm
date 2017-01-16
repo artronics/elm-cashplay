@@ -27,9 +27,18 @@ update msg customerTab =
             , Cmd.none
             )
 
-        SelectCrumb index ->
+        SelectCrumb view ->
+            ( { customerTab | currentView = view }, Cmd.none )
+
+        OnCustomerDetails customer ->
             let
-                currentView =
-                    SearchResults
+                views =
+                    customerTab.views ++ [ CustomerDetails ]
             in
-                ( customerTab, Cmd.none )
+                ( { customerTab
+                    | customerDetails = Just customer
+                    , views = views
+                    , currentView = CustomerDetails
+                  }
+                , Cmd.none
+                )
