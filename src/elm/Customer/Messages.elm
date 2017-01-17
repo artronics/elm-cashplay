@@ -12,5 +12,4 @@ type Msg
     | ViewReceiptMsg ViewReceipt.Msg
     | OnSearch (Result Http.Error (List Customer))
     | SelectCrumb View
-    | OnCustomerDetails Customer
     | OnNewCustomer

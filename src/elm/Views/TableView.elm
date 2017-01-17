@@ -23,7 +23,7 @@ render :
     -> (comparable -> Bool)
     -> Html m
 render headers resDict tableData viewActions rowAtr isHover =
-    table [ class "table art-search-table" ]
+    table [ class "table table-hover art-search-table" ]
         [ viewTableHeaders headers
         , tbody []
             (resDict

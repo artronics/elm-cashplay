@@ -35,19 +35,6 @@ update msg customerTab =
         SelectCrumb view ->
             ( { customerTab | currentView = view }, Cmd.none )
 
-        OnCustomerDetails customer ->
-            let
-                views =
-                    customerTab.views ++ [ CustomerDetails ]
-            in
-                ( { customerTab
-                    | customerDetails = Just customer
-                    , views = views
-                    , currentView = CustomerDetails
-                  }
-                , Cmd.none
-                )
-
         OnNewCustomer ->
             ( { customerTab
                 | views = [ NewCustomer ]

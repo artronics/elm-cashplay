@@ -3,7 +3,7 @@ module Customer.ResultList exposing (..)
 import Html exposing (..)
 import Html.Events exposing (onClick)
 import Dict as Dict exposing (Dict)
-import Customer.Models exposing (CustomerTab)
+import Customer.Models exposing (CustomerTab, View(..))
 import Customer.Messages exposing (Msg(..))
 import Customer.Customer exposing (Customer, customersToDict)
 import Shared.ViewReceipt as ViewReceipt
@@ -18,10 +18,25 @@ update msg customerTab =
                 customersToDict customerTab.fetchedCustomers
                     |> Dict.get key
 
-        ( newViewReceipt, ( _, _ ) ) =
+        ( newViewReceipt, ( viewCustomer, _ ) ) =
             ViewReceipt.update msg customerTab.viewReceipt getRes
+
+        ( views, currentView, customerDetails ) =
+            viewCustomer
+                |> Maybe.map
+                    (\c ->
+                        ( [ SearchResults, CustomerDetails ], CustomerDetails, viewCustomer )
+                    )
+                |> Maybe.withDefault ( customerTab.views, customerTab.currentView, customerTab.customerDetails )
     in
-        ( { customerTab | viewReceipt = newViewReceipt }, Cmd.none )
+        ( { customerTab
+            | viewReceipt = newViewReceipt
+            , customerDetails = customerDetails
+            , views = views
+            , currentView = currentView
+          }
+        , Cmd.none
+        )
 
 
 view : CustomerTab -> Html Msg
