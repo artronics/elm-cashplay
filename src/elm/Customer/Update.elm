@@ -42,3 +42,10 @@ update msg customerTab =
               }
             , Cmd.none
             )
+
+        OnNewCustomerInput f input ->
+            let
+                updatedNewCustomer =
+                    f customerTab.newCustomer input
+            in
+                ( { customerTab | newCustomer = updatedNewCustomer }, Cmd.none )
