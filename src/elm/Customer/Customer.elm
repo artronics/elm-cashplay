@@ -3,11 +3,14 @@ module Customer.Customer
         ( Customer
         , search
         , SearchField(..)
+        , customersToDict
         )
 
 import Http
 import Json.Decode as Decode
 import Api
+import Dict as Dict exposing (Dict)
+import Helpers
 
 
 type alias Customer =
@@ -58,3 +61,8 @@ memberDecoder =
         (Decode.field "id" Decode.int)
         (Decode.field "first_name" Decode.string)
         (Decode.field "last_name" Decode.string)
+
+
+customersToDict : List Customer -> Dict String Customer
+customersToDict customers =
+    Helpers.resourceToDict (\c -> toString <| .id c) customers

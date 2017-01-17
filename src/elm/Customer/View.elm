@@ -63,7 +63,7 @@ viewContent : CustomerTab -> Html Msg
 viewContent customerTab =
     case customerTab.currentView of
         SearchResults ->
-            ResultList.view customerTab.fetchedCustomers
+            ResultList.view customerTab
 
         CustomerDetails ->
             text "customer details"

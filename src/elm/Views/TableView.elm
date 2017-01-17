@@ -1,11 +1,9 @@
 module Views.TableView exposing (render)
 
-import Html exposing (Html, text)
+import Html exposing (..)
+import Html.Attributes exposing (class)
+import Html.Events exposing (onClick)
 import Dict exposing (..)
-import Material.Table
-import Material.Options exposing (..)
-import Material.Table as Table
-import Material.Icon as MdlIcon
 
 
 type alias Icon =
@@ -16,10 +14,18 @@ type alias ViewAction m =
     ( Icon, m )
 
 
+render :
+    List String
+    -> Dict comparable a
+    -> (a -> List (Html m))
+    -> (comparable -> List (ViewAction m))
+    -> (comparable -> List (Attribute m))
+    -> (comparable -> Bool)
+    -> Html m
 render headers resDict tableData viewActions rowAtr isHover =
-    Table.table [ cs "art-search-table" ]
+    table [ class "table art-search-table" ]
         [ viewTableHeaders headers
-        , Table.tbody []
+        , tbody []
             (resDict
                 |> Dict.map
                     (\key item ->
@@ -33,28 +39,24 @@ render headers resDict tableData viewActions rowAtr isHover =
 
 viewTableHeaders : List String -> Html m
 viewTableHeaders headers =
-    Table.thead []
-        [ Table.tr []
+    thead []
+        [ tr []
             (headers
                 |> List.map
                     (\header ->
-                        Table.td [] [ text header ]
+                        td [] [ text header ]
                     )
             )
         ]
 
 
-
--- viewTableRow:
--- viewTableRow :
---     a
---     -> (a -> List (Html m))
---     -> List (ViewAction m)
---     -> List (Property c m)
---     -> Bool
---     -> Html m
-
-
+viewTableRow :
+    a
+    -> (a -> List (Html m))
+    -> List (ViewAction m)
+    -> List (Attribute m)
+    -> Bool
+    -> Html m
 viewTableRow item tableData createActions rowAtr isHover =
     let
         tblData =
@@ -63,15 +65,15 @@ viewTableRow item tableData createActions rowAtr isHover =
         actions =
             [ viewActions createActions isHover ]
     in
-        Table.tr (rowAtr)
+        tr (rowAtr)
             (tblData ++ actions)
 
 
 viewActions : List (ViewAction m) -> Bool -> Html m
 viewActions actions show =
-    Table.td []
+    td []
         [ span
-            [ cs
+            [ class
                 (if show then
                     "art-search-results-actions"
                  else
@@ -81,7 +83,7 @@ viewActions actions show =
             (actions
                 |> List.map
                     (\( icon, msg ) ->
-                        span [ onClick <| msg ] [ MdlIcon.i icon ]
+                        span [ onClick <| msg ] [ i [ class <| "fa fa-" ++ icon ] [] ]
                     )
             )
         ]

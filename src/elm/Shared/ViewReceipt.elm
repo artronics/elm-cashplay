@@ -1,31 +1,27 @@
 module Shared.ViewReceipt exposing (..)
 
-import Html exposing (Html, text, p)
+import Html exposing (..)
+import Html.Attributes exposing (class)
+import Html.Events exposing (..)
 import Dict exposing (Dict)
-import Material
-import Material.Options exposing (..)
-import Material.Table as Table
 import Resources.Item as Res
 import Views.TableView as TableView
 
 
 type alias Model =
     { hoveredIndex : String
-    , mdl : Material.Model
     }
 
 
 init : Model
 init =
     { hoveredIndex = ""
-    , mdl = Material.model
     }
 
 
 type Msg
     = Update (Model -> Model)
     | ListAction RowAction
-    | Mdl (Material.Msg Msg)
 
 
 type RowAction
@@ -33,24 +29,17 @@ type RowAction
     | Receipt String
 
 
-update : Msg -> Model -> (String -> Maybe r) -> ( Model, Cmd Msg, ( Maybe r, Maybe r ) )
+update : Msg -> Model -> (String -> Maybe r) -> ( Model, ( Maybe r, Maybe r ) )
 update msg model getRes =
     case msg of
         Update f ->
-            ( f model, Cmd.none, ( Nothing, Nothing ) )
+            ( f model, ( Nothing, Nothing ) )
 
         ListAction (View msg) ->
-            ( model, Cmd.none, ( getRes msg, Nothing ) )
+            ( model, ( getRes msg, Nothing ) )
 
         ListAction (Receipt msg) ->
-            ( model, Cmd.none, ( Nothing, getRes msg ) )
-
-        Mdl msg_ ->
-            let
-                ( m, c ) =
-                    Material.update Mdl msg_ model
-            in
-                ( m, c, ( Nothing, Nothing ) )
+            ( model, ( Nothing, getRes msg ) )
 
 
 isHovered : Model -> String -> Bool
@@ -60,14 +49,10 @@ isHovered model key =
 
 viewActions : String -> List ( String, Msg )
 viewActions key =
-    [ ( "remove_red_eye", ListAction <| View key ), ( "receipt", ListAction <| Receipt key ) ]
+    [ ( "eye", ListAction <| View key ), ( "gbp", ListAction <| Receipt key ) ]
 
 
-
---TODO add type annotation
---Problem is Material Property c m causing type mismatch
-
-
+hoverAtr : String -> List (Attribute Msg)
 hoverAtr key =
     [ onMouseEnter <| Update (\m -> { m | hoveredIndex = key })
     , onMouseLeave <| Update (\m -> { m | hoveredIndex = "" })

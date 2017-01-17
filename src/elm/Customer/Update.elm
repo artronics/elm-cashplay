@@ -3,6 +3,7 @@ module Customer.Update exposing (update)
 import Customer.Messages exposing (Msg(..))
 import Customer.Models exposing (CustomerTab, View(..))
 import Customer.SearchBar as SearchBar
+import Customer.ResultList as ResultList
 
 
 update : Msg -> CustomerTab -> ( CustomerTab, Cmd Msg )
@@ -10,6 +11,9 @@ update msg customerTab =
     case msg of
         SearchBarMsg msg_ ->
             SearchBar.update msg_ customerTab
+
+        ViewReceiptMsg msg_ ->
+            ResultList.update msg_ customerTab
 
         OnSearch (Ok fetchedCustomers) ->
             ( { customerTab
