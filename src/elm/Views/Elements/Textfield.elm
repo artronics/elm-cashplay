@@ -1,7 +1,7 @@
-module Views.Elements.Textfield exposing (txt)
+module Views.Elements.Textfield exposing (txt, editable)
 
 import Html exposing (..)
-import Html.Attributes exposing (class)
+import Html.Attributes exposing (class, style)
 
 
 type alias Label =
@@ -14,3 +14,13 @@ txt lbl atr elm =
         [ label [] [ text lbl ]
         , input (atr ++ [ class "form-control" ]) elm
         ]
+
+
+editable : Bool -> Attribute msg
+editable b =
+    if b then
+        style []
+    else
+        style
+            [ ( "border", "none" )
+            ]

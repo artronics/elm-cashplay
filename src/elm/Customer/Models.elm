@@ -10,6 +10,7 @@ type alias CustomerTab =
     , viewReceipt : ViewReceipt.Model
     , fetchedCustomers : List Customer
     , customerDetails : Maybe Customer
+    , editCustomer : Bool
     , newCustomer : Customer
     , currentView : View
     , views : List View
@@ -30,6 +31,7 @@ init =
     , viewReceipt = ViewReceipt.init
     , fetchedCustomers = []
     , customerDetails = Nothing
+    , editCustomer = False
     , newCustomer = Cus.new
     , currentView = None
     , views = []
