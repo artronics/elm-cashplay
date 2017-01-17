@@ -7,6 +7,8 @@ import Customer.Models exposing (CustomerTab, View(..))
 import Customer.Messages exposing (Msg(..))
 import Customer.SearchBar as SearchBar exposing (view)
 import Customer.ResultList as ResultList
+import Customer.NewCustomer as NewCustomer
+import Customer.ViewCustomer as ViewCustomer
 import Views.Elements.Button as Btn
 import Views.Elements.Label exposing (labelIcon)
 import Views.Breadcrumb as Bread
@@ -66,10 +68,10 @@ viewContent customerTab =
             ResultList.view customerTab
 
         CustomerDetails ->
-            text "customer details"
+            ViewCustomer.view customerTab
 
         NewCustomer ->
-            text "new customer"
+            NewCustomer.view customerTab
 
         NetErr ->
             MsgBox.view "Network err"

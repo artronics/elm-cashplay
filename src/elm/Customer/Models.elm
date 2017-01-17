@@ -2,7 +2,7 @@ module Customer.Models exposing (CustomerTab, View(..), init)
 
 import Shared.SearchBar as SearchBar exposing (SearchBar)
 import Shared.ViewReceipt as ViewReceipt
-import Customer.Customer exposing (Customer)
+import Customer.Customer as Cus exposing (Customer)
 
 
 type alias CustomerTab =
@@ -10,6 +10,7 @@ type alias CustomerTab =
     , viewReceipt : ViewReceipt.Model
     , fetchedCustomers : List Customer
     , customerDetails : Maybe Customer
+    , newCustomer : Customer
     , currentView : View
     , views : List View
     }
@@ -29,6 +30,7 @@ init =
     , viewReceipt = ViewReceipt.init
     , fetchedCustomers = []
     , customerDetails = Nothing
+    , newCustomer = Cus.new
     , currentView = None
     , views = []
     }

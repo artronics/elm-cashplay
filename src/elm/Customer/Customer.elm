@@ -4,6 +4,7 @@ module Customer.Customer
         , search
         , SearchField(..)
         , customersToDict
+        , new
         )
 
 import Http
