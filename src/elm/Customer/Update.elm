@@ -4,7 +4,7 @@ import Customer.Messages exposing (Msg(..))
 import Customer.Models exposing (CustomerTab, View(..))
 import Customer.SearchBar as SearchBar
 import Customer.ResultList as ResultList
-import Customer.Customer exposing (new)
+import Customer.Customer exposing (validate, validateCustomer, initCustomerValidation, new)
 
 
 update : Msg -> CustomerTab -> ( CustomerTab, Cmd Msg )
@@ -52,7 +52,23 @@ update msg customerTab =
                 ( { customerTab | newCustomer = updatedNewCustomer }, Cmd.none )
 
         OnNewCustomerReset ->
-            ( { customerTab | newCustomer = new }, Cmd.none )
+            ( { customerTab | newCustomer = new, customerValidation = initCustomerValidation }, Cmd.none )
+
+        OnNewCustomerSave ->
+            let
+                isValid =
+                    validate customerTab.newCustomer |> List.isEmpty
+
+                customerValidation =
+                    customerTab.customerValidation
+
+                ( customerTab_, cmd ) =
+                    if isValid then
+                        ( customerTab, Cmd.none )
+                    else
+                        ( { customerTab | customerValidation = validateCustomer customerTab.newCustomer }, Cmd.none )
+            in
+                ( customerTab_, cmd )
 
         OnCustomerValidation validation ->
             ( { customerTab | customerValidation = validation }, Cmd.none )

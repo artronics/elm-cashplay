@@ -19,7 +19,7 @@ view customerTab =
             [ viewForm customerTab
             ]
         , div [ class "panel-footer clearfix art-dialog-footer" ]
-            [ btn [ class "pull-right", Btn.large, Btn.primary ] [ text "Save" ]
+            [ btn [ class "pull-right", Btn.large, Btn.primary, onClick OnNewCustomerSave ] [ text "Save" ]
             , btn [ class "pull-right", Btn.large, Btn.default, onClick <| OnNewCustomerReset ] [ text "Reset" ]
             ]
         ]
@@ -42,7 +42,14 @@ viewForm customerTab =
                     customerValidation.firstName
                     [ onInput <| OnNewCustomerInput (\c i -> { c | firstName = i })
                     , onBlur <| OnCustomerValidation { customerValidation | firstName = valFirstName newCustomer }
-                    , value customerTab.newCustomer.firstName
+                    , value newCustomer.firstName
+                    ]
+                , horInput "Last Name"
+                    Full
+                    customerValidation.lastName
+                    [ onInput <| OnNewCustomerInput (\c i -> { c | lastName = i })
+                    , onBlur <| OnCustomerValidation { customerValidation | lastName = valLastName newCustomer }
+                    , value newCustomer.lastName
                     ]
                 ]
             ]

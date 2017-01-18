@@ -1,8 +1,8 @@
-module Customer.Models exposing (CustomerTab, View(..), init, CustomerValidation)
+module Customer.Models exposing (CustomerTab, View(..), init)
 
 import Shared.SearchBar as SearchBar exposing (SearchBar)
 import Shared.ViewReceipt as ViewReceipt
-import Customer.Customer as Cus exposing (Customer)
+import Customer.Customer as Cus exposing (Customer, CustomerValidation, initCustomerValidation)
 
 
 type alias CustomerTab =
@@ -15,16 +15,6 @@ type alias CustomerTab =
     , customerValidation : CustomerValidation
     , currentView : View
     , views : List View
-    }
-
-
-type alias CustomerValidation =
-    { firstName : Maybe String
-    }
-
-
-initCustomerValidation =
-    { firstName = Nothing
     }
 
 

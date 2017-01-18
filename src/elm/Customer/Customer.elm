@@ -23,9 +23,16 @@ new =
     }
 
 
-type ValidationField
-    = FirstName
-    | LastName
+type alias CustomerValidation =
+    { firstName : Maybe String
+    , lastName : Maybe String
+    }
+
+
+initCustomerValidation =
+    { firstName = Nothing
+    , lastName = Nothing
+    }
 
 
 type SearchField
@@ -65,27 +72,39 @@ memberDecoder =
 
 valFirstName_ : List (Customer -> List String)
 valFirstName_ =
-    [ .firstName >> Val.ifBlank "First Name is required."
-    ]
+    [ .firstName >> Val.ifBlank "First Name is required." ]
 
 
 valFirstName : Customer -> Maybe String
 valFirstName =
-    Val.eager
-        valFirstName_
+    Val.eager valFirstName_
+
+
+valLastName_ : List (Customer -> List String)
+valLastName_ =
+    [ .lastName >> Val.ifBlank "Last Name is required." ]
+
+
+valLastName : Customer -> Maybe String
+valLastName =
+    Val.eager valLastName_
 
 
 validate : Customer -> List String
 validate =
     Val.all
         ([ valFirstName_
+         , valLastName_
          ]
             |> List.concat
         )
 
 
-(=>) =
-    (,)
+validateCustomer : Customer -> CustomerValidation
+validateCustomer customer =
+    { firstName = valFirstName customer
+    , lastName = valLastName customer
+    }
 
 
 customersToDict : List Customer -> Dict String Customer
