@@ -5,6 +5,7 @@ import Customer.Models exposing (CustomerTab, View(..))
 import Customer.SearchBar as SearchBar
 import Customer.ResultList as ResultList
 import Customer.Customer exposing (validate, validateCustomer, initCustomerValidation, new)
+import Views.Breadcrumb as Bread
 
 
 update : Msg -> CustomerTab -> ( CustomerTab, Cmd Msg )
@@ -64,7 +65,7 @@ update msg customerTab =
 
                 ( customerTab_, cmd ) =
                     if isValid then
-                        ( customerTab, Cmd.none )
+                        ( { customerTab | breadInfo = Bread.Loading }, Cmd.none )
                     else
                         ( { customerTab | customerValidation = validateCustomer customerTab.newCustomer }, Cmd.none )
             in

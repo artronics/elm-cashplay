@@ -27,7 +27,7 @@ view customerTab =
                 ]
                 [ labelIcon "New Customer" "user-plus" ]
             ]
-        , Bread.view (createCrumb customerTab) SelectCrumb customerTab.currentView Bread.None
+        , Bread.view (createCrumb customerTab) SelectCrumb customerTab.currentView customerTab.breadInfo
         , viewContent customerTab
         ]
 

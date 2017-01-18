@@ -74,7 +74,10 @@ viewInfo info =
             span [ class "hidden" ] []
 
         Loading ->
-            span [ class "art-breadcrumb-info loading" ] [ text "daram micharlham" ]
+            span [ class "art-breadcrumb-info loading" ]
+                [ i [ class "fa fa-spinner fa-pulse fa-2x fa-fw" ] []
+                ]
 
         Success str ->
-            span [ class "art-breadcrumb-info success" ] [ text "tick ba msg" ]
+            span [ class "art-breadcrumb-info success" ]
+                [ i [ class "fa fa-2x fa-fw fa-check" ] [], h5 [] [ text str ] ]

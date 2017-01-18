@@ -3,6 +3,7 @@ module Customer.Models exposing (CustomerTab, View(..), init)
 import Shared.SearchBar as SearchBar exposing (SearchBar)
 import Shared.ViewReceipt as ViewReceipt
 import Customer.Customer as Cus exposing (Customer, CustomerValidation, initCustomerValidation)
+import Views.Breadcrumb as Bread
 
 
 type alias CustomerTab =
@@ -15,6 +16,7 @@ type alias CustomerTab =
     , customerValidation : CustomerValidation
     , currentView : View
     , views : List View
+    , breadInfo : Bread.Info
     }
 
 
@@ -37,4 +39,5 @@ init =
     , customerValidation = initCustomerValidation
     , currentView = None
     , views = []
+    , breadInfo = Bread.None
     }
