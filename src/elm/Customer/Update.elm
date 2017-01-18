@@ -4,6 +4,7 @@ import Customer.Messages exposing (Msg(..))
 import Customer.Models exposing (CustomerTab, View(..))
 import Customer.SearchBar as SearchBar
 import Customer.ResultList as ResultList
+import Customer.Customer exposing (new)
 
 
 update : Msg -> CustomerTab -> ( CustomerTab, Cmd Msg )
@@ -49,3 +50,9 @@ update msg customerTab =
                     f customerTab.newCustomer input
             in
                 ( { customerTab | newCustomer = updatedNewCustomer }, Cmd.none )
+
+        OnNewCustomerReset ->
+            ( { customerTab | newCustomer = new }, Cmd.none )
+
+        OnCustomerValidation validation ->
+            ( { customerTab | customerValidation = validation }, Cmd.none )

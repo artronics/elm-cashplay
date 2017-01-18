@@ -1,4 +1,4 @@
-module Views.Elements.Button exposing (btn, primary, default)
+module Views.Elements.Button exposing (btn, primary, default, large)
 
 import Html exposing (..)
 import Html.Attributes exposing (classList, class)
@@ -17,6 +17,11 @@ btn atr elm =
 default : Attribute msg
 default =
     class <| "btn-" ++ (color Style.Default)
+
+
+large : Attribute msg
+large =
+    class <| "btn-lg"
 
 
 primary : Attribute msg

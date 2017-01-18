@@ -1,4 +1,4 @@
-module Customer.Models exposing (CustomerTab, View(..), init)
+module Customer.Models exposing (CustomerTab, View(..), init, CustomerValidation)
 
 import Shared.SearchBar as SearchBar exposing (SearchBar)
 import Shared.ViewReceipt as ViewReceipt
@@ -12,8 +12,19 @@ type alias CustomerTab =
     , customerDetails : Maybe Customer
     , editCustomer : Bool
     , newCustomer : Customer
+    , customerValidation : CustomerValidation
     , currentView : View
     , views : List View
+    }
+
+
+type alias CustomerValidation =
+    { firstName : Maybe String
+    }
+
+
+initCustomerValidation =
+    { firstName = Nothing
     }
 
 
@@ -33,6 +44,7 @@ init =
     , customerDetails = Nothing
     , editCustomer = False
     , newCustomer = Cus.new
+    , customerValidation = initCustomerValidation
     , currentView = None
     , views = []
     }

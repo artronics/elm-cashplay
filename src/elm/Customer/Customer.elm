@@ -1,16 +1,10 @@
-module Customer.Customer
-    exposing
-        ( Customer
-        , search
-        , SearchField(..)
-        , customersToDict
-        , new
-        )
+module Customer.Customer exposing (..)
 
 import Http
 import Json.Decode as Decode
 import Api
 import Dict as Dict exposing (Dict)
+import Validate as Val
 import Helpers
 
 
@@ -27,6 +21,11 @@ new =
     , firstName = ""
     , lastName = ""
     }
+
+
+type ValidationField
+    = FirstName
+    | LastName
 
 
 type SearchField
@@ -62,6 +61,31 @@ memberDecoder =
         (Decode.field "id" Decode.int)
         (Decode.field "first_name" Decode.string)
         (Decode.field "last_name" Decode.string)
+
+
+valFirstName_ : List (Customer -> List String)
+valFirstName_ =
+    [ .firstName >> Val.ifBlank "First Name is required."
+    ]
+
+
+valFirstName : Customer -> Maybe String
+valFirstName =
+    Val.eager
+        valFirstName_
+
+
+validate : Customer -> List String
+validate =
+    Val.all
+        ([ valFirstName_
+         ]
+            |> List.concat
+        )
+
+
+(=>) =
+    (,)
 
 
 customersToDict : List Customer -> Dict String Customer

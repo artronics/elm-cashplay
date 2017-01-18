@@ -3,7 +3,7 @@ module Customer.Messages exposing (Msg(..))
 import Http
 import Shared.SearchBar as SearchBar
 import Customer.Customer exposing (Customer)
-import Customer.Models exposing (CustomerTab, View)
+import Customer.Models exposing (CustomerTab, View, CustomerValidation)
 import Shared.ViewReceipt as ViewReceipt
 
 
@@ -14,3 +14,9 @@ type Msg
     | SelectCrumb View
     | OnNewCustomer
     | OnNewCustomerInput (Customer -> String -> Customer) String
+    | OnNewCustomerReset
+    | OnCustomerValidation CustomerValidation
+
+
+
+--    | OnNewCustomerSave
