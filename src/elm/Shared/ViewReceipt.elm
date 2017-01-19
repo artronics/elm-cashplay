@@ -4,6 +4,7 @@ import Html exposing (..)
 import Html.Events exposing (..)
 import Dict exposing (Dict)
 import Views.TableView as TableView
+import Views.MessageBox as MsgBox
 
 
 type alias Model =
@@ -60,4 +61,8 @@ hoverAtr key =
 view : Model -> List String -> Dict String r -> (r -> List (Html Msg)) -> Html Msg
 view model headers resDict viewRes =
     div []
-        [ TableView.render headers resDict viewRes viewActions hoverAtr (isHovered model) ]
+        [ if Dict.isEmpty resDict then
+            MsgBox.view "No Results found. Please Check search value and Search In options."
+          else
+            TableView.render headers resDict viewRes viewActions hoverAtr (isHovered model)
+        ]
