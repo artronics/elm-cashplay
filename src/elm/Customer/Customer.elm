@@ -2,6 +2,7 @@ module Customer.Customer exposing (..)
 
 import Http
 import Json.Decode as Decode
+import Json.Encode as Encode
 import Api
 import Dict as Dict exposing (Dict)
 import Validate as Val
@@ -56,6 +57,19 @@ search context { value, field } msg =
 
         _ ->
             Api.get context.jwt ("customer?") customerDecoder msg
+
+
+newCustomer : Context -> Customer -> (Result Http.Error () -> msg) -> Cmd msg
+newCustomer context customer msg =
+    Api.newResource context.jwt "customers" (customerValue customer) msg
+
+
+customerValue : Customer -> Encode.Value
+customerValue customer =
+    Encode.object
+        [ ( "first_name", Encode.string customer.firstName )
+        , ( "last_name", Encode.string customer.lastName )
+        ]
 
 
 customerDecoder : Decode.Decoder (List Customer)

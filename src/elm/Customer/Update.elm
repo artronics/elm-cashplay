@@ -4,7 +4,7 @@ import Customer.Messages exposing (Msg(..))
 import Customer.Models exposing (CustomerTab, View(..))
 import Customer.SearchBar as SearchBar
 import Customer.ResultList as ResultList
-import Customer.Customer exposing (validate, validateCustomer, initCustomerValidation, new)
+import Customer.Customer exposing (..)
 import Views.Breadcrumb as Bread
 import Context exposing (Context)
 
@@ -34,6 +34,12 @@ update msg customerTab context =
               }
             , Cmd.none
             )
+
+        NewCustomerReq (Ok _) ->
+            ( { customerTab | breadInfo = Bread.Success "New Customer has been saved successfuly." }, Cmd.none )
+
+        NewCustomerReq (Err err) ->
+            ( customerTab, Cmd.none )
 
         SelectCrumb view ->
             ( { customerTab | currentView = view }, Cmd.none )
@@ -66,7 +72,9 @@ update msg customerTab context =
 
                 ( customerTab_, cmd ) =
                     if isValid then
-                        ( { customerTab | breadInfo = Bread.Loading }, Cmd.none )
+                        ( { customerTab | breadInfo = Bread.Loading }
+                        , newCustomer context customerTab.newCustomer NewCustomerReq
+                        )
                     else
                         ( { customerTab | customerValidation = validateCustomer customerTab.newCustomer }, Cmd.none )
             in

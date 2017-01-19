@@ -16,6 +16,7 @@ type Msg
     | OnNewCustomerInput (Customer -> String -> Customer) String
     | OnNewCustomerReset
     | OnNewCustomerSave
+    | NewCustomerReq (Result Http.Error ())
     | OnCustomerValidation CustomerValidation
 
 

@@ -80,13 +80,32 @@ credentialValue cred =
         ]
 
 
+post : JwtToken -> Url -> Value -> Decode.Decoder a -> ((Result Http.Error a -> msg) -> Cmd msg)
+post jwt url value decoder msg =
+    Http.request
+        { method = "POST"
+        , headers = headers jwt.token
+        , url = (baseUrl ++ url)
+        , body = Http.jsonBody value
+        , expect = Http.expectJson decoder
+        , timeout = Nothing
+        , withCredentials = False
+        }
+        |> Http.send msg
 
---get : Url -> Decode.Decoder a -> ((Result Http.Error a -> msg) -> Cmd msg)
---get url decoder msg =
---    Http.get
---        (baseUrl ++ url)
---        decoder
---        |> Http.send msg
+
+newResource : JwtToken -> Url -> Value -> ((Result Http.Error () -> msg) -> Cmd msg)
+newResource jwt url value msg =
+    Http.request
+        { method = "POST"
+        , headers = headers jwt.token
+        , url = (baseUrl ++ url)
+        , body = Http.jsonBody value
+        , expect = Http.expectStringResponse (\_ -> Ok ())
+        , timeout = Nothing
+        , withCredentials = False
+        }
+        |> Http.send msg
 
 
 get : JwtToken -> Url -> Decode.Decoder a -> ((Result Http.Error a -> msg) -> Cmd msg)
