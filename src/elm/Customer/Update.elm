@@ -7,6 +7,7 @@ import Customer.ResultList as ResultList
 import Customer.Customer exposing (..)
 import Views.Breadcrumb as Bread
 import Context exposing (Context)
+import Debug
 
 
 update : Msg -> CustomerTab -> Context -> ( CustomerTab, Cmd Msg )
@@ -35,6 +36,28 @@ update msg customerTab context =
             , Cmd.none
             )
 
+        EditCustomerReq (Ok customerRes) ->
+            ( { customerTab
+                | breadInfo = Bread.Success "Customer has been updated successfuly."
+                , customerDetails =
+                    customerRes
+                        |> List.filter (\{ id } -> id == customerTab.editOrNewCustomer.id)
+                        |> List.head
+                        |> Maybe.withDefault new
+                , views = [ CustomerDetails ]
+                , currentView = CustomerDetails
+                , customerState = Presentation
+              }
+            , Cmd.none
+            )
+
+        EditCustomerReq (Err err) ->
+            let
+                e =
+                    Debug.log "kir" err
+            in
+                ( { customerTab | breadInfo = Bread.Failure "Network Error. Check Internet Connection." }, Cmd.none )
+
         NewCustomerReq (Ok customerRes) ->
             ( { customerTab
                 | breadInfo = Bread.Success "New Customer has been saved successfuly."
@@ -61,6 +84,27 @@ update msg customerTab context =
               }
             , Cmd.none
             )
+
+        OnEditCustomerSave ->
+            let
+                isValid =
+                    validate customerTab.editOrNewCustomer |> List.isEmpty
+
+                customerValidation =
+                    customerTab.customerValidation
+
+                ( customerTab_, cmd ) =
+                    if isValid then
+                        ( { customerTab | breadInfo = Bread.Loading }
+                        , updateCustomer context customerTab.editOrNewCustomer EditCustomerReq
+                        )
+                    else
+                        ( { customerTab | customerValidation = validateCustomer customerTab.editOrNewCustomer }, Cmd.none )
+            in
+                ( customerTab_, cmd )
+
+        OnEditCustomerCancel ->
+            ( customerTab, Cmd.none )
 
         OnNewCustomer ->
             ( { customerTab

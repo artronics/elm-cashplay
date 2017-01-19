@@ -64,6 +64,11 @@ newCustomer context customer msg =
     Api.newResource context.jwt "customers" (customerValue customer) customerDecoder msg
 
 
+updateCustomer : Context -> Customer -> (Result Http.Error (List Customer) -> msg) -> Cmd msg
+updateCustomer context customer msg =
+    Api.updateResource context.jwt "customers" (toString customer.id) (customerValue customer) customerListDecoder msg
+
+
 customerValue : Customer -> Encode.Value
 customerValue customer =
     Encode.object

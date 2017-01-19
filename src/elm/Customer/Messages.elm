@@ -17,6 +17,9 @@ type Msg
     | OnNewCustomerSave
     | NewCustomerReq (Result Http.Error Customer)
     | EditCustomer
+    | OnEditCustomerSave
+    | OnEditCustomerCancel
+    | EditCustomerReq (Result Http.Error (List Customer))
     | OnEditOrNewCustomerInput (Customer -> String -> Customer) String
     | OnCustomerValidation CustomerValidation
 

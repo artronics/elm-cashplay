@@ -98,8 +98,22 @@ newResource : JwtToken -> Url -> Value -> Decode.Decoder a -> ((Result Http.Erro
 newResource jwt url value decoder msg =
     Http.request
         { method = "POST"
-        , headers = (headers jwt.token) ++ [ Http.header "Prefer" "return=representation" ]
+        , headers = (headers jwt.token)
         , url = (baseUrl ++ url)
+        , body = Http.jsonBody value
+        , expect = Http.expectJson decoder
+        , timeout = Nothing
+        , withCredentials = False
+        }
+        |> Http.send msg
+
+
+updateResource : JwtToken -> Url -> String -> Value -> Decode.Decoder a -> ((Result Http.Error a -> msg) -> Cmd msg)
+updateResource jwt url id value decoder msg =
+    Http.request
+        { method = "PATCH"
+        , headers = (headers jwt.token)
+        , url = (baseUrl ++ url ++ "?id=eq." ++ id)
         , body = Http.jsonBody value
         , expect = Http.expectJson decoder
         , timeout = Nothing
@@ -126,4 +140,5 @@ headers : String -> List Http.Header
 headers token =
     [ Http.header "Content-Type" "application/json"
     , Http.header "Authorization" ("Bearer " ++ token)
+    , Http.header "Prefer" "return=representation"
     ]

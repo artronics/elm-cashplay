@@ -40,12 +40,15 @@ view customerTab =
 
 viewHeadingInEdit : Customer -> Html Msg
 viewHeadingInEdit subject =
-    text "heading in edit"
+    h5 [] [ text "Edit Customer" ]
 
 
 viewFooterInEdit : Customer -> Html Msg
 viewFooterInEdit subject =
-    text "footer in edit"
+    div [ class "clearfix art-dialog-footer" ]
+        [ btn [ class "pull-right", Btn.large, Btn.primary, onClick OnEditCustomerSave ] [ text "Save" ]
+        , btn [ class "pull-right", Btn.large, Btn.default, onClick <| OnEditCustomerCancel ] [ text "Cancel" ]
+        ]
 
 
 viewHeadingInNew : Customer -> Html Msg
