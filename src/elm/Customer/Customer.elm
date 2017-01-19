@@ -53,15 +53,15 @@ search : Context -> SearchQuery -> (Result Http.Error (List Customer) -> m) -> C
 search context { value, field } msg =
     case field of
         Name ->
-            Api.get context.jwt ("customer?full_name=ilike.*" ++ value ++ "*") customerDecoder msg
+            Api.get context.jwt ("customer?full_name=ilike.*" ++ value ++ "*") customerListDecoder msg
 
         _ ->
-            Api.get context.jwt ("customer?") customerDecoder msg
+            Api.get context.jwt ("customer?") customerListDecoder msg
 
 
-newCustomer : Context -> Customer -> (Result Http.Error () -> msg) -> Cmd msg
+newCustomer : Context -> Customer -> (Result Http.Error Customer -> msg) -> Cmd msg
 newCustomer context customer msg =
-    Api.newResource context.jwt "customers" (customerValue customer) msg
+    Api.newResource context.jwt "customers" (customerValue customer) customerDecoder msg
 
 
 customerValue : Customer -> Encode.Value
@@ -72,13 +72,13 @@ customerValue customer =
         ]
 
 
-customerDecoder : Decode.Decoder (List Customer)
+customerListDecoder : Decode.Decoder (List Customer)
+customerListDecoder =
+    Decode.list customerDecoder
+
+
+customerDecoder : Decode.Decoder Customer
 customerDecoder =
-    Decode.list memberDecoder
-
-
-memberDecoder : Decode.Decoder Customer
-memberDecoder =
     Decode.map3 Customer
         (Decode.field "id" Decode.int)
         (Decode.field "first_name" Decode.string)

@@ -35,8 +35,15 @@ update msg customerTab context =
             , Cmd.none
             )
 
-        NewCustomerReq (Ok _) ->
-            ( { customerTab | breadInfo = Bread.Success "New Customer has been saved successfuly." }, Cmd.none )
+        NewCustomerReq (Ok customerRes) ->
+            ( { customerTab
+                | breadInfo = Bread.Success "New Customer has been saved successfuly."
+                , customerDetails = Just customerRes
+                , views = [ CustomerDetails ]
+                , currentView = CustomerDetails
+              }
+            , Cmd.none
+            )
 
         NewCustomerReq (Err err) ->
             ( { customerTab | breadInfo = Bread.Failure "Network Error. Check Internet Connection." }, Cmd.none )
@@ -48,6 +55,7 @@ update msg customerTab context =
             ( { customerTab
                 | views = [ NewCustomer ]
                 , currentView = NewCustomer
+                , breadInfo = Bread.None
               }
             , Cmd.none
             )

@@ -94,14 +94,14 @@ post jwt url value decoder msg =
         |> Http.send msg
 
 
-newResource : JwtToken -> Url -> Value -> ((Result Http.Error () -> msg) -> Cmd msg)
-newResource jwt url value msg =
+newResource : JwtToken -> Url -> Value -> Decode.Decoder a -> ((Result Http.Error a -> msg) -> Cmd msg)
+newResource jwt url value decoder msg =
     Http.request
         { method = "POST"
-        , headers = headers jwt.token
+        , headers = (headers jwt.token) ++ [ Http.header "Prefer" "return=representation" ]
         , url = (baseUrl ++ url)
         , body = Http.jsonBody value
-        , expect = Http.expectStringResponse (\_ -> Ok ())
+        , expect = Http.expectJson decoder
         , timeout = Nothing
         , withCredentials = False
         }
