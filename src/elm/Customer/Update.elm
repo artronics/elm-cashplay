@@ -1,7 +1,7 @@
 module Customer.Update exposing (update)
 
 import Customer.Messages exposing (Msg(..))
-import Customer.Models exposing (CustomerTab, View(..))
+import Customer.Models exposing (CustomerTab, View(..), CustomerState(..))
 import Customer.SearchBar as SearchBar
 import Customer.ResultList as ResultList
 import Customer.Customer exposing (..)
@@ -38,7 +38,7 @@ update msg customerTab context =
         NewCustomerReq (Ok customerRes) ->
             ( { customerTab
                 | breadInfo = Bread.Success "New Customer has been saved successfuly."
-                , customerDetails = Just customerRes
+                , customerDetails = customerRes
                 , views = [ CustomerDetails ]
                 , currentView = CustomerDetails
               }
@@ -51,25 +51,29 @@ update msg customerTab context =
         SelectCrumb view ->
             ( { customerTab | currentView = view }, Cmd.none )
 
+        EditCustomer ->
+            ( { customerTab
+                | customerState = Edit
+                , editOrNewCustomer = customerTab.customerDetails
+              }
+            , Cmd.none
+            )
+
         OnNewCustomer ->
             ( { customerTab
                 | views = [ NewCustomer ]
                 , currentView = NewCustomer
                 , breadInfo = Bread.None
+                , customerState = New
+                , editOrNewCustomer = new
+                , customerValidation = initCustomerValidation
               }
             , Cmd.none
             )
 
-        OnNewCustomerInput f input ->
-            let
-                updatedNewCustomer =
-                    f customerTab.newCustomer input
-            in
-                ( { customerTab | newCustomer = updatedNewCustomer }, Cmd.none )
-
         OnNewCustomerReset ->
             ( { customerTab
-                | newCustomer = new
+                | editOrNewCustomer = new
                 , customerValidation = initCustomerValidation
                 , breadInfo = Bread.None
               }
@@ -79,7 +83,7 @@ update msg customerTab context =
         OnNewCustomerSave ->
             let
                 isValid =
-                    validate customerTab.newCustomer |> List.isEmpty
+                    validate customerTab.editOrNewCustomer |> List.isEmpty
 
                 customerValidation =
                     customerTab.customerValidation
@@ -87,12 +91,19 @@ update msg customerTab context =
                 ( customerTab_, cmd ) =
                     if isValid then
                         ( { customerTab | breadInfo = Bread.Loading }
-                        , newCustomer context customerTab.newCustomer NewCustomerReq
+                        , newCustomer context customerTab.editOrNewCustomer NewCustomerReq
                         )
                     else
-                        ( { customerTab | customerValidation = validateCustomer customerTab.newCustomer }, Cmd.none )
+                        ( { customerTab | customerValidation = validateCustomer customerTab.editOrNewCustomer }, Cmd.none )
             in
                 ( customerTab_, cmd )
+
+        OnEditOrNewCustomerInput f input ->
+            let
+                updatedSubject =
+                    f customerTab.editOrNewCustomer input
+            in
+                ( { customerTab | editOrNewCustomer = updatedSubject }, Cmd.none )
 
         OnCustomerValidation validation ->
             ( { customerTab | customerValidation = validation }, Cmd.none )

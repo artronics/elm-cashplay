@@ -4,7 +4,7 @@ import Html exposing (..)
 import Dict as Dict exposing (Dict)
 import Customer.Models exposing (CustomerTab, View(..))
 import Customer.Messages exposing (Msg(..))
-import Customer.Customer exposing (Customer, customersToDict)
+import Customer.Customer exposing (Customer, customersToDict, new)
 import Shared.ViewReceipt as ViewReceipt
 import Debug
 
@@ -24,7 +24,7 @@ update msg customerTab =
             viewCustomer
                 |> Maybe.map
                     (\c ->
-                        ( [ SearchResults, CustomerDetails ], CustomerDetails, viewCustomer )
+                        ( [ SearchResults, CustomerDetails ], CustomerDetails, c )
                     )
                 |> Maybe.withDefault ( customerTab.views, customerTab.currentView, customerTab.customerDetails )
     in

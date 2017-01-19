@@ -44,9 +44,7 @@ createCrumb customerTab =
                     CustomerDetails ->
                         let
                             title =
-                                customerTab.customerDetails
-                                    |> Maybe.map (\c -> c.firstName ++ " " ++ c.lastName)
-                                    |> Maybe.withDefault "Customer Details"
+                                customerTab.customerDetails.firstName ++ " " ++ customerTab.customerDetails.lastName
                         in
                             ( "user", title, CustomerDetails )
 

@@ -13,10 +13,11 @@ type Msg
     | OnSearch (Result Http.Error (List Customer))
     | SelectCrumb View
     | OnNewCustomer
-    | OnNewCustomerInput (Customer -> String -> Customer) String
     | OnNewCustomerReset
     | OnNewCustomerSave
     | NewCustomerReq (Result Http.Error Customer)
+    | EditCustomer
+    | OnEditOrNewCustomerInput (Customer -> String -> Customer) String
     | OnCustomerValidation CustomerValidation
 
 
