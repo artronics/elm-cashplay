@@ -80,9 +80,29 @@ credentialValue cred =
         ]
 
 
-
---get:Url -> Decode.Decoder a -> Result Http.Error a
-
-
+get : Url -> Decode.Decoder a -> ((Result Http.Error a -> msg) -> Cmd msg)
 get url decoder msg =
-    Http.get (baseUrl ++ url) decoder |> Http.send msg
+    Http.get
+        (baseUrl ++ url)
+        decoder
+        |> Http.send msg
+
+
+cGet : Url -> Decode.Decoder a -> Http.Request a
+cGet url decoder =
+    Http.request
+        { method = "GET"
+        , headers = headers
+        , url = (baseUrl ++ url)
+        , body = Http.emptyBody
+        , expect = Http.expectJson decoder
+        , timeout = Nothing
+        , withCredentials = False
+        }
+
+
+headers : List Http.Header
+headers =
+    [ Http.header "Content-Type" "application/json"
+    , Http.header "Authorization" ("Bearer " ++ "jwt")
+    ]
