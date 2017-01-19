@@ -6,12 +6,10 @@
   clear:both;
 
   .success {
-    color: green;
-    i{
-      float:right;
-    }
-    h5{
-    }
+    color: $brand-success;
+  }
+  .failure{
+    color: $brand-danger;
   }
 }
 
@@ -116,5 +114,8 @@
   color: $primary;
   float:right !important;
   width:350px;
+  i{
+    float:right;
+  }
 }
 

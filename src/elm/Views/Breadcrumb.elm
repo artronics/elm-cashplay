@@ -10,6 +10,7 @@ type Info
     = None
     | Loading
     | Success String
+    | Failure String
 
 
 type alias Icon =
@@ -81,3 +82,7 @@ viewInfo info =
         Success str ->
             span [ class "art-breadcrumb-info success" ]
                 [ i [ class "fa fa-2x fa-fw fa-check" ] [], h5 [] [ text str ] ]
+
+        Failure str ->
+            span [ class "art-breadcrumb-info failure" ]
+                [ i [ class "fa fa-2x fa-fw fa-times" ] [], h5 [] [ text str ] ]

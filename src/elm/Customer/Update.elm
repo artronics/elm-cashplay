@@ -39,7 +39,7 @@ update msg customerTab context =
             ( { customerTab | breadInfo = Bread.Success "New Customer has been saved successfuly." }, Cmd.none )
 
         NewCustomerReq (Err err) ->
-            ( customerTab, Cmd.none )
+            ( { customerTab | breadInfo = Bread.Failure "Network Error. Check Internet Connection." }, Cmd.none )
 
         SelectCrumb view ->
             ( { customerTab | currentView = view }, Cmd.none )
@@ -60,7 +60,13 @@ update msg customerTab context =
                 ( { customerTab | newCustomer = updatedNewCustomer }, Cmd.none )
 
         OnNewCustomerReset ->
-            ( { customerTab | newCustomer = new, customerValidation = initCustomerValidation }, Cmd.none )
+            ( { customerTab
+                | newCustomer = new
+                , customerValidation = initCustomerValidation
+                , breadInfo = Bread.None
+              }
+            , Cmd.none
+            )
 
         OnNewCustomerSave ->
             let
