@@ -11,8 +11,9 @@ type alias Item =
     }
 
 
-search msg =
-    Api.get "items" itemDecoder msg
+
+--search msg =
+--    Api.get "items" itemDecoder msg
 
 
 itemDecoder : Decode.Decoder (List Item)

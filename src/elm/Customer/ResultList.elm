@@ -1,7 +1,6 @@
 module Customer.ResultList exposing (..)
 
 import Html exposing (..)
-import Html.Events exposing (onClick)
 import Dict as Dict exposing (Dict)
 import Customer.Models exposing (CustomerTab, View(..))
 import Customer.Messages exposing (Msg(..))

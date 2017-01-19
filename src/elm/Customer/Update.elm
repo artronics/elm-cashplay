@@ -6,13 +6,14 @@ import Customer.SearchBar as SearchBar
 import Customer.ResultList as ResultList
 import Customer.Customer exposing (validate, validateCustomer, initCustomerValidation, new)
 import Views.Breadcrumb as Bread
+import Context exposing (Context)
 
 
-update : Msg -> CustomerTab -> ( CustomerTab, Cmd Msg )
-update msg customerTab =
+update : Msg -> CustomerTab -> Context -> ( CustomerTab, Cmd Msg )
+update msg customerTab context =
     case msg of
         SearchBarMsg msg_ ->
-            SearchBar.update msg_ customerTab
+            SearchBar.update msg_ customerTab context
 
         ViewReceiptMsg msg_ ->
             ResultList.update msg_ customerTab

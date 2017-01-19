@@ -12,7 +12,14 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         OnDevLogin (Ok jwt) ->
-            ( { model | login = True, jwt = jwt.token }, Navigation.newUrl "#cashplay" )
+            let
+                context_ =
+                    model.context
+
+                context =
+                    { context_ | jwt = jwt }
+            in
+                ( { model | login = True, context = context }, Navigation.newUrl "#cashplay" )
 
         OnDevLogin (Err _) ->
             ( model, Cmd.none )
@@ -34,6 +41,6 @@ update msg model =
         CashplayMsg msg_ ->
             let
                 ( newCashplay, cmd ) =
-                    Cashplay.update msg_ model.cashplay
+                    Cashplay.update msg_ model.cashplay model.context
             in
                 ( { model | cashplay = newCashplay }, Cmd.map CashplayMsg cmd )

@@ -8,6 +8,7 @@ import Customer.Customer exposing (..)
 import Customer.Messages exposing (Msg(..))
 import Shared.SearchBar as SearchBar
 import Customer.Customer exposing (search)
+import Context exposing (Context)
 
 
 type alias Query =
@@ -18,8 +19,8 @@ type alias MenuItem =
     String
 
 
-update : SearchBar.Msg -> CustomerTab -> ( CustomerTab, Cmd Msg )
-update msg customerTab =
+update : SearchBar.Msg -> CustomerTab -> Context -> ( CustomerTab, Cmd Msg )
+update msg customerTab context =
     let
         ( newSearchBar, cmd, query ) =
             SearchBar.update msg customerTab.searchBar filter menu
@@ -27,7 +28,7 @@ update msg customerTab =
         -- an string which is comming from Shared.SearchBar
         searchCmd =
             query
-                |> Maybe.map (\q -> search q OnSearch)
+                |> Maybe.map (\q -> search context q OnSearch)
                 |> Maybe.withDefault (Cmd.none)
 
         batchCmd =

@@ -6,6 +6,7 @@ import Api
 import Dict as Dict exposing (Dict)
 import Validate as Val
 import Helpers
+import Context exposing (Context)
 
 
 type alias Customer =
@@ -47,14 +48,14 @@ type alias SearchQuery =
     }
 
 
-search : SearchQuery -> (Result Http.Error (List Customer) -> m) -> Cmd m
-search { value, field } msg =
+search : Context -> SearchQuery -> (Result Http.Error (List Customer) -> m) -> Cmd m
+search context { value, field } msg =
     case field of
         Name ->
-            Api.get ("customer?full_name=ilike.*" ++ value ++ "*") customerDecoder msg
+            Api.get context.jwt ("customer?full_name=ilike.*" ++ value ++ "*") customerDecoder msg
 
         _ ->
-            Api.get ("customer?") customerDecoder msg
+            Api.get context.jwt ("customer?") customerDecoder msg
 
 
 customerDecoder : Decode.Decoder (List Customer)

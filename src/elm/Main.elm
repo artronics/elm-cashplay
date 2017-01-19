@@ -1,8 +1,5 @@
 module Main exposing (..)
 
-import Html exposing (..)
-import Html.Attributes exposing (class)
-import Http
 import Navigation exposing (Location)
 import Routing exposing (..)
 import Messages exposing (Msg(..))

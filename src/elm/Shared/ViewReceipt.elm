@@ -1,10 +1,8 @@
 module Shared.ViewReceipt exposing (..)
 
 import Html exposing (..)
-import Html.Attributes exposing (class)
 import Html.Events exposing (..)
 import Dict exposing (Dict)
-import Resources.Item as Res
 import Views.TableView as TableView
 
 
