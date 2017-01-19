@@ -24,6 +24,7 @@ update msg customerTab context =
                 | views = [ SearchResults ]
                 , currentView = SearchResults
                 , fetchedCustomers = fetchedCustomers
+                , breadInfo = Bread.None
               }
             , Cmd.none
             )

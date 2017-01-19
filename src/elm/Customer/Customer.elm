@@ -8,6 +8,7 @@ import Dict as Dict exposing (Dict)
 import Validate as Val
 import Helpers
 import Context exposing (Context)
+import String
 
 
 type alias Customer =
@@ -70,7 +71,20 @@ updateCustomer context customer msg =
 
 
 customerValue : Customer -> Encode.Value
-customerValue customer =
+customerValue =
+    normalize >> customerValue_
+
+
+normalize : Customer -> Customer
+normalize customer =
+    { customer
+        | firstName = String.toLower customer.firstName
+        , lastName = String.toLower customer.lastName
+    }
+
+
+customerValue_ : Customer -> Encode.Value
+customerValue_ customer =
     Encode.object
         [ ( "first_name", Encode.string customer.firstName )
         , ( "last_name", Encode.string customer.lastName )

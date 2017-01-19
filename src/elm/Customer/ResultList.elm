@@ -1,6 +1,7 @@
 module Customer.ResultList exposing (..)
 
 import Html exposing (..)
+import Html.Attributes exposing (class)
 import Dict as Dict exposing (Dict)
 import Customer.Models exposing (..)
 import Customer.Messages exposing (Msg(..))
@@ -72,5 +73,5 @@ tableHeaders =
 tableData : Customer -> List (Html m)
 tableData customer =
     [ td [] [ text <| toString customer.id ]
-    , td [] [ text <| customer.firstName ++ " " ++ customer.lastName ]
+    , td [ class "text-capitalize" ] [ text <| customer.firstName ++ " " ++ customer.lastName ]
     ]

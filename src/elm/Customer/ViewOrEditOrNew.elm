@@ -53,7 +53,7 @@ viewFooterInEdit subject =
 
 viewHeadingInNew : Customer -> Html Msg
 viewHeadingInNew subject =
-    text "heading in edit"
+    h3 [ class "panel-title" ] [ text "heading in edit" ]
 
 
 viewFooterInNew : Customer -> Html Msg
