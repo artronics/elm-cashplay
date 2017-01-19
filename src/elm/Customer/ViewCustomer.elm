@@ -36,4 +36,4 @@ viewCustomer customerTab customer =
 
 viewFields : CustomerTab -> Customer -> Html Msg
 viewFields customerTab customer =
-    txt "First Name" [ Txt.editable False, value <| customer.firstName ] []
+    txt "First Name" [ value <| customer.firstName ] []

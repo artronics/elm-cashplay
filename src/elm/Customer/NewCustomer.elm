@@ -6,8 +6,9 @@ import Html.Events exposing (onInput, onClick, onBlur)
 import Customer.Customer exposing (..)
 import Customer.Messages exposing (Msg(..))
 import Customer.Models exposing (CustomerTab)
-import Views.Elements.Textfield as Txt exposing (txt)
+import Views.Elements.Textfield as Txt exposing (horInput)
 import Views.Elements.Button as Btn exposing (btn)
+import Views.Elements.Form as Frm exposing (frm)
 
 
 view : CustomerTab -> Html Msg
@@ -16,7 +17,7 @@ view customerTab =
         [ div [ class "panel-heading" ]
             [ text "heading" ]
         , div [ class "panel-body" ]
-            [ viewForm customerTab
+            [ viewForm customerTab True
             ]
         , div [ class "panel-footer clearfix art-dialog-footer" ]
             [ btn [ class "pull-right", Btn.large, Btn.primary, onClick OnNewCustomerSave ] [ text "Save" ]
@@ -25,8 +26,8 @@ view customerTab =
         ]
 
 
-viewForm : CustomerTab -> Html Msg
-viewForm customerTab =
+viewForm : CustomerTab -> Bool -> Html Msg
+viewForm customerTab asLabel =
     let
         newCustomer =
             customerTab.newCustomer
@@ -34,18 +35,20 @@ viewForm customerTab =
         customerValidation =
             customerTab.customerValidation
     in
-        Html.form [ class "form-horizontal" ]
+        frm [ class "form-horizontal", Frm.editable <| not asLabel ]
             [ div [ class "col-md-3" ] [ customerPic ]
             , div [ class "col-md-9" ]
                 [ horInput "First Name"
-                    Full
+                    Txt.Full
                     customerValidation.firstName
                     [ onInput <| OnNewCustomerInput (\c i -> { c | firstName = i })
                     , onBlur <| OnCustomerValidation { customerValidation | firstName = valFirstName newCustomer }
                     , value newCustomer.firstName
+                    , class "text-capitalize"
+                    , disabled asLabel
                     ]
                 , horInput "Last Name"
-                    Full
+                    Txt.Full
                     customerValidation.lastName
                     [ onInput <| OnNewCustomerInput (\c i -> { c | lastName = i })
                     , onBlur <| OnCustomerValidation { customerValidation | lastName = valLastName newCustomer }
@@ -61,44 +64,5 @@ customerPic =
         [ div [ class "art-upload-shot" ]
             [ i [ class "fa fa-2x fa-camera" ] []
             , i [ class "fa fa-2x fa-upload" ] []
-            ]
-        ]
-
-
-type Width
-    = Full
-    | Half
-
-
-horInput : String -> Width -> Maybe String -> List (Attribute msg) -> Html msg
-horInput lbl width valMsg atr =
-    div
-        [ class "form-group col-sm-12"
-        , class <|
-            if width == Full then
-                "col-md-12"
-            else
-                "col-md-6"
-        , class
-            (valMsg
-                |> Maybe.map (\_ -> "has-error")
-                |> Maybe.withDefault ""
-            )
-        ]
-        [ label [ class "col-sm-3 control-label" ] [ text <| lbl ++ ":" ]
-        , div [ class "col-sm-9" ]
-            [ input
-                ([ class "form-control text-capitalize"
-                 , placeholder lbl
-                 ]
-                    ++ atr
-                )
-                []
-            , span [ class "help-block" ]
-                [ text
-                    (valMsg
-                        |> Maybe.withDefault ""
-                    )
-                ]
             ]
         ]

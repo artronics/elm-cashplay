@@ -4,26 +4,14 @@ import Html exposing (..)
 import Html.Attributes exposing (classList, class)
 
 
-type Color
-    = Primary
+frm : List (Attribute msg) -> List (Html msg) -> Html msg
+frm atr elm =
+    form atr elm
 
 
-type Btn
-    = Primary
-
-
-btn : List (Attribute msg) -> List (Html msg) -> Html msg
-btn atr elm =
-    button (atr ++ [ classList [ "art-btn", "btn" ] ]) elm
-
-
-primary : Attribute msg
-primary =
-    class <| "btn-" ++ (color Primary)
-
-
-color : Color -> String
-color clr =
-    case clr of
-        Primary ->
-            "primary"
+editable : Bool -> Attribute msg
+editable b =
+    if b then
+        class ""
+    else
+        class "form-as-label"

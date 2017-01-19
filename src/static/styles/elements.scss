@@ -11,6 +11,20 @@
     padding-right: 0;
   }
 }
+@mixin as-label{
+  border:none !important;
+  background-color: white !important;
+  cursor: text !important;
+  box-shadow: none !important;
+  color: black !important;
+  font-size: large;
+}
+.input-as-label {
+  @include as-label
+}
+.form-as-label input{
+  @include as-label
+}
 
 select{
   padding-right: 5px;
