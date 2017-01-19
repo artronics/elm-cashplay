@@ -28,7 +28,7 @@ view customerTab =
         customerValidation =
             customerTab.customerValidation
     in
-        div [ class "panel panel-default" ]
+        div [ class "panel panel-default art-view-edit-new" ]
             [ div [ class "panel-heading" ] [ viewHeader subject ]
             , div [ class "panel-body" ]
                 [ viewForm subject asLabel customerValidation
@@ -40,7 +40,7 @@ view customerTab =
 
 viewHeadingInEdit : Customer -> Html Msg
 viewHeadingInEdit subject =
-    h5 [] [ text "Edit Customer" ]
+    h3 [ class "panel-title" ] [ text "Edit Customer" ]
 
 
 viewFooterInEdit : Customer -> Html Msg

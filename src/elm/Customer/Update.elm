@@ -36,36 +36,21 @@ update msg customerTab context =
             , Cmd.none
             )
 
-        EditCustomerReq (Ok customerRes) ->
-            ( { customerTab
-                | breadInfo = Bread.Success "Customer has been updated successfuly."
-                , customerDetails =
-                    customerRes
+        EditCustomerReq (Ok customerResList) ->
+            let
+                customerRes =
+                    customerResList
                         |> List.filter (\{ id } -> id == customerTab.editOrNewCustomer.id)
                         |> List.head
                         |> Maybe.withDefault new
-                , views = [ CustomerDetails ]
-                , currentView = CustomerDetails
-                , customerState = Presentation
-              }
-            , Cmd.none
-            )
+            in
+                ( resOk customerTab customerRes "Customer has been updated successfuly.", Cmd.none )
 
         EditCustomerReq (Err err) ->
-            let
-                e =
-                    Debug.log "kir" err
-            in
-                ( { customerTab | breadInfo = Bread.Failure "Network Error. Check Internet Connection." }, Cmd.none )
+            ( { customerTab | breadInfo = Bread.Failure "Network Error. Check Internet Connection." }, Cmd.none )
 
         NewCustomerReq (Ok customerRes) ->
-            ( { customerTab
-                | breadInfo = Bread.Success "New Customer has been saved successfuly."
-                , customerDetails = customerRes
-                , views = [ CustomerDetails ]
-                , currentView = CustomerDetails
-                , customerState = Presentation
-              }
+            ( resOk customerTab customerRes "New Customer has been saved successfuly."
             , Cmd.none
             )
 
@@ -76,47 +61,27 @@ update msg customerTab context =
             ( { customerTab | currentView = view }, Cmd.none )
 
         EditCustomer ->
-            ( { customerTab
-                | customerState = Edit
-                , editOrNewCustomer = customerTab.customerDetails
-                , customerValidation = initCustomerValidation
-                , breadInfo = Bread.None
-              }
+            ( changeCustomerState customerTab Edit customerTab.customerDetails
             , Cmd.none
             )
 
         OnEditCustomerSave ->
-            let
-                isValid =
-                    validate customerTab.editOrNewCustomer |> List.isEmpty
-
-                customerValidation =
-                    customerTab.customerValidation
-
-                ( customerTab_, cmd ) =
-                    if isValid then
-                        ( { customerTab | breadInfo = Bread.Loading }
-                        , updateCustomer context customerTab.editOrNewCustomer EditCustomerReq
-                        )
-                    else
-                        ( { customerTab | customerValidation = validateCustomer customerTab.editOrNewCustomer }, Cmd.none )
-            in
-                ( customerTab_, cmd )
+            proceedIfValid customerTab context <| updateCustomer context customerTab.editOrNewCustomer EditCustomerReq
 
         OnEditCustomerCancel ->
             ( customerTab, Cmd.none )
 
         OnNewCustomer ->
-            ( { customerTab
-                | views = [ NewCustomer ]
-                , currentView = NewCustomer
-                , breadInfo = Bread.None
-                , customerState = New
-                , editOrNewCustomer = new
-                , customerValidation = initCustomerValidation
-              }
-            , Cmd.none
-            )
+            let
+                customerTab_ =
+                    changeCustomerState customerTab New new
+            in
+                ( { customerTab_
+                    | views = [ NewCustomer ]
+                    , currentView = NewCustomer
+                  }
+                , Cmd.none
+                )
 
         OnNewCustomerReset ->
             ( { customerTab
@@ -128,22 +93,7 @@ update msg customerTab context =
             )
 
         OnNewCustomerSave ->
-            let
-                isValid =
-                    validate customerTab.editOrNewCustomer |> List.isEmpty
-
-                customerValidation =
-                    customerTab.customerValidation
-
-                ( customerTab_, cmd ) =
-                    if isValid then
-                        ( { customerTab | breadInfo = Bread.Loading }
-                        , newCustomer context customerTab.editOrNewCustomer NewCustomerReq
-                        )
-                    else
-                        ( { customerTab | customerValidation = validateCustomer customerTab.editOrNewCustomer }, Cmd.none )
-            in
-                ( customerTab_, cmd )
+            proceedIfValid customerTab context <| newCustomer context customerTab.editOrNewCustomer NewCustomerReq
 
         OnEditOrNewCustomerInput f input ->
             let
@@ -154,3 +104,44 @@ update msg customerTab context =
 
         OnCustomerValidation validation ->
             ( { customerTab | customerValidation = validation }, Cmd.none )
+
+
+changeCustomerState : CustomerTab -> CustomerState -> Customer -> CustomerTab
+changeCustomerState customerTab state subject =
+    { customerTab
+        | breadInfo = Bread.None
+        , customerState = state
+        , editOrNewCustomer = subject
+        , customerValidation = initCustomerValidation
+    }
+
+
+resOk : CustomerTab -> Customer -> String -> CustomerTab
+resOk customerTab cusRes sucMsg =
+    { customerTab
+        | breadInfo = Bread.Success sucMsg
+        , customerDetails = cusRes
+        , views = [ CustomerDetails ]
+        , currentView = CustomerDetails
+        , customerState = Presentation
+    }
+
+
+proceedIfValid : CustomerTab -> Context -> Cmd Msg -> ( CustomerTab, Cmd Msg )
+proceedIfValid customerTab context cmdOp =
+    let
+        isValid =
+            validate customerTab.editOrNewCustomer |> List.isEmpty
+
+        customerValidation =
+            customerTab.customerValidation
+
+        ( customerTab_, cmd ) =
+            if isValid then
+                ( { customerTab | breadInfo = Bread.Loading }
+                , cmdOp
+                )
+            else
+                ( { customerTab | customerValidation = validateCustomer customerTab.editOrNewCustomer }, Cmd.none )
+    in
+        ( customerTab_, cmd )

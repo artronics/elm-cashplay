@@ -1,0 +1,14 @@
+@import "variables";
+
+.art-view-edit-new .panel-heading i {
+  margin-right: 18px;
+  cursor: pointer;
+  &:hover{
+    color:$primary;
+  }
+}
+
+.art-view-edit-new .panel-footer button{
+  margin-right: 20px;
+  margin-left: 20px;
+}
