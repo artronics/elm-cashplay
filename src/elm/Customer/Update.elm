@@ -41,6 +41,7 @@ update msg customerTab context =
                 , customerDetails = customerRes
                 , views = [ CustomerDetails ]
                 , currentView = CustomerDetails
+                , customerState = Presentation
               }
             , Cmd.none
             )
@@ -55,6 +56,8 @@ update msg customerTab context =
             ( { customerTab
                 | customerState = Edit
                 , editOrNewCustomer = customerTab.customerDetails
+                , customerValidation = initCustomerValidation
+                , breadInfo = Bread.None
               }
             , Cmd.none
             )
