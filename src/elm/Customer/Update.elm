@@ -5,9 +5,9 @@ import Customer.Models exposing (CustomerTab, View(..), CustomerState(..))
 import Customer.SearchBar as SearchBar
 import Customer.ResultList as ResultList
 import Customer.Customer exposing (..)
+import Shared.PicLoader as PicLoader
 import Views.Breadcrumb as Bread
 import Context exposing (Context)
-import Debug
 
 
 update : Msg -> CustomerTab -> Context -> ( CustomerTab, Cmd Msg )
@@ -18,6 +18,13 @@ update msg customerTab context =
 
         ViewReceiptMsg msg_ ->
             ResultList.update msg_ customerTab
+
+        PicLoaderMsg msg_ ->
+            let
+                ( newPicLoader, cmd ) =
+                    PicLoader.update msg_ customerTab.picLoader
+            in
+                ( { customerTab | picLoader = newPicLoader }, Cmd.map PicLoaderMsg cmd )
 
         OnSearch (Ok fetchedCustomers) ->
             ( { customerTab

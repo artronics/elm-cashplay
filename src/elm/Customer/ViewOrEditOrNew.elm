@@ -6,6 +6,7 @@ import Html.Events exposing (..)
 import Customer.Customer exposing (..)
 import Customer.Messages exposing (Msg(..))
 import Customer.Models exposing (CustomerTab, CustomerState(..))
+import Shared.PicLoader as PicLoader
 import Views.Elements.Form as Frm exposing (frm)
 import Views.Elements.Button as Btn exposing (btn)
 import Views.Elements.Textfield as Txt exposing (horInput)
@@ -31,7 +32,7 @@ view customerTab =
         div [ class "panel panel-default art-view-edit-new" ]
             [ div [ class "panel-heading" ] [ viewHeader subject ]
             , div [ class "panel-body" ]
-                [ viewForm subject asLabel customerValidation
+                [ viewForm customerTab subject asLabel customerValidation
                 ]
             , div [ class "panel-footer" ]
                 [ viewFooter subject ]
@@ -78,10 +79,10 @@ viewFooterInPresentation subject =
     span [] []
 
 
-viewForm : Customer -> Bool -> CustomerValidation -> Html Msg
-viewForm subject asLabel customerValidation =
+viewForm : CustomerTab -> Customer -> Bool -> CustomerValidation -> Html Msg
+viewForm customerTab subject asLabel customerValidation =
     frm [ class "form-horizontal", Frm.editable <| not asLabel ]
-        [ div [ class "col-md-3" ] [ customerPic ]
+        [ div [ class "col-md-3" ] [ customerPic customerTab ]
         , div [ class "col-md-9" ]
             [ horInput "First Name"
                 Txt.Full
@@ -103,11 +104,6 @@ viewForm subject asLabel customerValidation =
         ]
 
 
-customerPic : Html msg
-customerPic =
-    div [ class "art-customer-pic well" ]
-        [ div [ class "art-upload-shot" ]
-            [ i [ class "fa fa-2x fa-camera" ] []
-            , i [ class "fa fa-2x fa-upload" ] []
-            ]
-        ]
+customerPic : CustomerTab -> Html Msg
+customerPic customerTab =
+    Html.map PicLoaderMsg <| PicLoader.view customerTab.picLoader
