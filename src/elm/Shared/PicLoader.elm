@@ -2,7 +2,7 @@ port module Shared.PicLoader exposing (..)
 
 import Html exposing (..)
 import Html.Events exposing (onClick)
-import Html.Attributes exposing (class, id, style, classList)
+import Html.Attributes exposing (..)
 import Json.Decode as Decode
 import Json.Encode as Encode
 import Debug
@@ -34,6 +34,8 @@ type Msg
     = OnConfig
     | OnAttached ()
     | OnConfiged ()
+    | Snap
+    | Snapped DataUri
 
 
 type alias WebcamConfigValue =
@@ -80,10 +82,16 @@ update msg picLoader =
                   ]
 
         OnConfiged _ ->
-            ( picLoader, webcamAttach "#my-camera" ) |> Debug.log "here"
+            ( picLoader, webcamAttach "#my-camera" )
 
         OnAttached _ ->
-            ( { picLoader | webcamState = On }, Cmd.none ) |> Debug.log "here"
+            ( { picLoader | webcamState = On }, Cmd.none )
+
+        Snap ->
+            ( { picLoader | webcamState = Off }, snap () )
+
+        Snapped dataUri ->
+            ( { picLoader | dataUri = Just dataUri }, Cmd.none )
 
 
 port webcamAttach : String -> Cmd msg
@@ -98,12 +106,19 @@ port webcamConfig : WebcamConfigValue -> Cmd msg
 port webcamConfiged : (() -> msg) -> Sub msg
 
 
-port snap : (String -> msg) -> Sub msg
+port snap : () -> Cmd msg
+
+
+port snapped : (String -> msg) -> Sub msg
 
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.batch [ webcamAttached <| OnAttached, webcamConfiged OnConfiged ]
+    Sub.batch
+        [ webcamAttached OnAttached
+        , webcamConfiged OnConfiged
+        , snapped Snapped
+        ]
 
 
 view : Model -> Maybe DataUri -> Html Msg
@@ -111,20 +126,34 @@ view picLoader dataUri =
     let
         empty =
             (picLoader.webcamState == Off && (dataUri == Nothing && picLoader.dataUri == Nothing))
-                |> Debug.log "empty "
     in
         div [ class "art-customer-pic" ]
             [ div [ styleWidthHeight, classList [ ( "empty", empty ) ] ]
                 [ p [ classList [ ( "hidden", not empty ) ], class "help-text text-center" ] [ text "Press Camera to take a Photo or drop your file here. " ]
+                  -- We attach webcam here. hidden if webcam is off
                 , div
-                    [ id "my-camera" ]
+                    [ id "my-camera", classList [ ( "hidden", picLoader.webcamState == Off ) ] ]
                     []
+                  -- Here is the img if available
+                , div [ classList [ ( "hidden", picLoader.webcamState == On ) ] ]
+                    [ picLoader.dataUri
+                        |> Maybe.map (\uri -> img [ src uri, width <| .width defaultConfig, height <| .height defaultConfig ] [])
+                        |> Maybe.withDefault (span [] [])
+                    ]
                 ]
+              -- here is the buttons bar. if wecam is off the camera button is for Snap
             , div [ class "art-upload-shot" ]
-                [ i [ class "fa fa-2x fa-camera", onClick <| OnConfig ] []
-                , i [ class "fa fa-2x fa-upload" ] []
+                [ i
+                    [ class "fa fa-2x fa-camera"
+                    , onClick <|
+                        if picLoader.webcamState == Off then
+                            OnConfig
+                        else
+                            Snap
+                    ]
+                    []
+                , i [ class "fa fa-2x fa-upload", classList [ ( "hidden", picLoader.webcamState == On ) ] ] []
                 ]
-            , text <| toString empty
             ]
 
 

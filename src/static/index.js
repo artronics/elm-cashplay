@@ -19,3 +19,10 @@ app.ports.webcamAttach.subscribe(function (id) {
   webcam.attach(id);
   app.ports.webcamAttached.send(null);
 });
+
+app.ports.snap.subscribe(function () {
+  webcam.snap(function (dataUri) {
+    app.ports.snapped.send(dataUri);
+  });
+  webcam.reset();
+});
