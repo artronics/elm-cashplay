@@ -1,7 +1,7 @@
 port module Shared.PicLoader exposing (..)
 
 import Html exposing (..)
-import Html.Events exposing (onClick)
+import Html.Events exposing (on, onClick)
 import Html.Attributes exposing (..)
 import Json.Decode as Decode
 import Json.Encode as Encode
@@ -14,6 +14,10 @@ import Debug
 
 type alias DataUri =
     Decode.Value
+
+
+type alias Files =
+    List NativeFile
 
 
 type WebcamState
@@ -46,6 +50,7 @@ type Msg
     | Snapped DataUri
     | DnD DragDrop.Msg
     | FileData (Result Error FileContentDataUrl)
+    | FilesSelect Files
 
 
 type alias WebcamConfigValue =
@@ -118,6 +123,16 @@ update msg picLoader =
               }
             , Cmd.none
             )
+
+        FilesSelect fileInstances ->
+            let
+                cmd =
+                    fileInstances
+                        |> List.head
+                        |> Maybe.map (\f -> readTextFile f)
+                        |> Maybe.withDefault Cmd.none
+            in
+                ( picLoader, cmd )
 
         FileData (Ok val) ->
             ( { picLoader | dataUri = Just val }, Cmd.none ) |> Debug.log "val "
@@ -201,7 +216,7 @@ viewButtonBar picLoader =
             ]
             []
         , i [ class "fa fa-2x fa-upload", classList [ ( "hidden", picLoader.webcamState == On ) ] ]
-            [ input [ type_ "file", class "file-input" ] [] ]
+            [ input [ type_ "file", class "file-input", onchange FilesSelect ] [] ]
         ]
 
 
@@ -216,6 +231,12 @@ viewError : Model -> Html Msg
 viewError picLoader =
     div []
         [ p [] [ text (picLoader.imageLoadError |> Maybe.map (\e -> FileReader.prettyPrint e) |> Maybe.withDefault "") ] ]
+
+
+onchange action =
+    on
+        "change"
+        (Decode.map action parseSelectedFiles)
 
 
 
@@ -268,3 +289,13 @@ loadFirstFileWithLoader loader files =
 
             Just file ->
                 loader file
+
+
+
+-- For file select
+
+
+readTextFile : NativeFile -> Cmd Msg
+readTextFile fileValue =
+    readAsDataUrl fileValue.blob
+        |> Task.attempt FileData
