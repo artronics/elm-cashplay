@@ -26,8 +26,7 @@ type WebcamState
 
 
 type alias Model =
-    { dataUri : Maybe DataUri
-    , webcamState : WebcamState
+    { webcamState : WebcamState
     , dnDModel : DragDrop.HoverState
     , imageLoadError : Maybe FileReader.Error
     }
@@ -35,8 +34,7 @@ type alias Model =
 
 init : Model
 init =
-    { dataUri = Nothing
-    , webcamState = Off
+    { webcamState = Off
     , dnDModel = DragDrop.init
     , imageLoadError = Nothing
     }
@@ -107,7 +105,7 @@ update msg picLoader =
             ( { picLoader | webcamState = Off }, snap (), Nothing )
 
         Snapped dataUri ->
-            ( { picLoader | dataUri = Just dataUri }, Cmd.none, Just dataUri )
+            ( picLoader, Cmd.none, Just dataUri )
 
         -- Case drop. Let the DnD library update it's model and emmit the loading effect
         DnD (Drop files) ->
@@ -138,7 +136,7 @@ update msg picLoader =
                 ( picLoader, cmd, Nothing )
 
         FileData (Ok val) ->
-            ( { picLoader | dataUri = Just val }, Cmd.none, Just val )
+            ( picLoader, Cmd.none, Just val )
 
         FileData (Err err) ->
             ( { picLoader | imageLoadError = Just err }, Cmd.none, Nothing )
@@ -171,17 +169,17 @@ subscriptions model =
         ]
 
 
-view : Model -> Maybe DataUri -> Html Msg
-view picLoader dataUri =
+view : Model -> Maybe String -> Html Msg
+view picLoader feedDataUri =
     let
         empty =
-            (picLoader.webcamState == Off && (dataUri == Nothing && picLoader.dataUri == Nothing))
+            picLoader.webcamState == Off && feedDataUri == Nothing
     in
         div ([ class "art-customer-pic" ])
             [ div [ styleWidthHeight, classList [ ( "empty", empty ) ] ]
                 [ p [ classList [ ( "hidden", not empty ) ], class "help-text text-center" ] [ text "Press Camera to take a Photo or drop your file here. " ]
                 , viewWebcamLive picLoader
-                , viewImageIfCamOff picLoader
+                , viewImageIfCamOff picLoader feedDataUri
                 ]
             , viewButtonBar picLoader
             , Html.map DnD <| div ([ class "drop-area" ] ++ dragDropEventHandlers) []
@@ -189,11 +187,11 @@ view picLoader dataUri =
             ]
 
 
-viewImageIfCamOff : Model -> Html Msg
-viewImageIfCamOff picLoader =
+viewImageIfCamOff : Model -> Maybe String -> Html Msg
+viewImageIfCamOff picLoader dataUri =
     div [ classList [ ( "hidden", picLoader.webcamState == On ) ] ]
-        [ picLoader.dataUri
-            |> Maybe.map (\uri -> img [ property "src" uri, width <| .width defaultConfig, height <| .height defaultConfig ] [])
+        [ dataUri
+            |> Maybe.map (\uri -> img [ src uri, width <| .width defaultConfig, height <| .height defaultConfig ] [])
             |> Maybe.withDefault (span [] [])
         ]
 
