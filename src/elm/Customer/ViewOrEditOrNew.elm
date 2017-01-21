@@ -1,5 +1,6 @@
 module Customer.ViewOrEditOrNew exposing (view)
 
+import String
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -82,7 +83,7 @@ viewFooterInPresentation subject =
 viewForm : CustomerTab -> Customer -> Bool -> CustomerValidation -> Html Msg
 viewForm customerTab subject asLabel customerValidation =
     frm [ class "form-horizontal", Frm.editable <| not asLabel ]
-        [ div [ class "col-md-3" ] [ customerPic customerTab ]
+        [ div [ class "col-md-3" ] [ customerPic customerTab subject ]
         , div [ class "col-md-9" ]
             [ horInput "First Name"
                 Txt.Full
@@ -104,6 +105,16 @@ viewForm customerTab subject asLabel customerValidation =
         ]
 
 
-customerPic : CustomerTab -> Html Msg
-customerPic customerTab =
-    Html.map PicLoaderMsg <| PicLoader.view customerTab.picLoader Nothing
+customerPic : CustomerTab -> Customer -> Html Msg
+customerPic customerTab subject =
+    let
+        hasPic =
+            if String.isEmpty subject.pic then
+                Nothing
+            else
+                Just subject.pic
+    in
+        div []
+            [ Html.map PicLoaderMsg <| PicLoader.view customerTab.picLoader Nothing
+            , span [ class "error" ] [ text (customerTab.customerValidation.pic |> Maybe.withDefault "") ]
+            ]

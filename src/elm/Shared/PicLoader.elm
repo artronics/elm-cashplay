@@ -88,25 +88,26 @@ webcamConfigValue conf =
     (,)
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
+update : Msg -> Model -> ( Model, Cmd Msg, Maybe DataUri )
 update msg picLoader =
     case msg of
         OnConfig ->
-            picLoader
-                ! [ webcamConfig (webcamConfigValue defaultConfig)
-                  ]
+            ( picLoader
+            , webcamConfig (webcamConfigValue defaultConfig)
+            , Nothing
+            )
 
         OnConfiged _ ->
-            ( picLoader, webcamAttach "#my-camera" )
+            ( picLoader, webcamAttach "#my-camera", Nothing )
 
         OnAttached _ ->
-            ( { picLoader | webcamState = On }, Cmd.none )
+            ( { picLoader | webcamState = On }, Cmd.none, Nothing )
 
         Snap ->
-            ( { picLoader | webcamState = Off }, snap () )
+            ( { picLoader | webcamState = Off }, snap (), Nothing )
 
         Snapped dataUri ->
-            ( { picLoader | dataUri = Just dataUri }, Cmd.none )
+            ( { picLoader | dataUri = Just dataUri }, Cmd.none, Just dataUri )
 
         -- Case drop. Let the DnD library update it's model and emmit the loading effect
         DnD (Drop files) ->
@@ -114,6 +115,7 @@ update msg picLoader =
                 | dnDModel = DragDrop.update (Drop files) picLoader.dnDModel
               }
             , loadFirstFile files
+            , Nothing
             )
 
         -- Other DnD cases. Let the DnD library update it's model.
@@ -122,6 +124,7 @@ update msg picLoader =
                 | dnDModel = DragDrop.update a picLoader.dnDModel
               }
             , Cmd.none
+            , Nothing
             )
 
         FilesSelect fileInstances ->
@@ -132,13 +135,13 @@ update msg picLoader =
                         |> Maybe.map (\f -> readTextFile f)
                         |> Maybe.withDefault Cmd.none
             in
-                ( picLoader, cmd )
+                ( picLoader, cmd, Nothing )
 
         FileData (Ok val) ->
-            ( { picLoader | dataUri = Just val }, Cmd.none ) |> Debug.log "val "
+            ( { picLoader | dataUri = Just val }, Cmd.none, Just val )
 
         FileData (Err err) ->
-            { picLoader | imageLoadError = Just err } ! []
+            ( { picLoader | imageLoadError = Just err }, Cmd.none, Nothing )
 
 
 port webcamAttach : String -> Cmd msg

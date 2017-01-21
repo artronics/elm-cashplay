@@ -1,5 +1,6 @@
 module Customer.Update exposing (update, subscriptions)
 
+import Json.Decode as Decode
 import Customer.Messages exposing (Msg(..))
 import Customer.Models exposing (CustomerTab, View(..), CustomerState(..))
 import Customer.SearchBar as SearchBar
@@ -8,6 +9,29 @@ import Customer.Customer exposing (..)
 import Shared.PicLoader as PicLoader
 import Views.Breadcrumb as Bread
 import Context exposing (Context)
+import Debug
+
+
+updatePicLoader : PicLoader.Msg -> CustomerTab -> ( CustomerTab, Cmd Msg )
+updatePicLoader msg customerTab =
+    let
+        ( newPicLoader, cmd, pic ) =
+            PicLoader.update msg customerTab.picLoader
+
+        editOrNewCustomer =
+            customerTab.editOrNewCustomer
+
+        editOrNewCustomer_ =
+            (decodePic pic) |> Maybe.map (\p -> { editOrNewCustomer | pic = p }) |> Maybe.withDefault editOrNewCustomer
+    in
+        ( { customerTab | picLoader = newPicLoader, editOrNewCustomer = editOrNewCustomer_ }, Cmd.map PicLoaderMsg cmd )
+
+
+decodePic : Maybe Decode.Value -> Maybe String
+decodePic pic =
+    pic
+        |> Maybe.map (\p -> (Decode.decodeValue Decode.string p) |> Result.toMaybe)
+        |> Maybe.andThen (\p -> p |> Maybe.map (\x -> x))
 
 
 update : Msg -> CustomerTab -> Context -> ( CustomerTab, Cmd Msg )
@@ -20,11 +44,7 @@ update msg customerTab context =
             ResultList.update msg_ customerTab
 
         PicLoaderMsg msg_ ->
-            let
-                ( newPicLoader, cmd ) =
-                    PicLoader.update msg_ customerTab.picLoader
-            in
-                ( { customerTab | picLoader = newPicLoader }, Cmd.map PicLoaderMsg cmd )
+            updatePicLoader msg_ customerTab
 
         OnSearch (Ok fetchedCustomers) ->
             ( { customerTab
