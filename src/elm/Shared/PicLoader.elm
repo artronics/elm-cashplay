@@ -5,6 +5,10 @@ import Html.Events exposing (onClick)
 import Html.Attributes exposing (..)
 import Json.Decode as Decode
 import Json.Encode as Encode
+import Task
+import FileReader exposing (..)
+import MimeType exposing (MimeType(..))
+import Shared.DragDropModel as DragDrop exposing (Msg(Drop), dragDropEventHandlers, HoverState(..))
 import Debug
 
 
@@ -19,14 +23,20 @@ type WebcamState
 
 type alias Model =
     { dataUri : Maybe DataUri
+    , uploadDataUri : Maybe FileContentDataUrl
     , webcamState : WebcamState
+    , dnDModel : DragDrop.HoverState
+    , imageLoadError : Maybe FileReader.Error
     }
 
 
 init : Model
 init =
     { dataUri = Nothing
+    , uploadDataUri = Nothing
     , webcamState = Off
+    , dnDModel = DragDrop.init
+    , imageLoadError = Nothing
     }
 
 
@@ -36,6 +46,8 @@ type Msg
     | OnConfiged ()
     | Snap
     | Snapped DataUri
+    | DnD DragDrop.Msg
+    | FileData (Result Error FileContentDataUrl)
 
 
 type alias WebcamConfigValue =
@@ -92,6 +104,28 @@ update msg picLoader =
 
         Snapped dataUri ->
             ( { picLoader | dataUri = Just dataUri }, Cmd.none )
+
+        -- Case drop. Let the DnD library update it's model and emmit the loading effect
+        DnD (Drop files) ->
+            ( { picLoader
+                | dnDModel = DragDrop.update (Drop files) picLoader.dnDModel
+              }
+            , loadFirstFile files
+            )
+
+        -- Other DnD cases. Let the DnD library update it's model.
+        DnD a ->
+            ( { picLoader
+                | dnDModel = DragDrop.update a picLoader.dnDModel
+              }
+            , Cmd.none
+            )
+
+        FileData (Ok val) ->
+            ( { picLoader | uploadDataUri = Just val }, Cmd.none ) |> Debug.log "val "
+
+        FileData (Err err) ->
+            { picLoader | imageLoadError = Just err } ! []
 
 
 port webcamAttach : String -> Cmd msg
@@ -154,6 +188,7 @@ view picLoader dataUri =
                     []
                 , i [ class "fa fa-2x fa-upload", classList [ ( "hidden", picLoader.webcamState == On ) ] ] []
                 ]
+            , viewUpload picLoader
             ]
 
 
@@ -162,3 +197,110 @@ styleWidthHeight =
         [ ( "width", (toString <| .width defaultConfig) ++ "px" )
         , ( "height", (toString <| .height defaultConfig) ++ "px" )
         ]
+
+
+viewUpload : Model -> Html Msg
+viewUpload model =
+    Html.map DnD <|
+        div
+            (countStyle model.dnDModel
+                :: dragDropEventHandlers
+            )
+            [ renderImageOrPrompt model
+            ]
+
+
+renderImageOrPrompt : Model -> Html a
+renderImageOrPrompt model =
+    case model.imageLoadError of
+        Just err ->
+            text (FileReader.prettyPrint err)
+
+        Nothing ->
+            case model.uploadDataUri of
+                Nothing ->
+                    case model.dnDModel of
+                        Normal ->
+                            text "Drop stuff here"
+
+                        Hovering ->
+                            text "Gimmie!"
+
+                Just result ->
+                    img
+                        [ property "src" result
+                        , style [ ( "max-width", "100%" ) ]
+                        ]
+                        []
+
+
+countStyle : DragDrop.HoverState -> Html.Attribute a
+countStyle dragState =
+    style
+        [ ( "font-size", "20px" )
+        , ( "font-family", "monospace" )
+        , ( "display", "block" )
+        , ( "width", "400px" )
+        , ( "height", "200px" )
+        , ( "text-align", "center" )
+        , ( "background"
+          , case dragState of
+                DragDrop.Hovering ->
+                    "#ffff99"
+
+                DragDrop.Normal ->
+                    "#cccc99"
+          )
+        ]
+
+
+
+-- TASKS
+
+
+dropAllowedForFile : NativeFile -> Bool
+dropAllowedForFile file =
+    case file.mimeType of
+        Nothing ->
+            False
+
+        Just mimeType ->
+            case mimeType of
+                MimeType.Image _ ->
+                    True
+
+                _ ->
+                    False
+
+
+loadFirstFile : List NativeFile -> Cmd Msg
+loadFirstFile =
+    loadFirstFileWithLoader loadData
+
+
+loadData : FileRef -> Cmd Msg
+loadData file =
+    FileReader.readAsDataUrl file
+        |> Task.map Ok
+        |> Task.onError (Task.succeed << Err)
+        |> Task.perform FileData
+
+
+
+-- small helper method to do nothing if 0 files were dropped, otherwise load the first file
+
+
+loadFirstFileWithLoader : (FileRef -> Cmd Msg) -> List NativeFile -> Cmd Msg
+loadFirstFileWithLoader loader files =
+    let
+        maybeHead =
+            List.head <|
+                List.map .blob
+                    (List.filter dropAllowedForFile files)
+    in
+        case maybeHead of
+            Nothing ->
+                Cmd.none
+
+            Just file ->
+                loader file
