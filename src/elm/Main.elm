@@ -29,17 +29,6 @@ devLogin =
     Api.login { email = "dev@dev.com", password = "admin" } OnDevLogin
 
 
-
--- VIEW
-
-
-subscriptions : Model -> Sub Msg
-subscriptions model =
-    Sub.batch
-        [ Sub.none
-        ]
-
-
 main : Program Never Model Msg
 main =
     Navigation.program OnLocationChange

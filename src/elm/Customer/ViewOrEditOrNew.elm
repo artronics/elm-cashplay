@@ -106,4 +106,4 @@ viewForm customerTab subject asLabel customerValidation =
 
 customerPic : CustomerTab -> Html Msg
 customerPic customerTab =
-    Html.map PicLoaderMsg <| PicLoader.view customerTab.picLoader
+    Html.map PicLoaderMsg <| PicLoader.view customerTab.picLoader Nothing

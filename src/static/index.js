@@ -5,4 +5,17 @@ require( '../../node_modules/bootstrap-sass/assets/javascripts/bootstrap.js' ); 
 
 // inject bundled Elm app into div#main
 var Elm = require( '../elm/Main' );
-Elm.Main.embed( document.getElementById( 'main' ) );
+var app = Elm.Main.embed( document.getElementById( 'main' ) );
+
+
+var webcam = require ('../../node_modules/webcamjs/webcam.min.js');
+
+app.ports.webcamConfig.subscribe(function (config) {
+  webcam.set(config);
+  app.ports.webcamConfiged.send(null)
+});
+
+app.ports.webcamAttach.subscribe(function (id) {
+  webcam.attach(id);
+  app.ports.webcamAttached.send(null);
+});

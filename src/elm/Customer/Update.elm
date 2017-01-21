@@ -1,4 +1,4 @@
-module Customer.Update exposing (update)
+module Customer.Update exposing (update, subscriptions)
 
 import Customer.Messages exposing (Msg(..))
 import Customer.Models exposing (CustomerTab, View(..), CustomerState(..))
@@ -112,6 +112,12 @@ update msg customerTab context =
 
         OnCustomerValidation validation ->
             ( { customerTab | customerValidation = validation }, Cmd.none )
+
+
+subscriptions : CustomerTab -> Sub Msg
+subscriptions customerTab =
+    Sub.batch
+        [ Sub.map PicLoaderMsg <| PicLoader.subscriptions customerTab.picLoader ]
 
 
 changeCustomerState : CustomerTab -> CustomerState -> Customer -> CustomerTab

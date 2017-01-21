@@ -4,6 +4,7 @@ import Home.Models as HomePage
 import Routing exposing (..)
 import Cashplay.Models as Cashplay
 import Context exposing (..)
+import Shared.PicLoader as PicLoader
 
 
 type alias Model =
@@ -12,6 +13,7 @@ type alias Model =
     , context : Context
     , home : HomePage.Home
     , cashplay : Cashplay.Cashplay
+    , picLoader : PicLoader.Model
     }
 
 
@@ -22,4 +24,5 @@ model route =
     , context = initContext
     , home = HomePage.init
     , cashplay = Cashplay.init
+    , picLoader = PicLoader.init
     }

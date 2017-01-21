@@ -3,10 +3,18 @@
 
 .art-customer-pic{
   position: relative;
-  border : dashed grey 5px;
-  width:320px;
-  height: 240px;
   //background: url("./add_customer.svg") no-repeat 50% 20px;
+}
+
+.art-customer-pic .empty{
+  border : dashed grey 5px;
+  background-color: $gray-lighter;
+}
+.art-customer-pic .help-text{
+  font-size:18px;
+  font-weight: bold;
+  color: grey;
+  margin:75px 20px;
 }
 
 .art-customer-pic .art-upload-shot{

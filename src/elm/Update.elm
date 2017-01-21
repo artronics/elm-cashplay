@@ -1,4 +1,4 @@
-module Update exposing (..)
+module Update exposing (update, subscriptions)
 
 import Navigation exposing (Location)
 import Messages exposing (..)
@@ -44,3 +44,9 @@ update msg model =
                     Cashplay.update msg_ model.cashplay model.context
             in
                 ( { model | cashplay = newCashplay }, Cmd.map CashplayMsg cmd )
+
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Sub.batch
+        [ Sub.map CashplayMsg <| Cashplay.subscriptions model.cashplay ]
