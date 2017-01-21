@@ -11,10 +11,15 @@ import Context exposing (Context)
 import String
 
 
+type alias DataUri =
+    String
+
+
 type alias Customer =
     { id : Int
     , firstName : String
     , lastName : String
+    , pic : DataUri
     }
 
 
@@ -23,18 +28,21 @@ new =
     { id = 0
     , firstName = ""
     , lastName = ""
+    , pic = ""
     }
 
 
 type alias CustomerValidation =
     { firstName : Maybe String
     , lastName : Maybe String
+    , pic : Maybe String
     }
 
 
 initCustomerValidation =
     { firstName = Nothing
     , lastName = Nothing
+    , pic = Nothing
     }
 
 
@@ -88,6 +96,7 @@ customerValue_ customer =
     Encode.object
         [ ( "first_name", Encode.string customer.firstName )
         , ( "last_name", Encode.string customer.lastName )
+        , ( "pic", Encode.string customer.pic )
         ]
 
 
@@ -98,10 +107,11 @@ customerListDecoder =
 
 customerDecoder : Decode.Decoder Customer
 customerDecoder =
-    Decode.map3 Customer
+    Decode.map4 Customer
         (Decode.field "id" Decode.int)
         (Decode.field "first_name" Decode.string)
         (Decode.field "last_name" Decode.string)
+        (Decode.field "pic" Decode.string)
 
 
 valFirstName_ : List (Customer -> List String)
@@ -124,11 +134,22 @@ valLastName =
     Val.eager valLastName_
 
 
+valPic_ : List (Customer -> List String)
+valPic_ =
+    [ .pic >> Val.ifBlank "Profile Picture is required." ]
+
+
+valPic : Customer -> Maybe String
+valPic =
+    Val.eager valPic_
+
+
 validate : Customer -> List String
 validate =
     Val.all
         ([ valFirstName_
          , valLastName_
+         , valPic_
          ]
             |> List.concat
         )
@@ -138,6 +159,7 @@ validateCustomer : Customer -> CustomerValidation
 validateCustomer customer =
     { firstName = valFirstName customer
     , lastName = valLastName customer
+    , pic = valPic customer
     }
 
 
