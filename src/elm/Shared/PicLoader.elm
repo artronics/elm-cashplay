@@ -13,7 +13,7 @@ import Debug
 
 
 type alias DataUri =
-    String
+    Decode.Value
 
 
 type WebcamState
@@ -23,7 +23,6 @@ type WebcamState
 
 type alias Model =
     { dataUri : Maybe DataUri
-    , uploadDataUri : Maybe FileContentDataUrl
     , webcamState : WebcamState
     , dnDModel : DragDrop.HoverState
     , imageLoadError : Maybe FileReader.Error
@@ -33,7 +32,6 @@ type alias Model =
 init : Model
 init =
     { dataUri = Nothing
-    , uploadDataUri = Nothing
     , webcamState = Off
     , dnDModel = DragDrop.init
     , imageLoadError = Nothing
@@ -122,7 +120,7 @@ update msg picLoader =
             )
 
         FileData (Ok val) ->
-            ( { picLoader | uploadDataUri = Just val }, Cmd.none ) |> Debug.log "val "
+            ( { picLoader | dataUri = Just val }, Cmd.none ) |> Debug.log "val "
 
         FileData (Err err) ->
             { picLoader | imageLoadError = Just err } ! []
@@ -143,7 +141,7 @@ port webcamConfiged : (() -> msg) -> Sub msg
 port snap : () -> Cmd msg
 
 
-port snapped : (String -> msg) -> Sub msg
+port snapped : (DataUri -> msg) -> Sub msg
 
 
 subscriptions : Model -> Sub Msg
@@ -161,35 +159,50 @@ view picLoader dataUri =
         empty =
             (picLoader.webcamState == Off && (dataUri == Nothing && picLoader.dataUri == Nothing))
     in
-        div [ class "art-customer-pic" ]
+        div ([ class "art-customer-pic" ])
             [ div [ styleWidthHeight, classList [ ( "empty", empty ) ] ]
                 [ p [ classList [ ( "hidden", not empty ) ], class "help-text text-center" ] [ text "Press Camera to take a Photo or drop your file here. " ]
-                  -- We attach webcam here. hidden if webcam is off
-                , div
-                    [ id "my-camera", classList [ ( "hidden", picLoader.webcamState == Off ) ] ]
-                    []
-                  -- Here is the img if available
-                , div [ classList [ ( "hidden", picLoader.webcamState == On ) ] ]
-                    [ picLoader.dataUri
-                        |> Maybe.map (\uri -> img [ src uri, width <| .width defaultConfig, height <| .height defaultConfig ] [])
-                        |> Maybe.withDefault (span [] [])
-                    ]
+                , viewWebcamLive picLoader
+                , viewImageIfCamOff picLoader
                 ]
-              -- here is the buttons bar. if wecam is off the camera button is for Snap
-            , div [ class "art-upload-shot" ]
-                [ i
-                    [ class "fa fa-2x fa-camera"
-                    , onClick <|
-                        if picLoader.webcamState == Off then
-                            OnConfig
-                        else
-                            Snap
-                    ]
-                    []
-                , i [ class "fa fa-2x fa-upload", classList [ ( "hidden", picLoader.webcamState == On ) ] ] []
-                ]
-            , viewUpload picLoader
+            , viewButtonBar picLoader
+            , Html.map DnD <| div ([ class "drop-area" ] ++ dragDropEventHandlers) []
+            , viewError picLoader
             ]
+
+
+viewImageIfCamOff : Model -> Html Msg
+viewImageIfCamOff picLoader =
+    div [ classList [ ( "hidden", picLoader.webcamState == On ) ] ]
+        [ picLoader.dataUri
+            |> Maybe.map (\uri -> img [ property "src" uri, width <| .width defaultConfig, height <| .height defaultConfig ] [])
+            |> Maybe.withDefault (span [] [])
+        ]
+
+
+viewWebcamLive : Model -> Html Msg
+viewWebcamLive picLoader =
+    div
+        [ id "my-camera", classList [ ( "hidden", picLoader.webcamState == Off ) ] ]
+        []
+
+
+viewButtonBar : Model -> Html Msg
+viewButtonBar picLoader =
+    div [ class "art-upload-shot" ]
+        -- here is the buttons bar. if wecam is off the camera button is for Snap
+        [ i
+            [ class "fa fa-2x fa-camera"
+            , onClick <|
+                if picLoader.webcamState == Off then
+                    OnConfig
+                else
+                    Snap
+            ]
+            []
+        , i [ class "fa fa-2x fa-upload", classList [ ( "hidden", picLoader.webcamState == On ) ] ]
+            [ input [ type_ "file", class "file-input" ] [] ]
+        ]
 
 
 styleWidthHeight =
@@ -199,63 +212,14 @@ styleWidthHeight =
         ]
 
 
-viewUpload : Model -> Html Msg
-viewUpload model =
-    Html.map DnD <|
-        div
-            (countStyle model.dnDModel
-                :: dragDropEventHandlers
-            )
-            [ renderImageOrPrompt model
-            ]
-
-
-renderImageOrPrompt : Model -> Html a
-renderImageOrPrompt model =
-    case model.imageLoadError of
-        Just err ->
-            text (FileReader.prettyPrint err)
-
-        Nothing ->
-            case model.uploadDataUri of
-                Nothing ->
-                    case model.dnDModel of
-                        Normal ->
-                            text "Drop stuff here"
-
-                        Hovering ->
-                            text "Gimmie!"
-
-                Just result ->
-                    img
-                        [ property "src" result
-                        , style [ ( "max-width", "100%" ) ]
-                        ]
-                        []
-
-
-countStyle : DragDrop.HoverState -> Html.Attribute a
-countStyle dragState =
-    style
-        [ ( "font-size", "20px" )
-        , ( "font-family", "monospace" )
-        , ( "display", "block" )
-        , ( "width", "400px" )
-        , ( "height", "200px" )
-        , ( "text-align", "center" )
-        , ( "background"
-          , case dragState of
-                DragDrop.Hovering ->
-                    "#ffff99"
-
-                DragDrop.Normal ->
-                    "#cccc99"
-          )
-        ]
+viewError : Model -> Html Msg
+viewError picLoader =
+    div []
+        [ p [] [ text (picLoader.imageLoadError |> Maybe.map (\e -> FileReader.prettyPrint e) |> Maybe.withDefault "") ] ]
 
 
 
--- TASKS
+--TASKS
 
 
 dropAllowedForFile : NativeFile -> Bool
