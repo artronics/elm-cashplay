@@ -12,6 +12,7 @@ var webcam = require ('../../node_modules/webcamjs/webcam.min.js');
 
 app.ports.webcamConfig.subscribe(function (config) {
   webcam.set(config);
+  console.log(config)
   app.ports.webcamConfiged.send(null)
 });
 

@@ -67,8 +67,8 @@ defaultConfig : WebcamConfig
 defaultConfig =
     { width = 320
     , height = 240
-    , destWidth = 320
-    , destHeight = 240
+    , destWidth = 640
+    , destHeight = 480
     }
 
 
@@ -77,7 +77,7 @@ webcamConfigValue conf =
     Encode.object
         [ "width" => Encode.int conf.width
         , "height" => Encode.int conf.height
-        , "dest_widht" => Encode.int conf.destWidth
+        , "dest_width" => Encode.int conf.destWidth
         , "dest_height" => Encode.int conf.destHeight
         ]
 

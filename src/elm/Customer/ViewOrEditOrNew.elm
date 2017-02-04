@@ -117,7 +117,7 @@ customerPic customerTab subject =
     in
         case customerTab.customerState of
             Presentation ->
-                ImgBox.viewImgBox subject.pic
+                ImgBox.viewImgBox subject.pic (subject.firstName ++ " " ++ subject.lastName)
 
             _ ->
                 div []
