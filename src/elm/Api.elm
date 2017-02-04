@@ -9,6 +9,17 @@ type alias Url =
     String
 
 
+type Method
+    = Get
+    | Post
+    | Patch
+
+
+type Plurality
+    = Singular
+    | Plural
+
+
 type alias Credential =
     { email : String
     , password : String
@@ -24,8 +35,12 @@ type alias User =
     }
 
 
+type alias Token =
+    String
+
+
 type alias JwtToken =
-    { token : String
+    { token : Token
     }
 
 
@@ -39,8 +54,7 @@ baseUrl =
 
 login : Credential -> (Result Http.Error JwtToken -> msg) -> Cmd msg
 login credential msg =
-    Http.post (baseUrl ++ "rpc/login") (Http.jsonBody <| credentialValue credential) jwtDecoder
-        |> Http.send msg
+    genRequest Post Nothing Singular "rpc/login" (Just <| credentialValue credential) jwtDecoder msg
 
 
 jwtDecoder : Decode.Decoder JwtToken
@@ -80,65 +94,68 @@ credentialValue cred =
         ]
 
 
-post : JwtToken -> Url -> Value -> Decode.Decoder a -> ((Result Http.Error a -> msg) -> Cmd msg)
-post jwt url value decoder msg =
-    Http.request
-        { method = "POST"
-        , headers = headers jwt.token
-        , url = (baseUrl ++ url)
-        , body = Http.jsonBody value
-        , expect = Http.expectJson decoder
-        , timeout = Nothing
-        , withCredentials = False
-        }
-        |> Http.send msg
+get : Maybe Token -> Url -> Decode.Decoder a -> ((Result Http.Error a -> msg) -> Cmd msg)
+get token url decoder msg =
+    genRequest Get token Plural url Nothing decoder msg
 
 
-newResource : JwtToken -> Url -> Value -> Decode.Decoder a -> ((Result Http.Error a -> msg) -> Cmd msg)
-newResource jwt url value decoder msg =
-    Http.request
-        { method = "POST"
-        , headers = (headers jwt.token)
-        , url = (baseUrl ++ url)
-        , body = Http.jsonBody value
-        , expect = Http.expectJson decoder
-        , timeout = Nothing
-        , withCredentials = False
-        }
-        |> Http.send msg
+post : Maybe Token -> Url -> Value -> Decode.Decoder a -> ((Result Http.Error a -> msg) -> Cmd msg)
+post token url value decoder msg =
+    genRequest Post token Singular url (Just value) decoder msg
 
 
-updateResource : JwtToken -> Url -> String -> Value -> Decode.Decoder a -> ((Result Http.Error a -> msg) -> Cmd msg)
-updateResource jwt url id value decoder msg =
-    Http.request
-        { method = "PATCH"
-        , headers = (headers jwt.token)
-        , url = (baseUrl ++ url ++ "?id=eq." ++ id)
-        , body = Http.jsonBody value
-        , expect = Http.expectJson decoder
-        , timeout = Nothing
-        , withCredentials = False
-        }
-        |> Http.send msg
+newResource : Maybe Token -> Url -> Value -> Decode.Decoder a -> ((Result Http.Error a -> msg) -> Cmd msg)
+newResource token url value decoder msg =
+    genRequest Post token Singular url (Just value) decoder msg
 
 
-get : JwtToken -> Url -> Decode.Decoder a -> ((Result Http.Error a -> msg) -> Cmd msg)
-get jwt url decoder msg =
-    Http.request
-        { method = "GET"
-        , headers = headers jwt.token
-        , url = (baseUrl ++ url)
-        , body = Http.emptyBody
-        , expect = Http.expectJson decoder
-        , timeout = Nothing
-        , withCredentials = False
-        }
-        |> Http.send msg
+updateResource : Maybe Token -> Url -> String -> Value -> Decode.Decoder a -> ((Result Http.Error a -> msg) -> Cmd msg)
+updateResource token url id value decoder msg =
+    genRequest Patch token Singular (url ++ "?id=eq." ++ id) (Just value) decoder msg
 
 
-headers : String -> List Http.Header
-headers token =
-    [ Http.header "Content-Type" "application/json"
-    , Http.header "Authorization" ("Bearer " ++ token)
-    , Http.header "Prefer" "return=representation"
-    ]
+headers : Maybe Token -> Plurality -> List Http.Header
+headers token pul =
+    let
+        p =
+            case pul of
+                Singular ->
+                    Http.header "Accept" "application/vnd.pgrst.object+json"
+
+                Plural ->
+                    Http.header "Accept" "application/json"
+
+        h =
+            [ Http.header "Prefer" "return=representation"
+            , p
+            ]
+    in
+        token
+            |> Maybe.map (\t -> (Http.header "Authorization" ("Bearer " ++ t)) :: h)
+            |> Maybe.withDefault h
+
+
+genRequest : Method -> Maybe Token -> Plurality -> Url -> Maybe Value -> Decode.Decoder a -> ((Result Http.Error a -> msg) -> Cmd msg)
+genRequest method token pul url body decoder msg =
+    let
+        method_ =
+            case method of
+                Get ->
+                    "GET"
+
+                Post ->
+                    "POST"
+
+                Patch ->
+                    "PATCH"
+    in
+        Http.request
+            { method = method_
+            , headers = headers token pul
+            , url = (baseUrl ++ url)
+            , body = body |> Maybe.map (\v -> Http.jsonBody v) |> Maybe.withDefault Http.emptyBody
+            , expect = Http.expectJson decoder
+            , timeout = Nothing
+            , withCredentials = False
+            }
+            |> Http.send msg
