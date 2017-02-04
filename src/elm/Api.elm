@@ -99,6 +99,11 @@ get token url decoder msg =
     genRequest Get token Plural url Nothing decoder msg
 
 
+getSingle : Maybe Token -> Url -> Decode.Decoder a -> ((Result Http.Error a -> msg) -> Cmd msg)
+getSingle token url decoder msg =
+    genRequest Get token Singular url Nothing decoder msg
+
+
 post : Maybe Token -> Url -> Value -> Decode.Decoder a -> ((Result Http.Error a -> msg) -> Cmd msg)
 post token url value decoder msg =
     genRequest Post token Singular url (Just value) decoder msg

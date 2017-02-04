@@ -5,14 +5,15 @@ import Html.Attributes exposing (class)
 import Dict as Dict exposing (Dict)
 import Customer.Models exposing (..)
 import Customer.Messages exposing (Msg(..))
-import Customer.Customer exposing (Customer, customersToDict, new, initCustomerValidation)
+import Customer.Customer exposing (Customer, customersToDict, new, initCustomerValidation, getCustomerPic)
 import Shared.ViewReceipt as ViewReceipt
 import Views.Breadcrumb as Bread
+import Context exposing (Context)
 import Debug
 
 
-update : ViewReceipt.Msg -> CustomerTab -> ( CustomerTab, Cmd Msg )
-update msg customerTab =
+update : ViewReceipt.Msg -> CustomerTab -> Context -> ( CustomerTab, Cmd Msg )
+update msg customerTab context =
     let
         getRes =
             \key ->
@@ -22,7 +23,7 @@ update msg customerTab =
         ( newViewReceipt, ( viewCustomer, _ ) ) =
             ViewReceipt.update msg customerTab.viewReceipt getRes
 
-        ( views, currentView, customerDetails, breadInfo, customerState, customerValidation ) =
+        ( views, currentView, customerDetails, breadInfo, customerState, customerValidation, cmd ) =
             viewCustomer
                 |> Maybe.map
                     (\c ->
@@ -32,6 +33,7 @@ update msg customerTab =
                         , Bread.None
                         , Presentation
                         , initCustomerValidation
+                        , getCustomerPic context (toString c.id) CustomerPicReq
                         )
                     )
                 |> Maybe.withDefault
@@ -41,6 +43,7 @@ update msg customerTab =
                     , customerTab.breadInfo
                     , customerTab.customerState
                     , customerTab.customerValidation
+                    , Cmd.none
                     )
     in
         ( { customerTab
@@ -52,7 +55,7 @@ update msg customerTab =
             , customerState = customerState
             , customerValidation = customerValidation
           }
-        , Cmd.none
+        , cmd
         )
 
 

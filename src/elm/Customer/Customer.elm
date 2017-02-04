@@ -24,6 +24,10 @@ type alias Customer =
     }
 
 
+type alias CustomerPic =
+    { pic : String }
+
+
 new : Customer
 new =
     { id = 0
@@ -78,9 +82,14 @@ newCustomer context customer msg =
     Api.newResource (Just context.jwt.token) "customers" (customerValue customer) customerDecoder msg
 
 
-updateCustomer : Context -> Customer -> (Result Http.Error (List Customer) -> msg) -> Cmd msg
+updateCustomer : Context -> Customer -> (Result Http.Error Customer -> msg) -> Cmd msg
 updateCustomer context customer msg =
-    Api.updateResource (Just context.jwt.token) "customers" (toString customer.id) (customerValue customer) customerListDecoder msg
+    Api.updateResource (Just context.jwt.token) "customers" (toString customer.id) (customerValue customer) customerDecoder msg
+
+
+getCustomerPic : Context -> String -> (Result Http.Error CustomerPic -> msg) -> Cmd msg
+getCustomerPic context id msg =
+    Api.getSingle (Just context.jwt.token) ("customers?id=eq." ++ id ++ "&select=pic") customerPicDecoder msg
 
 
 customerValue : Customer -> Encode.Value
@@ -117,6 +126,12 @@ customerDecoder =
         |> required "first_name" Decode.string
         |> required "last_name" Decode.string
         |> optional "pic" Decode.string ""
+
+
+customerPicDecoder : Decode.Decoder CustomerPic
+customerPicDecoder =
+    decode CustomerPic
+        |> required "pic" Decode.string
 
 
 valFirstName_ : List (Customer -> List String)

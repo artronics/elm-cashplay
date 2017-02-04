@@ -41,7 +41,7 @@ update msg customerTab context =
             SearchBar.update msg_ customerTab context
 
         ViewReceiptMsg msg_ ->
-            ResultList.update msg_ customerTab
+            ResultList.update msg_ customerTab context
 
         PicLoaderMsg msg_ ->
             updatePicLoader msg_ customerTab
@@ -64,15 +64,21 @@ update msg customerTab context =
             , Cmd.none
             )
 
-        EditCustomerReq (Ok customerResList) ->
+        CustomerPicReq (Ok pic) ->
             let
-                customerRes =
-                    customerResList
-                        |> List.filter (\{ id } -> id == customerTab.editOrNewCustomer.id)
-                        |> List.head
-                        |> Maybe.withDefault new
+                customerDetails_ =
+                    customerTab.customerDetails
+
+                customerDetails =
+                    { customerDetails_ | pic = pic.pic }
             in
-                ( resOk customerTab customerRes "Customer has been updated successfuly.", Cmd.none )
+                ( { customerTab | customerDetails = customerDetails }, Cmd.none )
+
+        CustomerPicReq (Err err) ->
+            ( customerTab, Cmd.none )
+
+        EditCustomerReq (Ok customerRes) ->
+            ( resOk customerTab customerRes "Customer has been updated successfuly.", Cmd.none )
 
         EditCustomerReq (Err err) ->
             ( { customerTab | breadInfo = Bread.Failure "Network Error. Check Internet Connection." }, Cmd.none )

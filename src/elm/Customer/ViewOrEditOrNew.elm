@@ -11,6 +11,7 @@ import Shared.PicLoader as PicLoader
 import Views.Elements.Form as Frm exposing (frm)
 import Views.Elements.Button as Btn exposing (btn)
 import Views.Elements.Textfield as Txt exposing (horInput)
+import Views.ImgBox as ImgBox
 
 
 view : CustomerTab -> Html Msg
@@ -114,7 +115,12 @@ customerPic customerTab subject =
             else
                 Just subject.pic
     in
-        div []
-            [ Html.map PicLoaderMsg <| PicLoader.view customerTab.picLoader hasPic
-            , span [ class "error" ] [ text (customerTab.customerValidation.pic |> Maybe.withDefault "") ]
-            ]
+        case customerTab.customerState of
+            Presentation ->
+                ImgBox.viewImgBox subject.pic
+
+            _ ->
+                div []
+                    [ Html.map PicLoaderMsg <| PicLoader.view customerTab.picLoader hasPic
+                    , span [ class "error" ] [ text (customerTab.customerValidation.pic |> Maybe.withDefault "") ]
+                    ]
