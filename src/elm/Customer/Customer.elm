@@ -3,6 +3,7 @@ module Customer.Customer exposing (..)
 import Http
 import Json.Decode as Decode
 import Json.Encode as Encode
+import Json.Decode.Pipeline exposing (decode, required, optional, hardcoded)
 import Api
 import Dict as Dict exposing (Dict)
 import Validate as Val
@@ -60,12 +61,16 @@ type alias SearchQuery =
 
 search : Context -> SearchQuery -> (Result Http.Error (List Customer) -> m) -> Cmd m
 search context { value, field } msg =
-    case field of
-        Name ->
-            Api.get (Just context.jwt.token) ("customer?full_name=ilike.*" ++ value ++ "*") customerListDecoder msg
+    let
+        select =
+            "&select=id,first_name,last_name"
+    in
+        case field of
+            Name ->
+                Api.get (Just context.jwt.token) ("customer?full_name=ilike.*" ++ value ++ "*" ++ select) customerListDecoder msg
 
-        _ ->
-            Api.get (Just context.jwt.token) ("customer?") customerListDecoder msg
+            _ ->
+                Api.get (Just context.jwt.token) ("customer?") customerListDecoder msg
 
 
 newCustomer : Context -> Customer -> (Result Http.Error Customer -> msg) -> Cmd msg
@@ -107,11 +112,11 @@ customerListDecoder =
 
 customerDecoder : Decode.Decoder Customer
 customerDecoder =
-    Decode.map4 Customer
-        (Decode.field "id" Decode.int)
-        (Decode.field "first_name" Decode.string)
-        (Decode.field "last_name" Decode.string)
-        (Decode.field "pic" Decode.string)
+    decode Customer
+        |> required "id" Decode.int
+        |> required "first_name" Decode.string
+        |> required "last_name" Decode.string
+        |> optional "pic" Decode.string ""
 
 
 valFirstName_ : List (Customer -> List String)
