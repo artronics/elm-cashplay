@@ -103,7 +103,9 @@ update msg customerTab context =
             proceedIfValid customerTab context <| updateCustomer context customerTab.editOrNewCustomer EditCustomerReq
 
         OnEditCustomerCancel ->
-            ( customerTab, Cmd.none )
+            ( changeCustomerState customerTab Presentation customerTab.customerDetails
+            , Cmd.none
+            )
 
         OnNewCustomer ->
             let
