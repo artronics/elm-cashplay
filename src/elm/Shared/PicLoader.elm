@@ -86,17 +86,19 @@ webcamConfigValue conf =
     (,)
 
 
-update : Msg -> Model -> ( Model, Cmd Msg, Maybe DataUri )
-update msg picLoader =
+update : Msg -> Model -> String -> ( Model, Cmd Msg, Maybe DataUri )
+update msg picLoader camId =
     case msg of
         OnConfig ->
             ( picLoader
             , webcamConfig (webcamConfigValue defaultConfig)
             , Nothing
             )
+                |> Debug.log "conf"
 
         OnConfiged _ ->
-            ( picLoader, webcamAttach "#my-camera", Nothing )
+            ( picLoader, webcamAttach ("#" ++ camId), Nothing )
+                |> Debug.log "confid"
 
         OnAttached _ ->
             ( { picLoader | webcamState = On }, Cmd.none, Nothing )
@@ -169,8 +171,8 @@ subscriptions model =
         ]
 
 
-view : Model -> Maybe String -> Html Msg
-view picLoader feedDataUri =
+view : Model -> String -> Maybe String -> Html Msg
+view picLoader camId feedDataUri =
     let
         empty =
             picLoader.webcamState == Off && feedDataUri == Nothing
@@ -178,7 +180,7 @@ view picLoader feedDataUri =
         div ([ class "art-customer-pic" ])
             [ div [ styleWidthHeight, classList [ ( "empty", empty ) ] ]
                 [ p [ classList [ ( "hidden", not empty ) ], class "help-text text-center" ] [ text "Press Camera to take a Photo or drop your file here. " ]
-                , viewWebcamLive picLoader
+                , viewWebcamLive picLoader camId
                 , viewImageIfCamOff picLoader feedDataUri
                 ]
             , viewButtonBar picLoader
@@ -196,10 +198,10 @@ viewImageIfCamOff picLoader dataUri =
         ]
 
 
-viewWebcamLive : Model -> Html Msg
-viewWebcamLive picLoader =
+viewWebcamLive : Model -> String -> Html Msg
+viewWebcamLive picLoader camId =
     div
-        [ id "my-camera", classList [ ( "hidden", picLoader.webcamState == Off ) ] ]
+        [ id camId, classList [ ( "hidden", picLoader.webcamState == Off ) ] ]
         []
 
 

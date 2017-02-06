@@ -126,11 +126,11 @@ customerPic customerTab subject =
 
             _ ->
                 div []
-                    [ Html.map PicLoaderMsg <| PicLoader.view customerTab.picLoader hasPic
+                    [ Html.map PicLoaderMsg <| PicLoader.view customerTab.picLoader "cus-camera" hasPic
                     , span [ class "error" ] [ text (customerTab.customerValidation.pic |> Maybe.withDefault "") ]
                     ]
 
 
 customerDocs : CustomerTab -> Customer -> Html Msg
 customerDocs customerTab subject =
-    Html.map PicListLoaderMsg <| PicListLoader.view customerTab.picListLoader
+    Html.map PicListLoaderMsg <| PicListLoader.view customerTab.picListLoader (Just [])

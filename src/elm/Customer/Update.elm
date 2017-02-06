@@ -17,7 +17,7 @@ updatePicLoader : PicLoader.Msg -> CustomerTab -> ( CustomerTab, Cmd Msg )
 updatePicLoader msg customerTab =
     let
         ( newPicLoader, cmd, pic ) =
-            PicLoader.update msg customerTab.picLoader
+            PicLoader.update msg customerTab.picLoader "cus-camera"
 
         editOrNewCustomer =
             customerTab.editOrNewCustomer
@@ -37,7 +37,11 @@ decodePic pic =
 
 updatePicListLoader : PicListLoader.Msg -> CustomerTab -> ( CustomerTab, Cmd Msg )
 updatePicListLoader msg customerTab =
-    ( customerTab, Cmd.none )
+    let
+        ( newPicListLoader, cmd, _ ) =
+            PicListLoader.update msg customerTab.picListLoader
+    in
+        ( { customerTab | picListLoader = newPicListLoader }, Cmd.map PicListLoaderMsg cmd )
 
 
 update : Msg -> CustomerTab -> Context -> ( CustomerTab, Cmd Msg )
@@ -154,7 +158,9 @@ update msg customerTab context =
 subscriptions : CustomerTab -> Sub Msg
 subscriptions customerTab =
     Sub.batch
-        [ Sub.map PicLoaderMsg <| PicLoader.subscriptions customerTab.picLoader ]
+        [ Sub.map PicLoaderMsg <| PicLoader.subscriptions customerTab.picLoader
+        , Sub.map PicListLoaderMsg <| PicListLoader.subscriptions customerTab.picListLoader
+        ]
 
 
 changeCustomerState : CustomerTab -> CustomerState -> Customer -> CustomerTab
