@@ -5,12 +5,14 @@ import Shared.ViewReceipt as ViewReceipt
 import Customer.Customer as Cus exposing (Customer, CustomerValidation, initCustomerValidation)
 import Views.Breadcrumb as Bread
 import Shared.PicLoader as PicLoader
+import Shared.PicListLoader as PicListLoader
 
 
 type alias CustomerTab =
     { searchBar : SearchBar
     , viewReceipt : ViewReceipt.Model
     , picLoader : PicLoader.Model
+    , picListLoader : PicListLoader.Model
     , fetchedCustomers : List Customer
     , customerDetails : Customer
     , customerState : CustomerState
@@ -41,6 +43,7 @@ init =
     { searchBar = SearchBar.initSearchBar
     , viewReceipt = ViewReceipt.init
     , picLoader = PicLoader.init
+    , picListLoader = PicListLoader.init
     , fetchedCustomers = []
     , customerDetails = Cus.new
     , customerState = Presentation

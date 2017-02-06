@@ -8,6 +8,7 @@ import Customer.Customer exposing (..)
 import Customer.Messages exposing (Msg(..))
 import Customer.Models exposing (CustomerTab, CustomerState(..))
 import Shared.PicLoader as PicLoader
+import Shared.PicListLoader as PicListLoader
 import Views.Elements.Form as Frm exposing (frm)
 import Views.Elements.Button as Btn exposing (btn)
 import Views.Elements.Textfield as Txt exposing (horInput)
@@ -101,8 +102,12 @@ viewForm customerTab subject asLabel customerValidation =
                 [ onInput <| OnEditOrNewCustomerInput (\c i -> { c | lastName = i })
                 , onBlur <| OnCustomerValidation { customerValidation | lastName = valLastName subject }
                 , value subject.lastName
+                , class "text-capitalize"
+                , disabled asLabel
                 ]
             ]
+        , div [ class "col-md-12" ]
+            [ customerDocs customerTab subject ]
         ]
 
 
@@ -124,3 +129,8 @@ customerPic customerTab subject =
                     [ Html.map PicLoaderMsg <| PicLoader.view customerTab.picLoader hasPic
                     , span [ class "error" ] [ text (customerTab.customerValidation.pic |> Maybe.withDefault "") ]
                     ]
+
+
+customerDocs : CustomerTab -> Customer -> Html Msg
+customerDocs customerTab subject =
+    Html.map PicListLoaderMsg <| PicListLoader.view customerTab.picListLoader

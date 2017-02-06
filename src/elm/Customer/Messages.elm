@@ -6,12 +6,14 @@ import Customer.Customer exposing (Customer, CustomerValidation, CustomerPic)
 import Customer.Models exposing (CustomerTab, View)
 import Shared.ViewReceipt as ViewReceipt
 import Shared.PicLoader as PicLoader
+import Shared.PicListLoader as PicListLoader
 
 
 type Msg
     = SearchBarMsg SearchBar.Msg
     | ViewReceiptMsg ViewReceipt.Msg
     | PicLoaderMsg PicLoader.Msg
+    | PicListLoaderMsg PicListLoader.Msg
     | OnSearch (Result Http.Error (List Customer))
     | SelectCrumb View
     | CustomerPicReq (Result Http.Error CustomerPic)

@@ -7,6 +7,7 @@ import Customer.SearchBar as SearchBar
 import Customer.ResultList as ResultList
 import Customer.Customer exposing (..)
 import Shared.PicLoader as PicLoader
+import Shared.PicListLoader as PicListLoader
 import Views.Breadcrumb as Bread
 import Context exposing (Context)
 import Debug
@@ -34,6 +35,11 @@ decodePic pic =
         |> Maybe.andThen (\p -> p |> Maybe.map (\x -> x))
 
 
+updatePicListLoader : PicListLoader.Msg -> CustomerTab -> ( CustomerTab, Cmd Msg )
+updatePicListLoader msg customerTab =
+    ( customerTab, Cmd.none )
+
+
 update : Msg -> CustomerTab -> Context -> ( CustomerTab, Cmd Msg )
 update msg customerTab context =
     case msg of
@@ -45,6 +51,9 @@ update msg customerTab context =
 
         PicLoaderMsg msg_ ->
             updatePicLoader msg_ customerTab
+
+        PicListLoaderMsg msg_ ->
+            updatePicListLoader msg_ customerTab
 
         OnSearch (Ok fetchedCustomers) ->
             ( { customerTab
