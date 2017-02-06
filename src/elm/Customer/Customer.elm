@@ -66,12 +66,12 @@ type alias SearchQuery =
 search : Context -> SearchQuery -> (Result Http.Error (List Customer) -> m) -> Cmd m
 search context { value, field } msg =
     let
-        select =
-            "&select=id,first_name,last_name"
+        searchValue =
+            Encode.object [ ( "search", Encode.string value ) ]
     in
         case field of
             Name ->
-                Api.get (Just context.jwt.token) ("customer?full_name=ilike.*" ++ value ++ "*" ++ select) customerListDecoder msg
+                Api.postPlural (Just context.jwt.token) ("rpc/customers_search_by_name") searchValue customerListDecoder msg
 
             _ ->
                 Api.get (Just context.jwt.token) ("customer?") customerListDecoder msg

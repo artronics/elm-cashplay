@@ -109,6 +109,11 @@ post token url value decoder msg =
     genRequest Post token Singular url (Just value) decoder msg
 
 
+postPlural : Maybe Token -> Url -> Value -> Decode.Decoder a -> ((Result Http.Error a -> msg) -> Cmd msg)
+postPlural token url value decoder msg =
+    genRequest Post token Plural url (Just value) decoder msg
+
+
 newResource : Maybe Token -> Url -> Value -> Decode.Decoder a -> ((Result Http.Error a -> msg) -> Cmd msg)
 newResource token url value decoder msg =
     genRequest Post token Singular url (Just value) decoder msg
