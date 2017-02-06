@@ -10,6 +10,7 @@ import Validate as Val
 import Helpers
 import Context exposing (Context)
 import String
+import Set
 
 
 type alias DataUri =
@@ -21,6 +22,7 @@ type alias Customer =
     , firstName : String
     , lastName : String
     , pic : DataUri
+    , docs : List String
     }
 
 
@@ -34,6 +36,7 @@ new =
     , firstName = ""
     , lastName = ""
     , pic = ""
+    , docs = []
     }
 
 
@@ -41,6 +44,7 @@ type alias CustomerValidation =
     { firstName : Maybe String
     , lastName : Maybe String
     , pic : Maybe String
+    , docs : Maybe String
     }
 
 
@@ -48,6 +52,7 @@ initCustomerValidation =
     { firstName = Nothing
     , lastName = Nothing
     , pic = Nothing
+    , docs = Nothing
     }
 
 
@@ -111,6 +116,7 @@ customerValue_ customer =
         [ ( "first_name", Encode.string customer.firstName )
         , ( "last_name", Encode.string customer.lastName )
         , ( "pic", Encode.string customer.pic )
+        , ( "docs", Encode.list (customer.docs |> List.map (\d -> Encode.string d)) )
         ]
 
 
@@ -126,6 +132,7 @@ customerDecoder =
         |> required "first_name" Decode.string
         |> required "last_name" Decode.string
         |> optional "pic" Decode.string ""
+        |> optional "docs" (Decode.list Decode.string) []
 
 
 customerPicDecoder : Decode.Decoder CustomerPic
@@ -164,12 +171,23 @@ valPic =
     Val.eager valPic_
 
 
+valDocs_ : List (Customer -> List String)
+valDocs_ =
+    [ .docs >> Set.fromList >> Val.ifEmptySet "At least one Document is required." ]
+
+
+valDocs : Customer -> Maybe String
+valDocs =
+    Val.eager valDocs_
+
+
 validate : Customer -> List String
 validate =
     Val.all
         ([ valFirstName_
          , valLastName_
          , valPic_
+         , valDocs_
          ]
             |> List.concat
         )
@@ -180,6 +198,7 @@ validateCustomer customer =
     { firstName = valFirstName customer
     , lastName = valLastName customer
     , pic = valPic customer
+    , docs = valDocs customer
     }
 
 
