@@ -1,0 +1,49 @@
+@import "patials/index";
+@import "variables";
+
+.art-img-input{
+  background-color: $gray-lighter;
+  border : dashed grey 5px;
+}
+.art-img-input .drop-area{
+  position: relative;
+  top:-22px;
+  left:-22px;
+}
+.art-img-input .empty-text{
+  position: relative;
+  font-size:18px;
+  font-weight: bold;
+  color: grey;
+  background-color: $gray-lighter;
+  top: 15%;
+  left:10%;
+  margin:0;
+  width:80%;
+}
+.art-img-input .delete{
+  top:15px;
+  left:87%;
+}
+.art-img-input .shot-or-upload{
+  position: relative;
+  width:100%;
+  top:30%;
+}
+.art-img-input .shot-or-upload>div{
+  @extend %flexbox;
+  @include justify-content(center);
+  @include align-items(center);
+  width: 100%;
+  opacity: .8;
+  div{
+    background-color: $gray-lighter;
+    padding: 10px 20px;
+    opacity: .7;
+    &:hover{
+      color: black;
+      background-color: $gray-light;
+      opacity: .9;
+    }
+  }
+}

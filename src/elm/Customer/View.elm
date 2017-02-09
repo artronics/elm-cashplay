@@ -12,6 +12,7 @@ import Views.Elements.Label exposing (labelIcon)
 import Views.Breadcrumb as Bread
 import Views.MessageBox as MsgBox
 import Customer.ViewOrEditOrNew as ViewEditNew
+import Views.Elements.ImgInput as ImgInput exposing (imgInput)
 
 
 view : CustomerTab -> Html Msg
@@ -27,7 +28,9 @@ view customerTab =
                 [ labelIcon "New Customer" "user-plus" ]
             ]
         , Bread.view (createCrumb customerTab) SelectCrumb customerTab.currentView customerTab.breadInfo
+        , imgInput ( 320, 240 ) Nothing False
         , viewContent customerTab
+        , a [ class "button is-black" ] [ text "Black" ]
         ]
 
 
