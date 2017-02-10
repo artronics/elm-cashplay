@@ -9,6 +9,7 @@
   position: relative;
   top:-5px;
   left:-5px;
+  z-index:100;
 }
 .art-img-input .empty-text{
   position: relative;
@@ -56,4 +57,7 @@
       opacity: .9;
     }
   }
+}
+.art-img-input .img{
+  margin-top: -90px;
 }

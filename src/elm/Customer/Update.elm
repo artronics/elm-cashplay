@@ -48,10 +48,16 @@ updatePicListLoader msg customerTab =
 updateImgInput : ImgInput.Msg -> CustomerTab -> ( CustomerTab, Cmd Msg )
 updateImgInput msg customerTab =
     let
-        ( newImgInput, cmd ) =
+        ( newImgInput, cmd, dataUri ) =
             ImgInput.update msg customerTab.imgInput
+
+        editOrNewCustomer =
+            customerTab.editOrNewCustomer
+
+        editOrNewCustomer_ =
+            { editOrNewCustomer | pic = dataUri |> Maybe.withDefault editOrNewCustomer.pic }
     in
-        ( { customerTab | imgInput = newImgInput }, Cmd.map ImgInputMsg cmd )
+        ( { customerTab | imgInput = newImgInput, editOrNewCustomer = editOrNewCustomer_ }, Cmd.map ImgInputMsg cmd )
 
 
 update : Msg -> CustomerTab -> Context -> ( CustomerTab, Cmd Msg )

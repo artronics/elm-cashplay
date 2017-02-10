@@ -32,12 +32,14 @@ type CameraState
 
 type alias Model =
     { cameraState : CameraState
+    , dataUri : Maybe String
     }
 
 
 init : Model
 init =
     { cameraState = Off
+    , dataUri = Nothing
     }
 
 
@@ -45,35 +47,35 @@ type Msg
     = Webcam
     | WebcamOff ()
     | CancelCamera
-    | StopPropagation
     | Snap
     | Ok
     | DataUri Decode.Value
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
+update : Msg -> Model -> ( Model, Cmd Msg, Maybe String )
 update msg model =
     case msg of
         Webcam ->
-            ( { model | cameraState = On }, webcam <| webcamConfigValue defaultConfig )
+            ( { model | cameraState = On }, webcam <| webcamConfigValue defaultConfig, Nothing )
 
         WebcamOff _ ->
-            ( model, Cmd.none )
+            ( model, Cmd.none, Nothing )
 
         Snap ->
-            ( model, webcamSnap () )
+            ( model, webcamSnap (), Nothing )
 
         DataUri uriValue ->
-            ( { model | cameraState = Off }, Cmd.none )
+            let
+                dataUri =
+                    Decode.decodeValue Decode.string uriValue |> Result.toMaybe
+            in
+                ( { model | cameraState = Off, dataUri = dataUri }, Cmd.none, Nothing )
 
         CancelCamera ->
-            ( { model | cameraState = Off }, webcamReset () )
+            ( { model | cameraState = Off }, webcamReset (), Nothing )
 
         Ok ->
-            ( model, Cmd.none )
-
-        StopPropagation ->
-            ( model, Cmd.none )
+            ( model, webcamReset (), model.dataUri )
 
 
 subscriptions : Model -> Sub Msg
@@ -98,7 +100,7 @@ viewCameraModal model =
         (div []
             [ viewWebcamPort
             , cameraButton model
-            , buttonBar
+            , buttonBar model
             ]
         )
 
@@ -128,11 +130,18 @@ cameraButton model =
         [ btn [] [ icon [ Icon.large ] "camera" ] ]
 
 
-buttonBar : Html Msg
-buttonBar =
+buttonBar : Model -> Html Msg
+buttonBar model =
     div [ class "controls" ]
         [ btn [ Btn.default, Btn.large, onClick CancelCamera, attribute "data-dismiss" "modal" ] [ text "Cancel" ]
-        , btn [ Btn.primary, Btn.large, onClick Ok ] [ text "Ok" ]
+        , btn
+            [ Btn.primary
+            , Btn.large
+            , onClick Ok
+            , attribute "data-dismiss" "modal"
+            , disabled <| model.dataUri == Nothing
+            ]
+            [ text "Ok" ]
         ]
 
 

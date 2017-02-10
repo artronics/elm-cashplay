@@ -21,22 +21,23 @@ imgInput size dataUri messages editable =
             dataUri == Nothing
     in
         div [ sizeStyle size, class "box art-img-input" ]
-            [ dropArea size messages
+            [ dropArea size dataUri messages
             ]
 
 
-dropArea : Size -> ( msg, msg ) -> Html msg
-dropArea size ( loadCamera, uploadFile ) =
+dropArea : Size -> Maybe DataUri -> ( msg, msg ) -> Html msg
+dropArea size dataUri ( loadCamera, uploadFile ) =
     div [ sizeStyle size, class "drop-area" ]
         [ closeImg False
-        , emptyText False size
+        , emptyText (not <| dataUri == Nothing) size
         , buttonBar False loadCamera uploadFile
+        , img [ class "img", width 320, height 240, src (dataUri |> Maybe.withDefault "") ] []
         ]
 
 
 emptyText : Bool -> Size -> Html msg
 emptyText hidden ( w, h ) =
-    p [ class "text-center empty-text" ] [ text "Press Camera to take a Photo or drop your file here. " ]
+    p [ class "text-center empty-text", classList [ ( "hidden", hidden ) ] ] [ text "Press Camera to take a Photo or drop your file here. " ]
 
 
 closeImg : Bool -> Html msg

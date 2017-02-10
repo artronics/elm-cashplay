@@ -10,12 +10,14 @@ import Shared.WebCam as Webcam
 
 type alias Model =
     { webcam : Webcam.Model
+    , dataUri : Maybe String
     }
 
 
 init : Model
 init =
     { webcam = Webcam.init
+    , dataUri = Nothing
     }
 
 
@@ -25,21 +27,21 @@ type Msg
     | WebcamMsg Webcam.Msg
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
+update : Msg -> Model -> ( Model, Cmd Msg, Maybe String )
 update msg model =
     case msg of
         LoadCamera ->
-            ( model, Cmd.none )
+            ( model, Cmd.none, Nothing )
 
         UploadFile ->
-            ( model, Cmd.none )
+            ( model, Cmd.none, Nothing )
 
         WebcamMsg msg_ ->
             let
-                ( newWebcam, cmd ) =
+                ( newWebcam, cmd, dataUri ) =
                     Webcam.update msg_ model.webcam
             in
-                ( { model | webcam = newWebcam }, Cmd.map WebcamMsg cmd )
+                ( { model | webcam = newWebcam, dataUri = dataUri |> Maybe.map (\d -> Just d) |> Maybe.withDefault model.dataUri }, Cmd.map WebcamMsg cmd, dataUri )
 
 
 subscriptions : Model -> Sub Msg
@@ -51,7 +53,7 @@ view : Model -> Html Msg
 view model =
     div []
         [ ImgInputView.imgInput ( 320, 240 )
-            Nothing
+            model.dataUri
             ( LoadCamera, UploadFile )
             True
         , Html.map WebcamMsg <| Webcam.view model.webcam
