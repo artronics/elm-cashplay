@@ -7,8 +7,8 @@
 }
 .art-img-input .drop-area{
   position: relative;
-  top:-22px;
-  left:-22px;
+  top:-5px;
+  left:-5px;
 }
 .art-img-input .empty-text{
   position: relative;
@@ -16,19 +16,29 @@
   font-weight: bold;
   color: grey;
   background-color: $gray-lighter;
-  top: 15%;
+  top: 25%;
   left:10%;
   margin:0;
   width:80%;
 }
-.art-img-input .delete{
-  top:15px;
-  left:87%;
+.art-img-input .close{
+  position: relative;
+  top: 5px;
+  right: 5px;
+  background-color: $gray-lighter;
+  color: $gray-light;
+  padding: 10px 20px;
+  opacity: .7;
+  &:hover{
+    color: black;
+    background-color: $gray-light;
+    opacity: .9;
+  }
 }
 .art-img-input .shot-or-upload{
   position: relative;
   width:100%;
-  top:30%;
+  top:50%;
 }
 .art-img-input .shot-or-upload>div{
   @extend %flexbox;

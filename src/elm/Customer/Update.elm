@@ -8,6 +8,7 @@ import Customer.ResultList as ResultList
 import Customer.Customer exposing (..)
 import Shared.PicLoader as PicLoader
 import Shared.PicListLoader as PicListLoader
+import Shared.ImgInput as ImgInput
 import Views.Breadcrumb as Bread
 import Context exposing (Context)
 import Debug
@@ -44,9 +45,21 @@ updatePicListLoader msg customerTab =
         ( { customerTab | picListLoader = newPicListLoader }, Cmd.map PicListLoaderMsg cmd )
 
 
+updateImgInput : ImgInput.Msg -> CustomerTab -> ( CustomerTab, Cmd Msg )
+updateImgInput msg customerTab =
+    let
+        ( newImgInput, cmd ) =
+            ImgInput.update msg customerTab.imgInput
+    in
+        ( { customerTab | imgInput = newImgInput }, Cmd.map ImgInputMsg cmd )
+
+
 update : Msg -> CustomerTab -> Context -> ( CustomerTab, Cmd Msg )
 update msg customerTab context =
     case msg of
+        NoOp ->
+            ( customerTab, Cmd.none )
+
         SearchBarMsg msg_ ->
             SearchBar.update msg_ customerTab context
 
@@ -58,6 +71,9 @@ update msg customerTab context =
 
         PicListLoaderMsg msg_ ->
             updatePicListLoader msg_ customerTab
+
+        ImgInputMsg msg_ ->
+            updateImgInput msg_ customerTab
 
         OnSearch (Ok fetchedCustomers) ->
             ( { customerTab
@@ -160,6 +176,7 @@ subscriptions customerTab =
     Sub.batch
         [ Sub.map PicLoaderMsg <| PicLoader.subscriptions customerTab.picLoader
         , Sub.map PicListLoaderMsg <| PicListLoader.subscriptions customerTab.picListLoader
+        , Sub.map ImgInputMsg <| ImgInput.subscriptions customerTab.imgInput
         ]
 
 

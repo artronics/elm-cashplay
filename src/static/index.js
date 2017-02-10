@@ -10,6 +10,22 @@ var app = Elm.Main.embed( document.getElementById( 'main' ) );
 
 var webcam = require ('../../node_modules/webcamjs/webcam.min.js');
 
+app.ports.webcam.subscribe(function (config) {
+  webcam.unfreeze();
+  webcam.set(config);
+  webcam.attach(config.id)
+});
+app.ports.webcamReset.subscribe(function () {
+  webcam.reset();
+  app.ports.webcamOff.send(null);
+});
+
+app.ports.webcamSnap.subscribe(function () {
+  webcam.snap(function (dataUri) {
+    app.ports.webcamDataUri.send(dataUri);
+  });
+  webcam.freeze();
+});
 app.ports.webcamConfig.subscribe(function (config) {
   webcam.set(config);
   app.ports.webcamConfiged.send(null)

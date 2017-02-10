@@ -6,20 +6,19 @@ import Html.Attributes exposing (..)
 
 icon : List (Attribute msg) -> String -> Html msg
 icon atr icn =
-    span ([ class "icon" ] ++ atr)
-        [ i [ class <| "fa fa-" ++ icn ] [] ]
+    i ([ class <| "fa fa-" ++ icn ] ++ atr) []
 
 
 small : Attribute msg
 small =
-    class "is-small"
+    class "fa-1x"
 
 
 large : Attribute msg
 large =
-    class "is-large"
+    class "fa-3x"
 
 
 medium : Attribute msg
 medium =
-    class "is-medium"
+    class "fa-2x"

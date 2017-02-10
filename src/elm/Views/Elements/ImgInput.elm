@@ -2,6 +2,7 @@ module Views.Elements.ImgInput exposing (imgInput)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import Html.Events exposing (..)
 import Views.Elements.Icon as Icon exposing (icon)
 
 
@@ -13,23 +14,23 @@ type alias DataUri =
     String
 
 
-imgInput : Size -> Maybe DataUri -> Bool -> Html msg
-imgInput size dataUri editable =
+imgInput : Size -> Maybe DataUri -> ( msg, msg ) -> Bool -> Html msg
+imgInput size dataUri messages editable =
     let
         empty =
             dataUri == Nothing
     in
         div [ sizeStyle size, class "box art-img-input" ]
-            [ dropArea size
+            [ dropArea size messages
             ]
 
 
-dropArea : Size -> Html msg
-dropArea size =
+dropArea : Size -> ( msg, msg ) -> Html msg
+dropArea size ( loadCamera, uploadFile ) =
     div [ sizeStyle size, class "drop-area" ]
         [ closeImg False
         , emptyText False size
-        , buttonBar False
+        , buttonBar False loadCamera uploadFile
         ]
 
 
@@ -40,15 +41,15 @@ emptyText hidden ( w, h ) =
 
 closeImg : Bool -> Html msg
 closeImg hidden =
-    a [ class "delete" ] []
+    i [ class "fa fa-2x fa-times close" ] []
 
 
-buttonBar : Bool -> Html msg
-buttonBar hidden =
+buttonBar : Bool -> msg -> msg -> Html msg
+buttonBar hidden loadCamera uploadFile =
     div [ class "shot-or-upload", classList [ ( "hidden", hidden ) ] ]
         [ div []
-            [ div [] [ icon [ Icon.medium ] "upload" ]
-            , div [] [ icon [ Icon.medium ] "camera" ]
+            [ div [ onClick uploadFile ] [ icon [ Icon.medium ] "upload" ]
+            , div [ onClick loadCamera, attribute "data-toggle" "modal", attribute "data-target" "#camera-modal" ] [ icon [ Icon.medium ] "camera" ]
             ]
         ]
 
