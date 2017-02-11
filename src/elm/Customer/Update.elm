@@ -6,21 +6,11 @@ import Customer.Models exposing (CustomerTab, View(..), CustomerState(..))
 import Customer.SearchBar as SearchBar
 import Customer.ResultList as ResultList
 import Customer.Customer exposing (..)
-import Shared.PicListLoader as PicListLoader
 import Shared.ImgInput as ImgInput
 import Shared.ImgListInput as ImgListInput
 import Views.Breadcrumb as Bread
 import Context exposing (Context)
 import Debug
-
-
-updatePicListLoader : PicListLoader.Msg -> CustomerTab -> ( CustomerTab, Cmd Msg )
-updatePicListLoader msg customerTab =
-    let
-        ( newPicListLoader, cmd, _ ) =
-            PicListLoader.update msg customerTab.picListLoader
-    in
-        ( { customerTab | picListLoader = newPicListLoader }, Cmd.map PicListLoaderMsg cmd )
 
 
 updateImgInput : ImgInput.Msg -> CustomerTab -> ( CustomerTab, Cmd Msg )
@@ -58,9 +48,6 @@ update msg customerTab context =
 
         ViewReceiptMsg msg_ ->
             ResultList.update msg_ customerTab context
-
-        PicListLoaderMsg msg_ ->
-            updatePicListLoader msg_ customerTab
 
         ImgInputMsg msg_ ->
             updateImgInput msg_ customerTab
@@ -167,7 +154,7 @@ update msg customerTab context =
 subscriptions : CustomerTab -> Sub Msg
 subscriptions customerTab =
     Sub.batch
-        [ Sub.map PicListLoaderMsg <| PicListLoader.subscriptions customerTab.picListLoader
+        [ Sub.map ImgListInputMsg <| ImgListInput.subscriptions customerTab.imgListInput
         , Sub.map ImgInputMsg <| ImgInput.subscriptions customerTab.imgInput
         ]
 

@@ -4,7 +4,6 @@ import Shared.SearchBar as SearchBar exposing (SearchBar)
 import Shared.ViewReceipt as ViewReceipt
 import Customer.Customer as Cus exposing (Customer, CustomerValidation, initCustomerValidation)
 import Views.Breadcrumb as Bread
-import Shared.PicListLoader as PicListLoader
 import Shared.ImgInput as ImgInput
 import Shared.ImgListInput as ImgListInput
 
@@ -12,7 +11,6 @@ import Shared.ImgListInput as ImgListInput
 type alias CustomerTab =
     { searchBar : SearchBar
     , viewReceipt : ViewReceipt.Model
-    , picListLoader : PicListLoader.Model
     , imgInput : ImgInput.Model
     , imgListInput : ImgListInput.Model
     , fetchedCustomers : List Customer
@@ -44,7 +42,6 @@ init : CustomerTab
 init =
     { searchBar = SearchBar.initSearchBar
     , viewReceipt = ViewReceipt.init
-    , picListLoader = PicListLoader.init
     , imgInput = ImgInput.init
     , imgListInput = ImgListInput.init
     , fetchedCustomers = []

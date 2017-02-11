@@ -7,9 +7,8 @@ import Html.Events exposing (..)
 import Customer.Customer exposing (..)
 import Customer.Messages exposing (Msg(..))
 import Customer.Models exposing (CustomerTab, CustomerState(..))
-import Shared.PicLoader as PicLoader
-import Shared.PicListLoader as PicListLoader
 import Shared.ImgInput as ImgInput
+import Shared.ImgListInput as ImgListInput
 import Views.Elements.Form as Frm exposing (frm)
 import Views.Elements.Button as Btn exposing (btn)
 import Views.Elements.Textfield as Txt exposing (horInput)
@@ -134,5 +133,4 @@ customerPic customerTab subject =
 
 customerDocs : CustomerTab -> Customer -> Html Msg
 customerDocs customerTab subject =
-    --    Html.map PicListLoaderMsg <| PicListLoader.view customerTab.picListLoader (Just [])
-    text "cus docs"
+    Html.map ImgListInputMsg <| ImgListInput.view customerTab.imgListInput
