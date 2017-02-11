@@ -1,4 +1,4 @@
-module Shared.ImgInput exposing (Model, init, Msg, update, subscriptions, view)
+module Shared.ImgInput exposing (Model, init, Msg(..), update, subscriptions, view)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -25,8 +25,8 @@ type Msg
     | WebcamMsg Webcam.Msg
 
 
-update : Msg -> Model -> ( Model, Cmd Msg, Maybe String )
-update msg model =
+update : Msg -> Model -> String -> ( Model, Cmd Msg, Maybe String )
+update msg model msgId =
     case msg of
         LoadCamera ->
             ( model, Cmd.none, Nothing )
@@ -37,7 +37,7 @@ update msg model =
         WebcamMsg msg_ ->
             let
                 ( newWebcam, cmd, dataUri ) =
-                    Webcam.update msg_ model.webcam
+                    Webcam.update msg_ model.webcam msgId
             in
                 ( { model
                     | webcam = newWebcam
@@ -52,12 +52,12 @@ subscriptions model =
     Sub.map WebcamMsg <| Webcam.subscriptions model.webcam
 
 
-view : Model -> Maybe String -> Html Msg
-view model feedDataUri =
+view : Model -> String -> Maybe String -> Html Msg
+view model msgId feedDataUri =
     div []
         [ ImgInputView.imgInput ( 320, 240 )
             feedDataUri
             ( LoadCamera, UploadFile )
             True
-        , Html.map WebcamMsg <| Webcam.view model.webcam
+        , Html.map WebcamMsg <| Webcam.view model.webcam msgId
         ]

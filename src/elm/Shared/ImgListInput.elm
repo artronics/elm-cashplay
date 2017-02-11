@@ -20,15 +20,15 @@ type Msg
     = ImgInputMsg ImgInput.Msg
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
+update : Msg -> Model -> String -> ( Model, Cmd Msg )
+update msg model msgId =
     case msg of
         ImgInputMsg msg_ ->
             let
                 ( newImgInput, cmd, dataUri ) =
-                    ImgInput.update msg_ model.imgInput
+                    ImgInput.update msg_ model.imgInput msgId
             in
-                ( { model | imgInput = newImgInput }, Cmd.map ImgInputMsg cmd )
+                ( { model | imgInput = newImgInput }, Cmd.map ImgInputMsg cmd ) |> Debug.log "imginput"
 
 
 subscriptions : Model -> Sub Msg
@@ -36,21 +36,21 @@ subscriptions model =
     Sub.map ImgInputMsg <| ImgInput.subscriptions model.imgInput
 
 
-view : Model -> Maybe (List String) -> Html Msg
-view model feedDataUris =
+view : Model -> String -> Maybe (List String) -> Html Msg
+view model msgId feedDataUris =
     let
         imgs =
             feedDataUris |> Maybe.withDefault [] |> List.filter (\p -> p == "")
     in
         div []
-            [ viewImgListBox model imgs "title" ]
+            [ viewImgListBox model msgId imgs "title" ]
 
 
-viewImgListBox : Model -> List String -> String -> Html Msg
-viewImgListBox model dataUris title =
+viewImgListBox : Model -> String -> List String -> String -> Html Msg
+viewImgListBox model msgId dataUris title =
     ul [ class "art-img-list-box" ]
         ((dataUris
-            |> List.map (\d -> li [] [ Html.map ImgInputMsg <| ImgInput.view model.imgInput (Just d) ])
+            |> List.map (\d -> li [] [ Html.map ImgInputMsg <| ImgInput.view model.imgInput msgId (Just d) ])
          )
-            ++ [ li [] [ Html.map ImgInputMsg <| ImgInput.view model.imgInput Nothing ] ]
+            ++ [ li [] [ Html.map ImgInputMsg <| ImgInput.view model.imgInput msgId Nothing ] ]
         )

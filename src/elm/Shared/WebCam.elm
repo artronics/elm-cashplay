@@ -8,6 +8,8 @@ import Json.Decode as Decode
 import Views.Elements.Icon as Icon exposing (icon)
 import Views.Modal exposing (viewModal)
 import Views.Elements.Button as Btn exposing (btn)
+import String
+import Webcam
 
 
 port webcam : WebcamConfigValue -> Cmd msg
@@ -19,7 +21,7 @@ port webcamOff : (() -> msg) -> Sub msg
 port webcamReset : () -> Cmd msg
 
 
-port webcamSnap : () -> Cmd msg
+port webcamSnap : String -> Cmd msg
 
 
 port webcamDataUri : (Decode.Value -> msg) -> Sub msg
@@ -52,30 +54,58 @@ type Msg
     | DataUri Decode.Value
 
 
-update : Msg -> Model -> ( Model, Cmd Msg, Maybe String )
-update msg model =
+update : Msg -> Model -> String -> ( Model, Cmd Msg, Maybe String )
+update msg model msgId =
     case msg of
         Webcam ->
-            ( { model | cameraState = On }, webcam <| webcamConfigValue defaultConfig, Nothing )
+            let
+                configWebcam =
+                    Webcam.config <| webcamConfigValue <| defaultConfig msgId
+            in
+                ( { model | cameraState = On }, webcam <| webcamConfigValue <| defaultConfig msgId, Nothing ) |> Debug.log "webcam"
 
         WebcamOff _ ->
             ( model, Cmd.none, Nothing )
 
         Snap ->
-            ( model, webcamSnap (), Nothing )
+            ( model, webcamSnap msgId, Nothing )
 
         DataUri uriValue ->
             let
                 dataUri =
-                    Decode.decodeValue Decode.string uriValue |> Result.toMaybe
+                    decodeDataUri uriValue
+
+                originId =
+                    decodeMsgId uriValue |> Maybe.withDefault "unknown" |> Debug.log "id"
+
+                updateDU m id du =
+                    if originId == id then
+                        du
+                    else
+                        Nothing
             in
-                ( { model | cameraState = Off, dataUri = dataUri }, Cmd.none, Nothing )
+                ( { model | cameraState = Off, dataUri = updateDU model msgId dataUri }, Cmd.none, Nothing )
 
         CancelCamera ->
             ( { model | cameraState = Off }, webcamReset (), Nothing )
 
         Ok ->
-            ( model, webcamReset (), model.dataUri )
+            ( model
+            , webcamReset ()
+            , model.dataUri
+            )
+
+
+decodeDataUri : Decode.Value -> Maybe String
+decodeDataUri value =
+    Decode.decodeValue (Decode.field "data_uri" (Decode.nullable Decode.string)) value
+        |> Result.toMaybe
+        |> Maybe.withDefault Nothing
+
+
+decodeMsgId : Decode.Value -> Maybe String
+decodeMsgId value =
+    Decode.decodeValue (Decode.field "msg_id" Decode.string) value |> Result.toMaybe
 
 
 subscriptions : Model -> Sub Msg
@@ -86,29 +116,29 @@ subscriptions model =
         ]
 
 
-view : Model -> Html Msg
-view model =
+view : Model -> String -> Html Msg
+view model msgId =
     div [ class "art-webcam" ]
-        [ viewCameraModal model ]
+        [ viewCameraModal model msgId ]
 
 
-viewCameraModal : Model -> Html Msg
-viewCameraModal model =
+viewCameraModal : Model -> String -> Html Msg
+viewCameraModal model msgId =
     viewModal "camera-modal"
         "Take Photo"
         CancelCamera
         (div []
-            [ viewWebcamPort
+            [ viewWebcamPort msgId
             , cameraButton model
             , buttonBar model
             ]
         )
 
 
-viewWebcamPort =
+viewWebcamPort msgId =
     div [ class "camera-viewport" ]
         [ div
-            [ id <| .id defaultConfig
+            [ id msgId
             , style
                 [ ( "width", "640px" )
                 , ( "height", "480px" )
@@ -158,9 +188,9 @@ type alias WebcamConfig =
     }
 
 
-defaultConfig : WebcamConfig
-defaultConfig =
-    { id = "webcam-viewport"
+defaultConfig : String -> WebcamConfig
+defaultConfig msgId =
+    { id = msgId
     , width = 640
     , height = 480
     , destWidth = 640

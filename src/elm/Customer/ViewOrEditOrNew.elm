@@ -126,7 +126,7 @@ customerPic customerTab subject =
 
             _ ->
                 div []
-                    [ Html.map ImgInputMsg <| ImgInput.view customerTab.imgInput hasPic
+                    [ Html.map ImgInputMsg <| ImgInput.view customerTab.imgInput "camera-customer-pic" hasPic
                     , span [ class "error" ] [ text (customerTab.customerValidation.pic |> Maybe.withDefault "") ]
                     ]
 
@@ -134,6 +134,6 @@ customerPic customerTab subject =
 customerDocs : CustomerTab -> Customer -> Html Msg
 customerDocs customerTab subject =
     div []
-        [ Html.map ImgListInputMsg <| ImgListInput.view customerTab.imgListInput (Just [])
+        [ Html.map ImgListInputMsg <| ImgListInput.view customerTab.imgListInput "camera-customer-docs" (Just [])
         , span [ class "error" ] [ text (customerTab.customerValidation.docs |> Maybe.withDefault "") ]
         ]

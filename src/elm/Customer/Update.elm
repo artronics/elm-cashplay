@@ -8,6 +8,7 @@ import Customer.ResultList as ResultList
 import Customer.Customer exposing (..)
 import Shared.ImgInput as ImgInput
 import Shared.ImgListInput as ImgListInput
+import Shared.WebCam as Webcam
 import Views.Breadcrumb as Bread
 import Context exposing (Context)
 import Debug
@@ -17,7 +18,7 @@ updateImgInput : ImgInput.Msg -> CustomerTab -> ( CustomerTab, Cmd Msg )
 updateImgInput msg customerTab =
     let
         ( newImgInput, cmd, dataUri ) =
-            ImgInput.update msg customerTab.imgInput
+            ImgInput.update msg customerTab.imgInput "camera-customer-pic"
 
         editOrNewCustomer =
             customerTab.editOrNewCustomer
@@ -32,7 +33,7 @@ updateImgListInput : ImgListInput.Msg -> CustomerTab -> ( CustomerTab, Cmd Msg )
 updateImgListInput msg customerTab =
     let
         ( newImgListInput, cmd ) =
-            ImgListInput.update msg customerTab.imgListInput
+            ImgListInput.update msg customerTab.imgListInput "camera-customer-docs"
     in
         ( { customerTab | imgListInput = newImgListInput }, Cmd.map ImgListInputMsg cmd )
 
@@ -49,11 +50,11 @@ update msg customerTab context =
         ViewReceiptMsg msg_ ->
             ResultList.update msg_ customerTab context
 
-        ImgInputMsg msg_ ->
-            updateImgInput msg_ customerTab
-
         ImgListInputMsg msg_ ->
             updateImgListInput msg_ customerTab
+
+        ImgInputMsg msg_ ->
+            updateImgInput msg_ customerTab
 
         OnSearch (Ok fetchedCustomers) ->
             ( { customerTab
@@ -154,8 +155,8 @@ update msg customerTab context =
 subscriptions : CustomerTab -> Sub Msg
 subscriptions customerTab =
     Sub.batch
-        [ Sub.map ImgListInputMsg <| ImgListInput.subscriptions customerTab.imgListInput
-        , Sub.map ImgInputMsg <| ImgInput.subscriptions customerTab.imgInput
+        [ Sub.map ImgInputMsg <| ImgInput.subscriptions customerTab.imgInput
+        , Sub.map ImgListInputMsg <| ImgListInput.subscriptions customerTab.imgListInput
         ]
 
 

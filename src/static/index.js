@@ -7,22 +7,35 @@ require( '../../node_modules/bootstrap-sass/assets/javascripts/bootstrap.js' ); 
 var Elm = require( '../elm/Main' );
 var app = Elm.Main.embed( document.getElementById( 'main' ) );
 
+// var native_webcam = require('../Native/Webcam.js');
+// console.log( native_webcam)
+//
+// Elm.Native.Webcam = {};
+// Elm.Native.Webcam.make = native_webcam.make;
 
 var webcam = require ('../../node_modules/webcamjs/webcam.min.js');
 
+window.webcam = webcam;
+
+var currentMsgId = null;
 app.ports.webcam.subscribe(function (config) {
+  currentMsgId = config.id;
   webcam.unfreeze();
   webcam.set(config);
-  webcam.attach(config.id)
+  webcam.attach(currentMsgId);
 });
 app.ports.webcamReset.subscribe(function () {
   webcam.reset();
+  currentMsgId = null;
   app.ports.webcamOff.send(null);
 });
 
-app.ports.webcamSnap.subscribe(function () {
+app.ports.webcamSnap.subscribe(function (msgId) {
   webcam.snap(function (dataUri) {
-    app.ports.webcamDataUri.send(dataUri);
+    var res = {"data_uri":dataUri, "msg_id" : msgId}
+    if (currentMsgId === msgId) {
+      app.ports.webcamDataUri.send(res);
+    }
   });
   webcam.freeze();
 });
