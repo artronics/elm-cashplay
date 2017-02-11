@@ -12,7 +12,6 @@ import Views.Elements.Label exposing (labelIcon)
 import Views.Breadcrumb as Bread
 import Views.MessageBox as MsgBox
 import Customer.ViewOrEditOrNew as ViewEditNew
-import Webcam
 
 
 view : CustomerTab -> Html Msg

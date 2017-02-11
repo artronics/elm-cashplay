@@ -28,7 +28,7 @@ update msg model msgId =
                 ( newImgInput, cmd, dataUri ) =
                     ImgInput.update msg_ model.imgInput msgId
             in
-                ( { model | imgInput = newImgInput }, Cmd.map ImgInputMsg cmd ) |> Debug.log "imginput"
+                ( { model | imgInput = newImgInput }, Cmd.map ImgInputMsg cmd )
 
 
 subscriptions : Model -> Sub Msg

@@ -9,7 +9,6 @@ import Views.Elements.Icon as Icon exposing (icon)
 import Views.Modal exposing (viewModal)
 import Views.Elements.Button as Btn exposing (btn)
 import String
-import Webcam
 
 
 port webcam : WebcamConfigValue -> Cmd msg
@@ -58,11 +57,7 @@ update : Msg -> Model -> String -> ( Model, Cmd Msg, Maybe String )
 update msg model msgId =
     case msg of
         Webcam ->
-            let
-                configWebcam =
-                    Webcam.config <| webcamConfigValue <| defaultConfig msgId
-            in
-                ( { model | cameraState = On }, webcam <| webcamConfigValue <| defaultConfig msgId, Nothing ) |> Debug.log "webcam"
+            ( { model | cameraState = On }, webcam <| webcamConfigValue <| defaultConfig msgId, Nothing )
 
         WebcamOff _ ->
             ( model, Cmd.none, Nothing )
@@ -76,7 +71,7 @@ update msg model msgId =
                     decodeDataUri uriValue
 
                 originId =
-                    decodeMsgId uriValue |> Maybe.withDefault "unknown" |> Debug.log "id"
+                    decodeMsgId uriValue |> Maybe.withDefault "unknown"
 
                 updateDU m id du =
                     if originId == id then
