@@ -6,34 +6,11 @@ import Customer.Models exposing (CustomerTab, View(..), CustomerState(..))
 import Customer.SearchBar as SearchBar
 import Customer.ResultList as ResultList
 import Customer.Customer exposing (..)
-import Shared.PicLoader as PicLoader
 import Shared.PicListLoader as PicListLoader
 import Shared.ImgInput as ImgInput
 import Views.Breadcrumb as Bread
 import Context exposing (Context)
 import Debug
-
-
-updatePicLoader : PicLoader.Msg -> CustomerTab -> ( CustomerTab, Cmd Msg )
-updatePicLoader msg customerTab =
-    let
-        ( newPicLoader, cmd, pic ) =
-            PicLoader.update msg customerTab.picLoader "cus-camera"
-
-        editOrNewCustomer =
-            customerTab.editOrNewCustomer
-
-        editOrNewCustomer_ =
-            (decodePic pic) |> Maybe.map (\p -> { editOrNewCustomer | pic = p }) |> Maybe.withDefault editOrNewCustomer
-    in
-        ( { customerTab | picLoader = newPicLoader, editOrNewCustomer = editOrNewCustomer_ }, Cmd.map PicLoaderMsg cmd )
-
-
-decodePic : Maybe Decode.Value -> Maybe String
-decodePic pic =
-    pic
-        |> Maybe.map (\p -> (Decode.decodeValue Decode.string p) |> Result.toMaybe)
-        |> Maybe.andThen (\p -> p |> Maybe.map (\x -> x))
 
 
 updatePicListLoader : PicListLoader.Msg -> CustomerTab -> ( CustomerTab, Cmd Msg )
@@ -71,9 +48,6 @@ update msg customerTab context =
 
         ViewReceiptMsg msg_ ->
             ResultList.update msg_ customerTab context
-
-        PicLoaderMsg msg_ ->
-            updatePicLoader msg_ customerTab
 
         PicListLoaderMsg msg_ ->
             updatePicListLoader msg_ customerTab
@@ -180,8 +154,7 @@ update msg customerTab context =
 subscriptions : CustomerTab -> Sub Msg
 subscriptions customerTab =
     Sub.batch
-        [ Sub.map PicLoaderMsg <| PicLoader.subscriptions customerTab.picLoader
-        , Sub.map PicListLoaderMsg <| PicListLoader.subscriptions customerTab.picListLoader
+        [ Sub.map PicListLoaderMsg <| PicListLoader.subscriptions customerTab.picListLoader
         , Sub.map ImgInputMsg <| ImgInput.subscriptions customerTab.imgInput
         ]
 

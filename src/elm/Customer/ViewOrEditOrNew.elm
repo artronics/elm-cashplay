@@ -127,8 +127,7 @@ customerPic customerTab subject =
 
             _ ->
                 div []
-                    [ Html.map PicLoaderMsg <| PicLoader.view customerTab.picLoader "cus-camera" hasPic
-                    , Html.map ImgInputMsg <| ImgInput.view customerTab.imgInput hasPic
+                    [ Html.map ImgInputMsg <| ImgInput.view customerTab.imgInput hasPic
                     , span [ class "error" ] [ text (customerTab.customerValidation.pic |> Maybe.withDefault "") ]
                     ]
 
