@@ -9,6 +9,7 @@ import Customer.Messages exposing (Msg(..))
 import Customer.Models exposing (CustomerTab, CustomerState(..))
 import Shared.PicLoader as PicLoader
 import Shared.PicListLoader as PicListLoader
+import Shared.ImgInput as ImgInput
 import Views.Elements.Form as Frm exposing (frm)
 import Views.Elements.Button as Btn exposing (btn)
 import Views.Elements.Textfield as Txt exposing (horInput)
@@ -127,10 +128,12 @@ customerPic customerTab subject =
             _ ->
                 div []
                     [ Html.map PicLoaderMsg <| PicLoader.view customerTab.picLoader "cus-camera" hasPic
+                    , Html.map ImgInputMsg <| ImgInput.view customerTab.imgInput hasPic
                     , span [ class "error" ] [ text (customerTab.customerValidation.pic |> Maybe.withDefault "") ]
                     ]
 
 
 customerDocs : CustomerTab -> Customer -> Html Msg
 customerDocs customerTab subject =
-    Html.map PicListLoaderMsg <| PicListLoader.view customerTab.picListLoader (Just [])
+    --    Html.map PicListLoaderMsg <| PicListLoader.view customerTab.picListLoader (Just [])
+    text "cus docs"

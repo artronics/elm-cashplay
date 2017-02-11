@@ -12,7 +12,6 @@ import Views.Elements.Label exposing (labelIcon)
 import Views.Breadcrumb as Bread
 import Views.MessageBox as MsgBox
 import Customer.ViewOrEditOrNew as ViewEditNew
-import Shared.ImgInput as ImgInput
 
 
 view : CustomerTab -> Html Msg
@@ -28,7 +27,6 @@ view customerTab =
                 [ labelIcon "New Customer" "user-plus" ]
             ]
         , Bread.view (createCrumb customerTab) SelectCrumb customerTab.currentView customerTab.breadInfo
-        , Html.map ImgInputMsg <| ImgInput.view customerTab.imgInput
         , viewContent customerTab
         ]
 
