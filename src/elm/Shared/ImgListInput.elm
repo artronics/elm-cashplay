@@ -36,6 +36,21 @@ subscriptions model =
     Sub.map ImgInputMsg <| ImgInput.subscriptions model.imgInput
 
 
-view : Model -> Html Msg
-view model =
-    div [] [ text "pic list" ]
+view : Model -> Maybe (List String) -> Html Msg
+view model feedDataUris =
+    let
+        imgs =
+            feedDataUris |> Maybe.withDefault [] |> List.filter (\p -> p == "")
+    in
+        div []
+            [ viewImgListBox model imgs "title" ]
+
+
+viewImgListBox : Model -> List String -> String -> Html Msg
+viewImgListBox model dataUris title =
+    ul [ class "art-img-list-box" ]
+        ((dataUris
+            |> List.map (\d -> li [] [ Html.map ImgInputMsg <| ImgInput.view model.imgInput (Just d) ])
+         )
+            ++ [ li [] [ Html.map ImgInputMsg <| ImgInput.view model.imgInput Nothing ] ]
+        )

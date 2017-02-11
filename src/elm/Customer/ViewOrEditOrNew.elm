@@ -133,4 +133,7 @@ customerPic customerTab subject =
 
 customerDocs : CustomerTab -> Customer -> Html Msg
 customerDocs customerTab subject =
-    Html.map ImgListInputMsg <| ImgListInput.view customerTab.imgListInput
+    div []
+        [ Html.map ImgListInputMsg <| ImgListInput.view customerTab.imgListInput (Just [])
+        , span [ class "error" ] [ text (customerTab.customerValidation.docs |> Maybe.withDefault "") ]
+        ]
