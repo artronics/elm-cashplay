@@ -8,6 +8,7 @@ import Customer.ResultList as ResultList
 import Customer.Customer exposing (..)
 import Shared.PicListLoader as PicListLoader
 import Shared.ImgInput as ImgInput
+import Shared.ImgListInput as ImgListInput
 import Views.Breadcrumb as Bread
 import Context exposing (Context)
 import Debug
@@ -37,6 +38,15 @@ updateImgInput msg customerTab =
         ( { customerTab | imgInput = newImgInput, editOrNewCustomer = editOrNewCustomer_ }, Cmd.map ImgInputMsg cmd )
 
 
+updateImgListInput : ImgListInput.Msg -> CustomerTab -> ( CustomerTab, Cmd Msg )
+updateImgListInput msg customerTab =
+    let
+        ( newImgListInput, cmd ) =
+            ImgListInput.update msg customerTab.imgListInput
+    in
+        ( { customerTab | imgListInput = newImgListInput }, Cmd.map ImgListInputMsg cmd )
+
+
 update : Msg -> CustomerTab -> Context -> ( CustomerTab, Cmd Msg )
 update msg customerTab context =
     case msg of
@@ -54,6 +64,9 @@ update msg customerTab context =
 
         ImgInputMsg msg_ ->
             updateImgInput msg_ customerTab
+
+        ImgListInputMsg msg_ ->
+            updateImgListInput msg_ customerTab
 
         OnSearch (Ok fetchedCustomers) ->
             ( { customerTab

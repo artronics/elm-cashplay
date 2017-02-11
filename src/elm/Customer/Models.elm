@@ -6,6 +6,7 @@ import Customer.Customer as Cus exposing (Customer, CustomerValidation, initCust
 import Views.Breadcrumb as Bread
 import Shared.PicListLoader as PicListLoader
 import Shared.ImgInput as ImgInput
+import Shared.ImgListInput as ImgListInput
 
 
 type alias CustomerTab =
@@ -13,6 +14,7 @@ type alias CustomerTab =
     , viewReceipt : ViewReceipt.Model
     , picListLoader : PicListLoader.Model
     , imgInput : ImgInput.Model
+    , imgListInput : ImgListInput.Model
     , fetchedCustomers : List Customer
     , customerDetails : Customer
     , customerState : CustomerState
@@ -44,6 +46,7 @@ init =
     , viewReceipt = ViewReceipt.init
     , picListLoader = PicListLoader.init
     , imgInput = ImgInput.init
+    , imgListInput = ImgListInput.init
     , fetchedCustomers = []
     , customerDetails = Cus.new
     , customerState = Presentation

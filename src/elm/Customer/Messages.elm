@@ -7,6 +7,7 @@ import Customer.Models exposing (CustomerTab, View)
 import Shared.ViewReceipt as ViewReceipt
 import Shared.PicListLoader as PicListLoader
 import Shared.ImgInput as ImgInput
+import Shared.ImgListInput as ImgListInput
 
 
 type Msg
@@ -15,6 +16,7 @@ type Msg
     | ViewReceiptMsg ViewReceipt.Msg
     | PicListLoaderMsg PicListLoader.Msg
     | ImgInputMsg ImgInput.Msg
+    | ImgListInputMsg ImgListInput.Msg
     | OnSearch (Result Http.Error (List Customer))
     | SelectCrumb View
     | CustomerPicReq (Result Http.Error CustomerPic)
