@@ -6,6 +6,7 @@ import Model exposing (Model)
 import Messages exposing (Msg(..))
 import Shared.Login as Login
 import Routing exposing (..)
+import Cashplay.View as Cashplay
 
 
 view : Model -> Html Msg
@@ -19,7 +20,7 @@ view model =
                 Html.map LoginMsg <| Login.view model.login
 
             App ->
-                div [] [ text "app" ]
+                Html.map CashplayMsg <| Cashplay.view model.cashplay
 
             NotFound ->
                 div [] [ text "Not Found" ]

@@ -7,11 +7,16 @@ import Routing exposing (parseLocation)
 import Shared.Login as Login
 import LocalStorage
 import Api
+import Cashplay.Update as Cashplay
+import Cashplay.Message as Cashplay
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        CashplayMsg msg_ ->
+            updateCashplay msg_ model
+
         OnLocationChange loc ->
             let
                 newLoc =
@@ -52,9 +57,18 @@ update msg model =
                 ( { model | context = { context_ | me = me } }, Navigation.newUrl "#app" )
 
         OnMe (Err err) ->
-            ( model, Cmd.none )
+            ( model, Navigation.newUrl "#login" )
 
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.none
+
+
+updateCashplay : Cashplay.Msg -> Model -> ( Model, Cmd Msg )
+updateCashplay msg model =
+    let
+        ( newCashplay, cmd ) =
+            Cashplay.update msg model.cashplay model.context
+    in
+        ( { model | cashplay = newCashplay }, Cmd.map CashplayMsg cmd )
