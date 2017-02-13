@@ -22,7 +22,11 @@ var commonConfig = {
     filename: `/static/js/${outputFilename}`,
     // publicPath: '/'
   },
-
+  devServer: {
+    // serve index.html in place of 404 responses
+    historyApiFallback: true,
+    stats: 'errors-only',
+  },
   resolve: {
     extensions: ['', '.js', '.elm']
   },

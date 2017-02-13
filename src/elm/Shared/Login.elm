@@ -5,8 +5,8 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Navigation
-import Views.Elements.Button as Btn exposing (btn)
-import Views.Elements.Input as Inp exposing (inp)
+import Elements.Button as Btn exposing (btn)
+import Elements.Input as Inp exposing (inp)
 import Api exposing (login)
 
 

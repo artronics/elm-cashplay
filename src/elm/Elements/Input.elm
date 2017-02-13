@@ -1,4 +1,4 @@
-module Views.Elements.Input exposing (inp, email, password)
+module Elements.Input exposing (inp, email, password)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)

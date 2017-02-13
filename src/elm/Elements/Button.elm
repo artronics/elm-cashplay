@@ -1,4 +1,4 @@
-module Views.Elements.Button exposing (btn, primary, default, large)
+module Elements.Button exposing (btn, primary, default, large)
 
 import Html exposing (..)
 import Html.Attributes exposing (classList, class)

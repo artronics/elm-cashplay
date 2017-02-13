@@ -54,7 +54,7 @@ type alias Signup =
 
 
 baseUrl =
-    "http://localhost:5000/"
+    "http://localhost:3000/"
 
 
 login : Credential -> (Result Http.Error JwtToken -> msg) -> Cmd msg
@@ -147,8 +147,7 @@ headers token pul =
                     Http.header "Accept" "application/json"
 
         h =
-            [ Http.header "Prefer" "return=representation"
-            , p
+            [ Http.header "Accept" "application/json"
             ]
     in
         token
