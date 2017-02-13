@@ -1,0 +1,66 @@
+module Shared.Login exposing (Model, init, Msg, update, view)
+
+import Http
+import Html exposing (..)
+import Html.Attributes exposing (..)
+import Html.Events exposing (..)
+import Navigation
+import Views.Elements.Button as Btn exposing (btn)
+import Views.Elements.Input as Inp exposing (inp)
+import Api exposing (login)
+
+
+type alias Model =
+    { email : String
+    , password : String
+    , msg : String
+    }
+
+
+init : Model
+init =
+    { email = ""
+    , password = ""
+    , msg = ""
+    }
+
+
+type Msg
+    = Email String
+    | Password String
+    | Login
+    | OnLogin (Result Http.Error Api.JwtToken)
+
+
+update : Msg -> Model -> ( Model, Cmd Msg, Maybe String )
+update msg model =
+    case msg of
+        Email email ->
+            ( { model | email = email }, Cmd.none, Nothing )
+
+        Password pass ->
+            ( { model | password = pass }, Cmd.none, Nothing )
+
+        Login ->
+            ( model, login { email = model.email, password = model.password } OnLogin, Nothing )
+
+        OnLogin (Ok jwt) ->
+            ( model, Navigation.newUrl "#", Just jwt.jwt )
+
+        OnLogin (Err err) ->
+            ( { model | msg = toString err }, Cmd.none, Nothing )
+
+
+view : Model -> Html Msg
+view model =
+    Html.form []
+        [ inp [ Inp.email, onInput Email ] "Email" ""
+        , inp [ Inp.password, onInput Password ] "Password" model.msg
+        , btn
+            [ Btn.primary
+            , Btn.large
+            , onClick Login
+            , disabled (model.email == "" || model.password == "")
+            ]
+            [ text "Login" ]
+        ]
