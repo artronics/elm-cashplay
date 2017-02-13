@@ -45,7 +45,7 @@ update msg model =
             ( model, login { email = model.email, password = model.password } OnLogin, Nothing )
 
         OnLogin (Ok jwt) ->
-            ( model, Navigation.newUrl "#", Just jwt.jwt )
+            ( model, Navigation.newUrl "#app", Just jwt.jwt )
 
         OnLogin (Err err) ->
             ( { model | msg = toString err }, Cmd.none, Nothing )

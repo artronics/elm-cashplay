@@ -18,6 +18,9 @@ view model =
             Login ->
                 Html.map LoginMsg <| Login.view model.login
 
+            App ->
+                div [] [ text "app" ]
+
             NotFound ->
                 div [] [ text "Not Found" ]
         ]
