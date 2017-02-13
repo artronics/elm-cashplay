@@ -90,9 +90,9 @@ login credential msg =
     genRequest Post Nothing Plural "user_token" (Just <| authValue credential) jwtDecoder msg
 
 
-me : String -> Token -> (Result Http.Error Me -> msg) -> Cmd msg
-me email token msg =
-    genRequest Get (Just token) Plural ("me/?email=" ++ email) Nothing meDecoder msg
+me : Token -> (Result Http.Error Me -> msg) -> Cmd msg
+me token msg =
+    genRequest Get (Just token) Plural "me" Nothing meDecoder msg
 
 
 jwtDecoder : Decode.Decoder JwtToken

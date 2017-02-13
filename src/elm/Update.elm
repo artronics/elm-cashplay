@@ -1,5 +1,6 @@
 module Update exposing (update, subscriptions)
 
+import Navigation
 import Model exposing (Model)
 import Messages exposing (Msg(..))
 import Routing exposing (parseLocation)
@@ -20,7 +21,7 @@ update msg model =
 
         LoginMsg msg_ ->
             let
-                ( newLogin, cmd, jwt, email ) =
+                ( newLogin, cmd, jwt ) =
                     Login.update msg_ model.login
 
                 context_ =
@@ -30,15 +31,16 @@ update msg model =
                     { context_ | jwt = jwt |> Maybe.map (\j -> Just j) |> Maybe.withDefault context_.jwt }
 
                 cmds =
-                    Cmd.batch
-                        [ Cmd.map LoginMsg cmd
-                        , jwt
-                            |> Maybe.map (\j -> LocalStorage.setLocalStorage { key = "jwt", value = j })
-                            |> Maybe.withDefault Cmd.none
-                        , email
-                            |> Maybe.map (\e -> Api.me e (jwt |> Maybe.withDefault "") OnMe)
-                            |> Maybe.withDefault Cmd.none
-                        ]
+                    jwt
+                        |> Maybe.map
+                            (\j ->
+                                Cmd.batch
+                                    [ Cmd.map LoginMsg cmd
+                                    , LocalStorage.setLocalStorage { key = "jwt", value = j }
+                                    , Api.me j OnMe
+                                    ]
+                            )
+                        |> Maybe.withDefault (Cmd.map LoginMsg cmd)
             in
                 ( { model | login = newLogin, context = context }, cmds )
 
@@ -47,7 +49,7 @@ update msg model =
                 context_ =
                     model.context
             in
-                ( { model | context = { context_ | me = me } }, Cmd.none )
+                ( { model | context = { context_ | me = me } }, Navigation.newUrl "#app" )
 
         OnMe (Err err) ->
             ( model, Cmd.none )
