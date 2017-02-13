@@ -8,5 +8,5 @@ import Context exposing (Context)
 update : Msg -> Model -> Context -> ( Model, Cmd Msg )
 update msg model context =
     case msg of
-        NoOp ->
+        Logout ->
             ( model, Cmd.none )

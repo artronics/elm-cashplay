@@ -21,5 +21,8 @@ keyValValue keyVal =
 port setLocalStorage : KeyVal -> Cmd msg
 
 
+port removeLocalStorage : KeyVal -> Cmd msg
+
+
 (=>) =
     (,)

@@ -3,7 +3,7 @@ module Update exposing (update, subscriptions)
 import Navigation
 import Model exposing (Model)
 import Messages exposing (Msg(..))
-import Routing exposing (parseLocation)
+import Routing as Route exposing (parseLocation)
 import Shared.Login as Login
 import LocalStorage
 import Api
@@ -21,8 +21,14 @@ update msg model =
             let
                 newLoc =
                     parseLocation loc
+
+                redirect =
+                    if newLoc == Route.App && model.loggedIn == False then
+                        Navigation.newUrl "#login"
+                    else
+                        Cmd.none
             in
-                ( { model | route = newLoc }, Cmd.none )
+                ( { model | route = newLoc }, redirect )
 
         LoginMsg msg_ ->
             let
@@ -49,12 +55,25 @@ update msg model =
             in
                 ( { model | login = newLogin, context = context }, cmds )
 
+        Logout ->
+            let
+                context_ =
+                    model.context
+
+                cmds =
+                    Cmd.batch
+                        [ Navigation.newUrl "#"
+                        , LocalStorage.removeLocalStorage { key = "jwt", value = "" }
+                        ]
+            in
+                ( { model | context = { context_ | jwt = Nothing, me = Api.newMe }, loggedIn = False }, cmds )
+
         OnMe (Ok me) ->
             let
                 context_ =
                     model.context
             in
-                ( { model | context = { context_ | me = me } }, Navigation.newUrl "#app" )
+                ( { model | context = { context_ | me = me }, loggedIn = True }, Navigation.newUrl "#app" )
 
         OnMe (Err err) ->
             ( model, Navigation.newUrl "#login" )

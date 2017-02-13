@@ -8,6 +8,7 @@ import Cashplay.Model as Cashplay
 
 type alias Model =
     { route : Route
+    , loggedIn : Bool
     , context : Context.Context
     , login : Login.Model
     , cashplay : Cashplay.Model
@@ -17,6 +18,7 @@ type alias Model =
 init : Route -> Model
 init route =
     { route = route
+    , loggedIn = False
     , context = Context.init
     , login = Login.init
     , cashplay = Cashplay.init

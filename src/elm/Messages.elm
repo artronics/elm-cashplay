@@ -10,5 +10,6 @@ import Cashplay.Message as Cashplay
 type Msg
     = OnLocationChange Location
     | LoginMsg Login.Msg
+    | Logout
     | OnMe (Result Http.Error Api.Me)
     | CashplayMsg Cashplay.Msg

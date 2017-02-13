@@ -17,3 +17,7 @@ app.ports.setLocalStorage.subscribe(function (keyVal) {
   localStorage.removeItem(keyVal.key);
   localStorage.setItem(keyVal.key,keyVal.value);
 })
+
+app.ports.removeLocalStorage.subscribe(function (keyVal) {
+  localStorage.removeItem(keyVal.key);
+})
