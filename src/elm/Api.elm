@@ -3,6 +3,7 @@ module Api exposing (..)
 import Http
 import Json.Decode as Decode exposing (field)
 import Json.Encode as Encode exposing (..)
+import Json.Decode.Pipeline exposing (decode, required, optional, hardcoded)
 
 
 type alias Url =
@@ -32,12 +33,39 @@ type alias Auth =
 
 
 type alias User =
-    { firstName : String
+    { id : Int
+    , firstName : String
     , lastName : String
     , company : String
     , password : String
     , email : String
     }
+
+
+type alias Me =
+    { firstName : String
+    , lastName : String
+    , email : String
+    , company : String
+    }
+
+
+newMe : Me
+newMe =
+    { firstName = ""
+    , lastName = ""
+    , email = ""
+    , company = ""
+    }
+
+
+meDecoder : Decode.Decoder Me
+meDecoder =
+    Decode.map4 Me
+        (field "first_name" Decode.string)
+        (field "last_name" Decode.string)
+        (field "email" Decode.string)
+        (field "company" Decode.string)
 
 
 type alias Token =
@@ -60,6 +88,11 @@ baseUrl =
 login : Credential -> (Result Http.Error JwtToken -> msg) -> Cmd msg
 login credential msg =
     genRequest Post Nothing Plural "user_token" (Just <| authValue credential) jwtDecoder msg
+
+
+me : String -> Token -> (Result Http.Error Me -> msg) -> Cmd msg
+me email token msg =
+    genRequest Get (Just token) Plural ("me/?email=" ++ email) Nothing meDecoder msg
 
 
 jwtDecoder : Decode.Decoder JwtToken

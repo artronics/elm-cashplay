@@ -32,23 +32,23 @@ type Msg
     | OnLogin (Result Http.Error Api.JwtToken)
 
 
-update : Msg -> Model -> ( Model, Cmd Msg, Maybe String )
+update : Msg -> Model -> ( Model, Cmd Msg, Maybe String, Maybe String )
 update msg model =
     case msg of
         Email email ->
-            ( { model | email = email }, Cmd.none, Nothing )
+            ( { model | email = email }, Cmd.none, Nothing, Nothing )
 
         Password pass ->
-            ( { model | password = pass }, Cmd.none, Nothing )
+            ( { model | password = pass }, Cmd.none, Nothing, Nothing )
 
         Login ->
-            ( model, login { email = model.email, password = model.password } OnLogin, Nothing )
+            ( model, login { email = model.email, password = model.password } OnLogin, Nothing, Nothing )
 
         OnLogin (Ok jwt) ->
-            ( model, Navigation.newUrl "#app", Just jwt.jwt )
+            ( model, Navigation.newUrl "#app", Just jwt.jwt, Just model.email )
 
         OnLogin (Err err) ->
-            ( { model | msg = toString err }, Cmd.none, Nothing )
+            ( { model | msg = toString err }, Cmd.none, Nothing, Nothing )
 
 
 view : Model -> Html Msg
