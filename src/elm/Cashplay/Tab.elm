@@ -6,6 +6,7 @@ import Html.Events exposing (..)
 import Cashplay.Message exposing (Msg(..))
 import Cashplay.Model exposing (Cashplay, Tab(..))
 import Elements.Icon as Icon exposing (icon)
+import Customer.View as CustomerTab
 
 
 tabs =
@@ -44,7 +45,7 @@ viewTabContent : Cashplay -> Html Msg
 viewTabContent cashplay =
     case cashplay.currentTab of
         CustomerTab ->
-            div [] [ text "customer tab" ]
+            Html.map CustomerTabMsg <| CustomerTab.view cashplay.customerTab
 
         ItemTab ->
             div [] [ text "item tab" ]
