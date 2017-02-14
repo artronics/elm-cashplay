@@ -52,7 +52,7 @@ viewTabContent : Cashplay -> Html Msg
 viewTabContent cashplay =
     case cashplay.currentTab of
         CustomerTab ->
-            div [ class "w-100" ] [ Html.map CustomerTabMsg <| CustomerTab.view cashplay.customerTab ]
+            div [ class "w-100 tab-content" ] [ Html.map CustomerTabMsg <| CustomerTab.view cashplay.customerTab ]
 
         ItemTab ->
             div [] [ text "item tab" ]

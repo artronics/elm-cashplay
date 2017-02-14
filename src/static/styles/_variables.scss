@@ -1,8 +1,11 @@
 //override variables
 
+
 @import '~bootstrap/scss/bootstrap.scss';
 @import '~bootstrap/scss/bootstrap-grid.scss';
 @import '~bootstrap/scss/bootstrap-reboot.scss';
 
 @import "partials/index";
 @import "components/index";
+
+$bg-color-content : $gray-lighter

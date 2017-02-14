@@ -4,6 +4,7 @@ $tab-bg-color : $gray-lighter;
 .art-tab{
   background-color: $tab-bg-color;
   list-style: none;
+  margin-bottom:1px;
 }
 
 .art-tab .tab-item{
@@ -34,4 +35,8 @@ $tab-bg-color : $gray-lighter;
   margin: 0;
 
   font-size: 20px;
+}
+
+.tab-content{
+  margin-top: 1px;
 }

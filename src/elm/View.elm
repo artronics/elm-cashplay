@@ -14,7 +14,7 @@ import Elements.Icon as Icn exposing (icon)
 
 view : Model -> Html Msg
 view model =
-    div []
+    div [ class "no-gutters" ]
         [ viewNavBar model
         , case model.route of
             Home ->
