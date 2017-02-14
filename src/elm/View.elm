@@ -14,7 +14,7 @@ import Elements.Icon as Icn exposing (icon)
 
 view : Model -> Html Msg
 view model =
-    div [ class "container-fluid" ]
+    div []
         [ viewNavBar model
         , case model.route of
             Home ->

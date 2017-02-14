@@ -10,5 +10,5 @@ import Cashplay.Tab as Tab
 
 view : Cashplay -> Html Msg
 view cashplay =
-    div [ class "" ]
+    div [ class "row" ]
         [ Tab.view cashplay ]

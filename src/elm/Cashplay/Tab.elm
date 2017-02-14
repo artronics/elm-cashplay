@@ -17,7 +17,15 @@ tabs =
 
 view : Cashplay -> Html Msg
 view cashplay =
-    div []
+    div [ class "col" ]
+        [ viewTabBar cashplay
+        , viewTabContent cashplay
+        ]
+
+
+viewTabBar : Cashplay -> Html Msg
+viewTabBar cashplay =
+    div [ class "w-100" ]
         [ ul [ class "art-tab d-flex justify-content-center align-items-stretch" ]
             (tabs
                 |> List.map
@@ -32,7 +40,6 @@ view cashplay =
                             ]
                     )
             )
-        , viewTabContent cashplay
         ]
 
 
@@ -45,7 +52,7 @@ viewTabContent : Cashplay -> Html Msg
 viewTabContent cashplay =
     case cashplay.currentTab of
         CustomerTab ->
-            Html.map CustomerTabMsg <| CustomerTab.view cashplay.customerTab
+            div [ class "w-100" ] [ Html.map CustomerTabMsg <| CustomerTab.view cashplay.customerTab ]
 
         ItemTab ->
             div [] [ text "item tab" ]
