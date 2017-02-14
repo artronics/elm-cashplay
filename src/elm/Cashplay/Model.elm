@@ -1,10 +1,17 @@
-module Cashplay.Model exposing (Model, init)
+module Cashplay.Model exposing (Cashplay, init, Tab(..))
 
 
-type alias Model =
-    {}
+type alias Cashplay =
+    { currentTab : Tab
+    }
 
 
-init : Model
+type Tab
+    = CustomerTab
+    | ItemTab
+
+
+init : Cashplay
 init =
-    {}
+    { currentTab = CustomerTab
+    }

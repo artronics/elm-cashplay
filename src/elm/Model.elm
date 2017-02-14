@@ -11,7 +11,7 @@ type alias Model =
     , loggedIn : Bool
     , context : Context.Context
     , login : Login.Model
-    , cashplay : Cashplay.Model
+    , cashplay : Cashplay.Cashplay
     }
 
 

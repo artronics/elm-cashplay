@@ -1,12 +1,12 @@
 module Cashplay.Update exposing (update)
 
-import Cashplay.Model exposing (Model)
+import Cashplay.Model exposing (Cashplay)
 import Cashplay.Message exposing (Msg(..))
 import Context exposing (Context)
 
 
-update : Msg -> Model -> Context -> ( Model, Cmd Msg )
+update : Msg -> Cashplay -> Context -> ( Cashplay, Cmd Msg )
 update msg model context =
     case msg of
-        Logout ->
-            ( model, Cmd.none )
+        ChangeTab tab ->
+            ( { model | currentTab = tab }, Cmd.none )
