@@ -7,6 +7,7 @@ import Customer.Model exposing (CustomerTab, View(..))
 import Customer.Message exposing (Msg(..))
 import Elements.Button as Btn exposing (btn)
 import Elements.Icon as Icon exposing (icon)
+import Customer.NewCustomer as NewCustomer
 
 
 view : CustomerTab -> Html Msg
@@ -30,4 +31,4 @@ viewMain customerTab =
             div [] [ text "search" ]
 
         New ->
-            div [] [ text "new" ]
+            Html.map NewCustomerMsg <| NewCustomer.view customerTab.newCustomer
