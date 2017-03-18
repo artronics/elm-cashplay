@@ -76,7 +76,17 @@ update msg model =
                 ( { model | context = { context_ | me = me }, loggedIn = True }, Navigation.newUrl "#app" )
 
         OnMe (Err err) ->
-            ( model, Navigation.newUrl "#login" )
+            let
+                context_ =
+                    model.context
+
+                cmds =
+                    Cmd.batch
+                        [ Navigation.newUrl "#login"
+                        , LocalStorage.removeLocalStorage { key = "jwt", value = "" }
+                        ]
+            in
+                ( { model | context = { context_ | jwt = Nothing }, loggedIn = True }, cmds )
 
 
 subscriptions : Model -> Sub Msg

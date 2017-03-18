@@ -22,7 +22,7 @@ type Plurality
 
 
 type alias Credential =
-    { email : String
+    { username : String
     , password : String
     }
 
@@ -82,12 +82,12 @@ type alias Signup =
 
 
 baseUrl =
-    "http://localhost:3000/"
+    "http://localhost:6464/"
 
 
 login : Credential -> (Result Http.Error JwtToken -> msg) -> Cmd msg
 login credential msg =
-    genRequest Post Nothing Plural "user_token" (Just <| authValue credential) jwtDecoder msg
+    genRequest Post Nothing Plural "login" (Just <| credentialValue credential) jwtDecoder msg
 
 
 me : Token -> (Result Http.Error Me -> msg) -> Cmd msg
@@ -98,7 +98,7 @@ me token msg =
 jwtDecoder : Decode.Decoder JwtToken
 jwtDecoder =
     Decode.map JwtToken
-        (field "jwt" Decode.string)
+        (field "token" Decode.string)
 
 
 signup : User -> (Result Http.Error Signup -> msg) -> Cmd msg
@@ -127,7 +127,7 @@ userValue user =
 credentialValue : Credential -> Value
 credentialValue cred =
     object
-        [ ( "email", string cred.email )
+        [ ( "username", string cred.username )
         , ( "password", string cred.password )
         ]
 
