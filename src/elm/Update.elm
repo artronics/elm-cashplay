@@ -86,7 +86,7 @@ update msg model =
                         , LocalStorage.removeLocalStorage { key = "jwt", value = "" }
                         ]
             in
-                ( { model | context = { context_ | jwt = Nothing }, loggedIn = True }, cmds )
+                ( { model | context = { context_ | jwt = Nothing }, loggedIn = False }, cmds )
 
 
 subscriptions : Model -> Sub Msg

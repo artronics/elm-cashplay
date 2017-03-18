@@ -22,7 +22,7 @@ type Plurality
 
 
 type alias Credential =
-    { username : String
+    { email : String
     , password : String
     }
 
@@ -92,7 +92,7 @@ login credential msg =
 
 me : Token -> (Result Http.Error Me -> msg) -> Cmd msg
 me token msg =
-    genRequest Get (Just token) Plural "me" Nothing meDecoder msg
+    genRequest Get (Just token) Plural "api/me" Nothing meDecoder msg
 
 
 jwtDecoder : Decode.Decoder JwtToken
@@ -127,7 +127,7 @@ userValue user =
 credentialValue : Credential -> Value
 credentialValue cred =
     object
-        [ ( "username", string cred.username )
+        [ ( "email", string cred.email )
         , ( "password", string cred.password )
         ]
 

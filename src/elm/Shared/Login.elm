@@ -42,7 +42,7 @@ update msg model =
             ( { model | password = pass }, Cmd.none, Nothing )
 
         Login ->
-            ( model, login { username = model.email, password = model.password } OnLogin, Nothing )
+            ( model, login { email = model.email, password = model.password } OnLogin, Nothing )
 
         OnLogin (Ok jwt) ->
             ( model, Cmd.none, Just jwt.jwt )
