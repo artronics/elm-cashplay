@@ -15,7 +15,7 @@ view customerTab =
     div [ class "row no-gutters" ]
         [ div [ class "col-md-2 art-section" ]
             [ viewNewCustomerBtn ]
-        , div [ class "col art-bg art-section" ] [ viewMain customerTab ]
+        , div [ class "col art-bg art-section tab-middle" ] [ viewMain customerTab ]
         , div [ class "col-md-3 art-section" ] [ text "bar" ]
         ]
 

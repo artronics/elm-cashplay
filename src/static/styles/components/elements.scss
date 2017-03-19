@@ -1,5 +1,19 @@
+@mixin as-label{
+  border:none !important;
+  background-color: white !important;
+  cursor: text !important;
+  box-shadow: none !important;
+  color: black !important;
+  pointer-events: none;
+}
+
 .art-icon-btn{
   i{
     margin-right: 5px;
   }
 }
+
+.input-as-label{
+  @include as-label;
+}
+

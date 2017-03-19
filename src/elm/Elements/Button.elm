@@ -1,4 +1,4 @@
-module Elements.Button exposing (btn, primary, default, submit, large, iconBtn, outlinePrimary)
+module Elements.Button exposing (btn, primary, default, submit, reset, large, iconBtn, outlinePrimary)
 
 import Html exposing (..)
 import Html.Attributes exposing (classList, class, type_)
@@ -23,6 +23,11 @@ default =
 submit : Attribute msg
 submit =
     type_ "submit"
+
+
+reset : Attribute msg
+reset =
+    type_ "reset"
 
 
 large : Attribute msg
