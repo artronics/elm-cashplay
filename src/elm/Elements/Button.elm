@@ -1,7 +1,7 @@
-module Elements.Button exposing (btn, primary, default, large, iconBtn)
+module Elements.Button exposing (btn, primary, default, submit, large, iconBtn, outlinePrimary)
 
 import Html exposing (..)
-import Html.Attributes exposing (classList, class)
+import Html.Attributes exposing (classList, class, type_)
 import Elements.Icon as Icon exposing (icon)
 
 
@@ -20,6 +20,11 @@ default =
     class <| "btn-default"
 
 
+submit : Attribute msg
+submit =
+    type_ "submit"
+
+
 large : Attribute msg
 large =
     class <| "btn-lg"
@@ -28,3 +33,8 @@ large =
 primary : Attribute msg
 primary =
     class <| "btn-primary"
+
+
+outlinePrimary : Attribute msg
+outlinePrimary =
+    class <| "btn-outline-primary"

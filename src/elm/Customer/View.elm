@@ -22,7 +22,7 @@ view customerTab =
 
 viewNewCustomerBtn =
     div [ class "d-inline-flex w-100 justify-content-center" ]
-        [ Btn.iconBtn [ class "btn-outline-primary", onClick <| ChangeView New ] "NEW CUSTOMER" "user-plus" ]
+        [ Btn.iconBtn [ Btn.outlinePrimary, onClick <| ChangeView New ] "NEW CUSTOMER" "user-plus" ]
 
 
 viewMain customerTab =

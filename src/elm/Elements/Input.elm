@@ -1,4 +1,4 @@
-module Elements.Input exposing (inp, email, password)
+module Elements.Input exposing (inp, email, password, required)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -21,3 +21,8 @@ email =
 password : Attribute msg
 password =
     type_ "password"
+
+
+required : Attribute msg
+required =
+    Html.Attributes.required True
