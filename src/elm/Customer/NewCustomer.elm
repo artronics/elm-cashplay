@@ -1,4 +1,4 @@
-module Customer.NewCustomer exposing (Model, init, update, Msg, view)
+module Customer.NewCustomer exposing (Model, init, update, subscription, Msg, view)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -6,22 +6,29 @@ import Html.Events exposing (onClick, onInput)
 import Customer.Customer as Customer exposing (Customer)
 import Elements.Input as Input exposing (inp)
 import Elements.Button as Btn exposing (btn)
+import Elements.Icon as Icon exposing (icon)
+import Views.Modal as Modal exposing (viewModal)
+import Shared.Webcam as Webcam
 
 
 type alias Model =
     { customer : Customer
+    , webcam : Webcam.Model
     }
 
 
 init : Model
 init =
     { customer = Customer.new
+    , webcam = Webcam.init
     }
 
 
 type Msg
     = Update (Customer -> String -> Customer) String
     | Reset
+    | DismissCameraModal
+    | WebcamMsg Webcam.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -32,6 +39,39 @@ update msg model =
 
         Update f val ->
             ( { model | customer = f model.customer val }, Cmd.none )
+
+        DismissCameraModal ->
+            ( model, Cmd.none )
+
+        WebcamMsg msg_ ->
+            updateWebcam msg_ model
+
+
+subscription : Model -> Sub Msg
+subscription model =
+    Sub.batch
+        [ Sub.map WebcamMsg <| Webcam.subscriptions model.webcam
+        ]
+
+
+updateWebcam : Webcam.Msg -> Model -> ( Model, Cmd Msg )
+updateWebcam msg model =
+    let
+        ( newWebcam, cmd, dataUri ) =
+            Webcam.update msg model.webcam
+
+        customer =
+            model.customer
+
+        customer_ =
+            case dataUri of
+                Nothing ->
+                    customer
+
+                Just p ->
+                    { customer | pic = p }
+    in
+        ( { model | webcam = newWebcam, customer = customer_ }, Cmd.map WebcamMsg cmd )
 
 
 view : Model -> Html Msg
@@ -54,7 +94,23 @@ view model =
 
 viewProfilePic : Model -> Html Msg
 viewProfilePic model =
-    div [ class "profile-pic" ] []
+    div [ class "choose-profile-pic" ]
+        [ if model.customer.pic == "" then
+            div [ class "pic-frame" ] []
+          else
+            img [ src model.customer.pic ] []
+        , div [ class "d-flex justify-content-center align-items-center controls " ]
+            [ button
+                [ Btn.outlinePrimary
+                , type_ "button"
+                , attribute "data-toggle" "modal"
+                , attribute "data-target" "#camera-modal"
+                ]
+                [ icon [ Icon.medium ] "camera" ]
+            ]
+        , div [ class "help-text" ] [ span [] [ text "kir" ] ]
+        , viewModal "camera-modal" "Camera" DismissCameraModal (Html.map WebcamMsg <| Webcam.view model.webcam "customer-pic")
+        ]
 
 
 viewPrimaryForm : Model -> List (Html Msg)

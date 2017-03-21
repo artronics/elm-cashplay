@@ -5,6 +5,7 @@ type alias Customer =
     { id : Int
     , firstName : String
     , lastName : String
+    , pic : String
     }
 
 
@@ -13,4 +14,5 @@ new =
     { id = 0
     , firstName = ""
     , lastName = ""
+    , pic = ""
     }

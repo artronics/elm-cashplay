@@ -1,4 +1,4 @@
-module Cashplay.Update exposing (update)
+module Cashplay.Update exposing (update, subscription)
 
 import Cashplay.Model exposing (Cashplay)
 import Cashplay.Message exposing (Msg(..))
@@ -15,6 +15,13 @@ update msg cashplay context =
 
         CustomerTabMsg msg_ ->
             updateCustomerTab msg_ cashplay context
+
+
+subscription : Cashplay -> Sub Msg
+subscription cashplay =
+    Sub.batch
+        [ Sub.map CustomerTabMsg <| Customer.subscriptions cashplay.customerTab
+        ]
 
 
 updateCustomerTab : Customer.Msg -> Cashplay -> Context -> ( Cashplay, Cmd Msg )

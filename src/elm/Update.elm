@@ -91,7 +91,9 @@ update msg model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.none
+    Sub.batch
+        [ Sub.map CashplayMsg <| Cashplay.subscription model.cashplay
+        ]
 
 
 updateCashplay : Cashplay.Msg -> Model -> ( Model, Cmd Msg )

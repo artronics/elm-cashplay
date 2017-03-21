@@ -1,4 +1,4 @@
-module Customer.Update exposing (update)
+module Customer.Update exposing (update, subscriptions)
 
 import Customer.Model exposing (CustomerTab)
 import Customer.Message exposing (Msg(..))
@@ -14,6 +14,13 @@ update msg customerTab context =
 
         NewCustomerMsg msg_ ->
             updateNewCustomer msg_ customerTab
+
+
+subscriptions : CustomerTab -> Sub Msg
+subscriptions customerTab =
+    Sub.batch
+        [ Sub.map NewCustomerMsg <| NewCustomer.subscription customerTab.newCustomer
+        ]
 
 
 updateNewCustomer : NewCustomer.Msg -> CustomerTab -> ( CustomerTab, Cmd Msg )

@@ -1,7 +1,27 @@
-.art-new-customer .profile-pic{
-  width: 320px;
-  height: 240px;
-  background-color: tomato;
+
+.art-new-customer .choose-profile-pic{
+  width: 360px;
+  border: 1px solid red;
+  .pic-frame{
+    border : dashed grey 5px;
+    background-color: $gray-lighter;
+    width: 320px;
+    height: 240px;
+    margin: 5px 20px 5px 20px;
+  }
+  .controls{
+    margin: 0 20px 5px 20px;
+    button{
+      margin: 5px 2px 0 2px;
+      box-shadow: none;
+    }
+    i{
+      padding: 5px 5px 5px 5px;
+    }
+  }
+  .help-text{
+    margin: 0 20px 5px 20px;
+  }
 }
 
 .art-new-customer .controls button{
