@@ -43,3 +43,7 @@ app.ports.webcamSnap.subscribe(function () {
   });
   webcam.freeze();
 })
+
+/*
+This is what adults do, they communicate
+* */
